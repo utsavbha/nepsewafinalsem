@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — NepSewa</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='profile.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-left">
+      <img src="/static/final_logo.png" alt="NepSewa Logo" class="logo-img">
+    </a>
+    <ul class="nav-menu">
+      <li><a href="/">Home</a></li>
+      <li><a href="/services">Services &amp; Providers</a></li>
+      <li><a href="/login">Login</a></li>
+    </ul>
+    <div class="nav-right">
+      <label class="theme-toggle">
+        <input type="checkbox" id="darkToggle">
+        <span class="toggle-track">
+          <span class="icon sun">☀️</span>
+          <span class="icon moon">🌙</span>
+          <span class="toggle-thumb"></span>
+        </span>
+      </label>
+      <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page" id="page">
+
+  <!-- Profile Card -->
+  <div class="profile-card">
+    <div class="avatar" id="avatar">--</div>
+    <div class="profile-info">
+      <h1 id="uName">Loading...</h1>
+      <p class="email" id="uEmail">Loading...</p>
+      <span class="badge">✦ NepSewa Member</span>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon purple">📋</div>
+      <div>
+        <div class="stat-val" id="sBookings">—</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon cyan">📅</div>
+      <div>
+        <div class="stat-val" id="sSince">—</div>
+        <div class="stat-label">Member Since</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">✅</div>
+      <div>
+        <div class="stat-val">Active</div>
+        <div class="stat-label">Account Status</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Details -->
+  <div class="info-card">
+    <h3>Account Details</h3>
+    <div class="info-row">
+      <span class="lbl">Full Name</span>
+      <span class="val" id="dName">—</span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Email Address</span>
+      <span class="val" id="dEmail">—</span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Member Since</span>
+      <span class="val" id="dSince">—</span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Account ID</span>
+      <span class="val" id="dId" style="color:var(--muted);font-size:13px">—</span>
+    </div>
+    <div class="info-row">
+      <span class="lbl">Total Bookings</span>
+      <span class="val" id="dBookings">—</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='profile.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NepSewa Admin Panel v2.1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-item.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            margin-bottom: 32px;
+            padding: 32px 32px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .content-wrapper {
+            padding: 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 24px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 42px;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .main-section {
+            background: #ffffff;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 16px 0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: "👥";
+            font-size: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 200px;
+            background: #ffffff;
+        }
+        
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #374151;
+            min-width: 120px;
+        }
+        
+        .add-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .add-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .add-btn:active {
+            transform: translateY(0);
+        }
+        
+        .table-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .workers-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .workers-table th {
+            background: #f9fafb;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .workers-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        
+        .workers-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .workers-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .worker-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .worker-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+        
+        .worker-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .worker-name {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .worker-id {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .service-text {
+            color: #374151;
+        }
+        
+        .location-text {
+            color: #6b7280;
+        }
+        
+        .exp-text {
+            color: #374151;
+        }
+        
+        .rating-cell {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .rating-star {
+            color: #fbbf24;
+            font-size: 14px;
+        }
+        
+        .rating-value {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .jobs-text {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            color: #374151;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 400;
+        }
+        
+        .action-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .delete-btn {
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+        
+        .delete-btn:hover {
+            background: #fef2f2;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+        
+        .empty-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        
+        .pagination {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .save-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .save-btn:hover {
+            background: #2563eb;
+        }
+        
+        .loading-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">NepSewa</div>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/admin/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/approvals" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Pending Approvals</span>
+                </a>
+                <a href="/orders" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/workers" class="nav-item active">
+                    <span class="nav-icon">👥</span>
+                    <span>Workers</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <a href="/admin/payments" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span>Payments</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Workers Management</h1>
+            <div class="subtitle">Manage all service providers</div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalWorkers">-</div>
+                    <div class="stat-label">Total Workers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="verifiedWorkers">-</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalServices">-</div>
+                    <div class="stat-label">Services</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgRating">-</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            </div>
+            
+            <div class="main-section">
+                <div class="section-header">
+                    <div class="section-title">Workers</div>
+                    <div class="controls">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search name..." onkeyup="filterWorkers()">
+                        <select class="filter-select" id="serviceFilter" onchange="filterWorkers()">
+                            <option value="">All services</option>
+                        </select>
+                        <select class="filter-select" id="locationFilter" onchange="filterWorkers()">
+                            <option value="">All locations</option>
+                        </select>
+                        <button class="add-btn" onclick="exportToCSV()" style="background: #059669;">📥 Export CSV</button>
+                        <button class="add-btn" onclick="openAddModal()">+ Add worker</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="workers-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Service</th>
+                                <th>Location</th>
+                                <th>Exp</th>
+                                <th>Rating</th>
+                                <th>Jobs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workersTableBody">
+                            <tr>
+                                <td colspan="7" class="loading-state">Loading workers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="pagination">
+                        <span id="paginationInfo">Showing 0 of 0 workers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Worker Modal -->
+    <div class="modal" id="workerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Worker</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <form id="workerForm">
+                <input type="hidden" id="workerId">
+                
+                <div class="form-group">
+                    <label class="form-label">Name *</label>
+                    <input type="text" class="form-input" id="workerName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Service *</label>
+                    <select class="form-input" id="workerService" required>
+                        <option value="">Select Service</option>
+                        <option value="Home Cleaning">Home Cleaning</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electric Repair">Electric Repair</option>
+                        <option value="AC Service">AC Service</option>
+                        <option value="Maid Service">Maid Service</option>
+                        <option value="Technician Service">Technician Service</option>
+                        <option value="Hair Cutting">Hair Cutting</option>
+                        <option value="Gardener">Gardener</option>
+                        <option value="Makeup Artist">Makeup Artist</option>
+                        <option value="Photographer">Photographer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Location *</label>
+                    <select class="form-input" id="workerLocation" required>
+                        <option value="">Select Location</option>
+                        <option value="Kathmandu">Kathmandu</option>
+                        <option value="Lalitpur">Lalitpur</option>
+                        <option value="Bhaktapur">Bhaktapur</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone *</label>
+                    <input type="tel" class="form-input" id="workerPhone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Experience (years)</label>
+                    <input type="number" class="form-input" id="workerExperience" min="0" max="20" value="2">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Rating (1-5)</label>
+                    <input type="number" class="form-input" id="workerRating" min="1" max="5" step="0.1" value="4.0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Image URL</label>
+                    <input type="url" class="form-input" id="workerImage" placeholder="https://...">
+                </div>
+                
+                <div class="form-checkbox">
+                    <input type="checkbox" id="workerVerified">
+                    <label for="workerVerified">Verified Worker</label>
+                </div>
+                
+                <button type="submit" class="save-btn">Save Worker</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let allWorkers = [];
+        let filteredWorkers = [];
+        
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWorkers();
+            loadStats();
+        });
+        
+        async function loadWorkers() {
+            try {
+                console.log('Loading workers from API...');
+                const response = await fetch('/api/admin/providers');
+                const data = await response.json();
+                
+                console.log('API response:', data);
+                
+                if (data.success) {
+                    allWorkers = data.providers;
+                    filteredWorkers = [...allWorkers];
+                    console.log('Loaded', allWorkers.length, 'workers');
+                    console.log('Sample worker:', allWorkers[0]);
+                    renderWorkers();
+                    populateServiceFilter();
+                    populateLocationFilter();
+                    updatePaginationInfo();
+                } else {
+                    console.error('API returned error:', data.message);
+                    showError('Failed to load workers: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error loading workers:', error);
+                showError('Network error loading workers');
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/provider-stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalWorkers').textContent = data.stats.total;
+                    document.getElementById('verifiedWorkers').textContent = data.stats.verified;
+                    document.getElementById('totalServices').textContent = data.stats.services;
+                    document.getElementById('avgRating').textContent = data.stats.avgRating;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        function renderWorkers() {
+            const tbody = document.getElementById('workersTableBody');
+            
+            if (filteredWorkers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-title">No workers found</div>
+                            <div>Try adjusting your search or filters</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filteredWorkers.map(worker => {
+                const initials = worker.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="worker-cell">
+                                <div class="worker-avatar">${initials}</div>
+                                <div class="worker-info">
+                                    <div class="worker-name">${worker.name}</div>
+                                    <div class="worker-id">#${worker.id}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-text">${worker.service}</span></td>
+                        <td><span class="location-text">${worker.location}</span></td>
+                        <td><span class="exp-text">${worker.experience}yr</span></td>
+                        <td>
+                            <div class="rating-cell">
+                                <span class="rating-star">★</span>
+                                <span class="rating-value">${worker.rating}</span>
+                            </div>
+                        </td>
+                        <td><span class="jobs-text">${worker.completed_jobs}</span></td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="action-btn" onclick="editWorker(${worker.id})">Edit</button>
+                                <button class="action-btn delete-btn" onclick="deleteWorker(${worker.id}, '${worker.name}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function populateServiceFilter() {
+            console.log('Populating service filter, workers:', allWorkers.length);
+            
+            if (!allWorkers || allWorkers.length === 0) {
+                console.log('No workers to populate filters');
+                return;
+            }
+            
+            const services = [...new Set(allWorkers.map(w => w.service).filter(s => s))];
+            console.log('Unique services found:', services);
+            
+            const serviceFilter = document.getElementById('serviceFilter');
+            if (!serviceFilter) {
+                console.error('Service filter element not found');
+                return;
+            }
+            
+            const optionsHTML = '<option value="">All services</option>' + 
+                services.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            serviceFilter.innerHTML = optionsHTML;
+            console.log('Service filter populated with', services.length, 'options');
+        }
+        
+        function populateLocationFilter() {
+            console.log('Populating location filter, workers:', allWorkers.length);
+            
+            if (!allWorkers || allWorkers.length === 0) {
+                console.log('No workers to populate location filter');
+                return;
+            }
+            
+            const locations = [...new Set(allWorkers.map(w => w.location).filter(l => l))];
+            console.log('Unique locations found:', locations);
+            
+            const locationFilter = document.getElementById('locationFilter');
+            if (!locationFilter) {
+                console.error('Location filter element not found');
+                return;
+            }
+            
+            const optionsHTML = '<option value="">All locations</option>' + 
+                locations.map(l => `<option value="${l}">${l}</option>`).join('');
+            
+            locationFilter.innerHTML = optionsHTML;
+            console.log('Location filter populated with', locations.length, 'options');
+        }
+        
+        function filterWorkers() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const service = document.getElementById('serviceFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            
+            filteredWorkers = allWorkers.filter(worker => {
+                const matchesSearch = !search || 
+                    worker.name.toLowerCase().includes(search) ||
+                    worker.service.toLowerCase().includes(search) ||
+                    worker.location.toLowerCase().includes(search);
+                    
+                const matchesService = !service || worker.service === service;
+                const matchesLocation = !location || worker.location === location;
+                
+                return matchesSearch && matchesService && matchesLocation;
+            });
+            
+            renderWorkers();
+            updatePaginationInfo();
+        }
+        
+        function updatePaginationInfo() {
+            const info = document.getElementById('paginationInfo');
+            info.textContent = `Showing ${filteredWorkers.length} of ${allWorkers.length} workers`;
+        }
+        
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Worker';
+            document.getElementById('workerForm').reset();
+            document.getElementById('workerId').value = '';
+            document.getElementById('workerModal').classList.add('show');
+        }
+        
+        function editWorker(id) {
+            const worker = allWorkers.find(w => w.id === id);
+            if (!worker) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Worker';
+            document.getElementById('workerId').value = worker.id;
+            document.getElementById('workerName').value = worker.name;
+            document.getElementById('workerService').value = worker.service;
+            document.getElementById('workerLocation').value = worker.location;
+            document.getElementById('workerPhone').value = worker.phone;
+            document.getElementById('workerExperience').value = worker.experience;
+            document.getElementById('workerRating').value = worker.rating;
+            document.getElementById('workerImage').value = worker.image || '';
+            document.getElementById('workerVerified').checked = worker.is_verified;
+            
+            document.getElementById('workerModal').classList.add('show');
+        }
+        
+        async function deleteWorker(id, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+            
+            try {
+                const response = await fetch(`/api/admin/providers/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadWorkers();
+                    loadStats();
+                } else {
+                    alert('Error deleting worker: ' + data.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('workerModal').classList.remove('show');
+        }
+        
+        function exportToCSV() {
+            // Create CSV content
+            const headers = ['ID', 'Name', 'Service', 'Location', 'Experience', 'Rating', 'Jobs', 'Phone', 'Verified'];
+            const csvRows = [headers.join(',')];
+            
+            // Add data rows
+            filteredWorkers.forEach(worker => {
+                const row = [
+                    worker.id,
+                    `"${worker.name}"`,
+                    `"${worker.service}"`,
+                    `"${worker.location}"`,
+                    worker.experience,
+                    worker.rating,
+                    worker.completed_jobs,
+                    worker.phone || '',
+                    worker.is_verified ? 'Yes' : 'No'
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            // Create blob and download
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.setAttribute('href', url);
+            link.setAttribute('download', `nepsewa_workers_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`Exported ${filteredWorkers.length} workers to CSV`);
+        }
+        
+        function showError(message) {
+            document.getElementById('workersTableBody').innerHTML = `
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <div class="empty-title">Error</div>
+                        <div>${message}</div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Form submission
+        document.getElementById('workerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: document.getElementById('workerId').value,
+                name: document.getElementById('workerName').value,
+                service: document.getElementById('workerService').value,
+                location: document.getElementById('workerLocation').value,
+                phone: document.getElementById('workerPhone').value,
+                rating: parseFloat(document.getElementById('workerRating').value),
+                experience: parseInt(document.getElementById('workerExperience').value),
+                image: document.getElementById('workerImage').value,
+                is_verified: document.getElementById('workerVerified').checked
+            };
+            
+            const isEdit = formData.id !== '';
+            const url = isEdit ? `/api/admin/providers/${formData.id}` : '/api/admin/providers';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    closeModal();
+                    loadWorkers();
+                    loadStats();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('workerModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Approvals - NepSewa Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-item.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 0;
+        }
+        
+        .header {
+            padding: 32px 32px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .content-wrapper {
+            padding: 32px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 250px;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+        
+        .application-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+        
+        .application-card:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .worker-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .worker-info {
+            flex: 1;
+        }
+        
+        .worker-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .worker-service {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .pending-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .card-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-approve {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #059669;
+        }
+        
+        .btn-reject {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+        
+        .btn-view {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-view:hover {
+            background: #e5e7eb;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .empty-text {
+            color: #6b7280;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">NepSewa</div>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/admin/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/approvals" class="nav-item active">
+                    <span class="nav-icon">✅</span>
+                    <span>Pending Approvals</span>
+                    <span class="badge" id="pendingBadge">0</span>
+                </a>
+                <a href="/orders" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/workers" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Workers</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <a href="/admin/payments" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span>Payments</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Worker Approvals</h1>
+            <div class="subtitle">Review and approve new service provider applications</div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="filters">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name..." onkeyup="filterApplications()">
+                <select class="filter-select" id="serviceFilter" onchange="filterApplications()">
+                    <option value="">All services</option>
+                </select>
+            </div>
+            
+            <div class="applications-grid" id="applicationsGrid">
+                <div class="loading">Loading applications...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Confirm Action</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <p id="modalMessage"></p>
+            <div style="display: flex; gap: 8px; margin-top: 20px;">
+                <button class="btn btn-view" onclick="closeModal()" style="flex: 1;">Cancel</button>
+                <button class="btn" id="confirmBtn" onclick="confirmAction()" style="flex: 1;">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allApplications = [];
+        let filteredApplications = [];
+        let currentAction = null;
+        let currentWorkerId = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadApplications();
+        });
+        
+        async function loadApplications() {
+            try {
+                const response = await fetch('/api/admin/providers');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Filter only unverified workers
+                    allApplications = data.providers.filter(p => !p.is_verified);
+                    filteredApplications = [...allApplications];
+                    
+                    // Update badge
+                    document.getElementById('pendingBadge').textContent = allApplications.length;
+                    
+                    renderApplications();
+                    populateServiceFilter();
+                } else {
+                    showError('Failed to load applications');
+                }
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                showError('Network error loading applications');
+            }
+        }
+        
+        function renderApplications() {
+            const grid = document.getElementById('applicationsGrid');
+            
+            if (filteredApplications.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-icon">✅</div>
+                        <div class="empty-title">All caught up!</div>
+                        <div class="empty-text">No pending worker applications at the moment.</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = filteredApplications.map(worker => `
+                <div class="application-card">
+                    <div class="card-header">
+                        <img src="${worker.image || 'https://via.placeholder.com/64'}" alt="${worker.name}" class="worker-avatar">
+                        <div class="worker-info">
+                            <div class="worker-name">${worker.name}</div>
+                            <div class="worker-service">${worker.service}</div>
+                            <span class="pending-badge">Pending Review</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Location</span>
+                            <span class="detail-value">${worker.location}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Experience</span>
+                            <span class="detail-value">${worker.experience} years</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value">${worker.phone}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Applied</span>
+                            <span class="detail-value">${formatDate(worker.created_at)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-actions">
+                        <button class="btn btn-approve" onclick="approveWorker(${worker.id}, '${worker.name}')">
+                            ✓ Approve
+                        </button>
+                        <button class="btn btn-reject" onclick="rejectWorker(${worker.id}, '${worker.name}')">
+                            ✗ Reject
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function populateServiceFilter() {
+            const services = [...new Set(allApplications.map(w => w.service))];
+            const serviceFilter = document.getElementById('serviceFilter');
+            
+            serviceFilter.innerHTML = '<option value="">All services</option>' + 
+                services.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        
+        function filterApplications() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const service = document.getElementById('serviceFilter').value;
+            
+            filteredApplications = allApplications.filter(worker => {
+                const matchesSearch = !search || 
+                    worker.name.toLowerCase().includes(search) ||
+                    worker.location.toLowerCase().includes(search);
+                    
+                const matchesService = !service || worker.service === service;
+                
+                return matchesSearch && matchesService;
+            });
+            
+            renderApplications();
+        }
+        
+        function approveWorker(id, name) {
+            currentAction = 'approve';
+            currentWorkerId = id;
+            
+            document.getElementById('modalTitle').textContent = 'Approve Worker';
+            document.getElementById('modalMessage').textContent = `Are you sure you want to approve "${name}" as a verified service provider?`;
+            document.getElementById('confirmBtn').className = 'btn btn-approve';
+            document.getElementById('confirmBtn').textContent = 'Approve';
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        function rejectWorker(id, name) {
+            currentAction = 'reject';
+            currentWorkerId = id;
+            
+            document.getElementById('modalTitle').textContent = 'Reject Application';
+            document.getElementById('modalMessage').textContent = `Are you sure you want to reject "${name}"'s application? This will remove them from the system.`;
+            document.getElementById('confirmBtn').className = 'btn btn-reject';
+            document.getElementById('confirmBtn').textContent = 'Reject';
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        async function confirmAction() {
+            if (currentAction === 'approve') {
+                await executeApproval();
+            } else if (currentAction === 'reject') {
+                await executeRejection();
+            }
+            
+            closeModal();
+        }
+        
+        async function executeApproval() {
+            try {
+                const response = await fetch(`/api/admin/providers/${currentWorkerId}/approve`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadApplications(); // Reload the list
+                } else {
+                    alert('Error approving worker: ' + data.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        async function executeRejection() {
+            try {
+                const response = await fetch(`/api/admin/providers/${currentWorkerId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadApplications(); // Reload the list
+                } else {
+                    alert('Error rejecting worker: ' + data.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            currentAction = null;
+            currentWorkerId = null;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Recently';
+            const date = new Date(dateString);
+            const now = new Date();
+            const days = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            return date.toLocaleDateString();
+        }
+        
+        function showError(message) {
+            document.getElementById('applicationsGrid').innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-icon">⚠️</div>
+                    <div class="empty-title">Error</div>
+                    <div class="empty-text">${message}</div>
+                </div>
+            `;
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

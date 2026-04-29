@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard - NepSewa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #667eea;
+        }
+        
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+        
+        .header {
+            margin-bottom: 32px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #6b7280;
+        }
+        
+        .verification-banner {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .verification-banner.show {
+            display: block;
+        }
+        
+        .verification-banner strong {
+            color: #92400e;
+        }
+        
+        .verified-banner {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .verified-banner.show {
+            display: block;
+        }
+        
+        .verified-banner strong {
+            color: #065f46;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .profile-section {
+            display: flex;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 600;
+            color: #6b7280;
+            flex-shrink: 0;
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .profile-service {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .profile-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .detail-icon {
+            font-size: 16px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #374151;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: #f3f4f6;
+            border-color: #667eea;
+        }
+        
+        .action-icon {
+            font-size: 24px;
+        }
+        
+        .action-text {
+            flex: 1;
+        }
+        
+        .action-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .action-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🛠️ NepSewa</div>
+        <div class="navbar-menu">
+            <a href="/provider/dashboard" class="nav-link active">Dashboard</a>
+            <a href="/provider/profile" class="nav-link">My Profile</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Welcome back, <span id="providerName">Provider</span>! 👋</h1>
+            <p>Here's your performance overview</p>
+        </div>
+        
+        <div class="verification-banner" id="pendingBanner">
+            <strong>⏳ Account Pending Verification</strong><br>
+            Your account is under review. You'll be able to receive bookings once approved by our admin team.
+        </div>
+        
+        <div class="verified-banner" id="verifiedBanner">
+            <strong>✅ Verified Provider</strong><br>
+            Your account is verified! You can now receive bookings from customers.
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-label">Completed Jobs</div>
+                <div class="stat-value" id="completedJobs">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-label">Rating</div>
+                <div class="stat-value" id="rating">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div class="stat-label">Reviews</div>
+                <div class="stat-value" id="reviews">-</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Earnings (Est.)</div>
+                <div class="stat-value" id="earnings">-</div>
+            </div>
+        </div>
+        
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Your Profile</h2>
+                    <a href="/provider/profile" class="btn btn-primary">Edit Profile</a>
+                </div>
+                
+                <div id="profileContent" class="loading">Loading profile...</div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Quick Actions</h2>
+                </div>
+                
+                <div class="quick-actions">
+                    <a href="/provider/profile" class="action-btn">
+                        <div class="action-icon">✏️</div>
+                        <div class="action-text">
+                            <div class="action-title">Edit Profile</div>
+                            <div class="action-desc">Update your information</div>
+                        </div>
+                    </a>
+                    
+                    <a href="/" class="action-btn">
+                        <div class="action-icon">🏠</div>
+                        <div class="action-text">
+                            <div class="action-title">View Website</div>
+                            <div class="action-desc">See how customers see you</div>
+                        </div>
+                    </a>
+                    
+                    <a href="/services" class="action-btn">
+                        <div class="action-icon">🔍</div>
+                        <div class="action-text">
+                            <div class="action-title">Browse Services</div>
+                            <div class="action-desc">See all available services</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProviderData();
+            loadStats();
+        });
+        
+        async function loadProviderData() {
+            try {
+                const response = await fetch('/api/provider/me');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const provider = data.provider;
+                    
+                    // Update header
+                    document.getElementById('providerName').textContent = provider.name;
+                    
+                    // Show verification status
+                    if (provider.is_verified) {
+                        document.getElementById('verifiedBanner').classList.add('show');
+                    } else {
+                        document.getElementById('pendingBanner').classList.add('show');
+                    }
+                    
+                    // Render profile
+                    const initials = provider.name.split(' ').map(n => n[0]).join('').toUpperCase();
+                    const profileHTML = `
+                        <div class="profile-section">
+                            <div class="profile-avatar">
+                                ${provider.image ? `<img src="${provider.image}" alt="${provider.name}">` : initials}
+                            </div>
+                            <div class="profile-info">
+                                <div class="profile-name">${provider.name}</div>
+                                <div class="profile-service">${provider.service}</div>
+                                <div class="profile-details">
+                                    <div class="detail-item">
+                                        <span class="detail-icon">📍</span>
+                                        <span>${provider.location}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">📞</span>
+                                        <span>${provider.phone}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">📧</span>
+                                        <span>${provider.email}</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-icon">💼</span>
+                                        <span>${provider.experience} years experience</span>
+                                    </div>
+                                </div>
+                                ${provider.bio ? `<p style="margin-top: 16px; color: #6b7280;">${provider.bio}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('profileContent').innerHTML = profileHTML;
+                } else {
+                    if (data.message === 'Not logged in') {
+                        window.location.href = '/provider/login';
+                    } else {
+                        document.getElementById('profileContent').innerHTML = '<p style="color: #dc2626;">Error loading profile</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading provider data:', error);
+                document.getElementById('profileContent').innerHTML = '<p style="color: #dc2626;">Network error</p>';
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/provider/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.stats;
+                    
+                    document.getElementById('completedJobs').textContent = stats.completed_jobs;
+                    document.getElementById('rating').textContent = stats.rating.toFixed(1);
+                    document.getElementById('reviews').textContent = stats.review_count;
+                    document.getElementById('earnings').textContent = 'Rs. ' + stats.estimated_earnings.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/provider/logout';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NepSewa — Orders Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+body { 
+    background: #f8fafc; 
+    color: #1f2937; 
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* NAVBAR */
+.navbar { 
+    background: #ffffff; 
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 32px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.navbar h1 { 
+    font-size: 24px; 
+    color: #111827; 
+    font-weight: 700; 
+}
+.nav-links { 
+    display: flex; 
+    gap: 24px; 
+    align-items: center; 
+}
+.nav-links a { 
+    color: #6b7280; 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 500;
+    transition: color 0.2s; 
+}
+.nav-links a:hover { 
+    color: #111827; 
+}
+.nav-links span {
+    font-size: 12px;
+    color: #22c55e;
+}
+.logout-btn { 
+    background: #ef4444; 
+    color: white; 
+    padding: 8px 16px; 
+    border-radius: 6px; 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 500; 
+}
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+/* STATS BAR */
+.stats-bar { 
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding: 32px; 
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.stat-card { 
+    background: #ffffff; 
+    border: 1px solid #e5e7eb;
+    border-radius: 8px; 
+    padding: 24px; 
+    text-align: center;
+    transition: all 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.stat-num { 
+    font-size: 32px; 
+    font-weight: 700; 
+    margin-bottom: 8px;
+}
+.stat-lbl { 
+    font-size: 13px; 
+    color: #6b7280; 
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.stat-card.total .stat-num { color: #3b82f6; }
+.stat-card.pending .stat-num { color: #f59e0b; }
+.stat-card.confirmed .stat-num { color: #06b6d4; }
+.stat-card.completed .stat-num { color: #22c55e; }
+
+/* FILTERS */
+.filter-bar { 
+    padding: 0 32px 24px; 
+    display: flex; 
+    gap: 12px; 
+    flex-wrap: wrap; 
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.filter-bar input, .filter-bar select {
+    background: #ffffff; 
+    border: 1px solid #d1d5db; 
+    color: #374151;
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    outline: none;
+    transition: all 0.2s;
+}
+.filter-bar input:focus, .filter-bar select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.filter-bar input { width: 240px; }
+.filter-bar input::placeholder { color: #9ca3af; }
+
+/* TABLE */
+.table-wrap { 
+    padding: 0 32px 32px; 
+    overflow-x: auto;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.table-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+}
+thead th {
+    background: #f9fafb; 
+    padding: 12px 16px; 
+    text-align: left;
+    font-size: 12px; 
+    color: #6b7280; 
+    font-weight: 500; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e5e7eb;
+}
+tbody tr { 
+    border-bottom: 1px solid #f3f4f6; 
+    transition: all 0.2s; 
+}
+tbody tr:hover { 
+    background: #f9fafb; 
+}
+tbody tr:last-child {
+    border-bottom: none;
+}
+tbody td { 
+    padding: 16px; 
+    font-size: 14px; 
+    vertical-align: middle; 
+}
+.booking-id { 
+    font-family: monospace; 
+    color: #3b82f6; 
+    font-weight: 600; 
+    font-size: 13px; 
+}
+.customer-name { 
+    font-weight: 500; 
+    color: #111827;
+}
+.phone { color:#94a3b8; font-size:0.8rem; margin-top:2px; }
+.service-tag {
+  display:inline-block; background:rgba(6,182,212,0.15); color:#06b6d4;
+  border:1px solid rgba(6,182,212,0.3); border-radius:20px;
+  padding:3px 10px; font-size:0.75rem; font-weight:500;
+}
+.date-time { color:#94a3b8; font-size:0.8rem; }
+
+/* STATUS BADGE */
+.status-badge {
+    display: inline-block; 
+    border-radius: 12px; 
+    padding: 4px 12px; 
+    font-size: 12px; 
+    font-weight: 500;
+}
+.status-pending { 
+    background: #fef3c7; 
+    color: #92400e; 
+}
+.status-confirmed { 
+    background: #dbeafe; 
+    color: #1e40af; 
+}
+.status-completed { 
+    background: #d1fae5; 
+    color: #065f46; 
+}
+.status-cancelled { 
+    background: #fef2f2; 
+    color: #dc2626; 
+}
+
+/* STATUS SELECT */
+.status-select {
+    background: #ffffff; 
+    border: 1px solid #d1d5db; 
+    color: #374151;
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    font-size: 12px; 
+    cursor: pointer; 
+    outline: none;
+    transition: all 0.2s;
+}
+.status-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* NOTE */
+.note-text { 
+    color: #6b7280; 
+    font-size: 13px; 
+    max-width: 160px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+}
+
+/* EMPTY STATE */
+.empty-state { 
+    text-align: center; 
+    padding: 80px 20px; 
+    color: #6b7280; 
+}
+.empty-state h3 { 
+    font-size: 18px; 
+    margin-bottom: 8px; 
+    color: #374151;
+}
+
+/* TOAST */
+#toast {
+    position: fixed; 
+    bottom: 30px; 
+    right: 30px; 
+    background: #22c55e; 
+    color: white;
+    padding: 12px 24px; 
+    border-radius: 8px; 
+    font-size: 14px; 
+    font-weight: 500;
+    opacity: 0; 
+    transform: translateY(10px); 
+    transition: 0.3s; 
+    pointer-events: none; 
+    z-index: 999;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#toast.show { 
+    opacity: 1; 
+    transform: translateY(0); 
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h1>🧾 NepSewa Orders</h1>
+  <div class="nav-links">
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/approvals">Approvals</a>
+    <a href="/orders" style="color: #6366f1; font-weight: 600;">Orders</a>
+    <a href="/admin/workers">Workers</a>
+    <a href="/admin/payments">Payments</a>
+    <span style="color: #22c55e; font-size: 0.8rem; margin-left: 8px;">● Admin</span>
+    <a href="/admin/logout" class="logout-btn">Logout</a>
+  </div>
+</nav>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-card total">
+    <div class="stat-num">{{ orders | length }}</div>
+    <div class="stat-lbl">Total Orders</div>
+  </div>
+  <div class="stat-card pending">
+    <div class="stat-num">{{ orders | selectattr('status','eq','pending') | list | length }}</div>
+    <div class="stat-lbl">Pending</div>
+  </div>
+  <div class="stat-card confirmed">
+    <div class="stat-num">{{ orders | selectattr('status','eq','confirmed') | list | length }}</div>
+    <div class="stat-lbl">Confirmed</div>
+  </div>
+  <div class="stat-card completed">
+    <div class="stat-num">{{ orders | selectattr('status','eq','completed') | list | length }}</div>
+    <div class="stat-lbl">Completed</div>
+  </div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-bar">
+  <input type="text" id="searchInput" placeholder="Search by name, phone or booking ID..." oninput="filterTable()">
+  <select id="statusFilter" onchange="filterTable()">
+    <option value="">All Statuses</option>
+    <option value="pending">Pending</option>
+    <option value="confirmed">Confirmed</option>
+    <option value="completed">Completed</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  {% if orders %}
+  <div class="table-container">
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Customer</th>
+          <th>Service</th>
+          <th>Provider</th>
+          <th>Address</th>
+          <th>Date &amp; Time</th>
+          <th>Note</th>
+          <th>Payment</th>
+          <th>Booked At</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr data-search="{{ order.name }} {{ order.phone }} {{ order.booking_id }}" data-status="{{ order.status }}">
+          <td><span class="booking-id">{{ order.booking_id }}</span></td>
+          <td>
+            <div class="customer-name">{{ order.name }}</div>
+            <div class="phone-number">📞 {{ order.phone }}</div>
+            {% if order.email %}<div class="phone-number">✉ {{ order.email }}</div>{% endif %}
+          </td>
+          <td><span class="service-name">{{ order.service }}</span></td>
+          <td class="address">{{ order.provider }}</td>
+          <td class="address">
+            {{ order.address }}
+            {% if order.landmark %}<br><span style="color:#6b7280">📍 {{ order.landmark }}</span>{% endif %}
+          </td>
+          <td class="date-time">{{ order.date_time or '—' }}</td>
+          <td><span class="note-text" title="{{ order.note }}">{{ order.note or '—' }}</span></td>
+          <td>
+            <span class="status-badge status-{% if order.payment == 'paid' %}completed{% else %}pending{% endif %}">
+              {{ order.payment | default("unpaid") | upper }}
+            </span>
+          </td>
+          <td class="date-time">{{ order.booked_at }}</td>
+          <td>
+            <select class="status-select" onchange="updateStatus('{{ order.booking_id }}', this.value)">
+              <option value="pending"   {% if order.status=='pending'   %}selected{% endif %}>⏳ Pending</option>
+              <option value="confirmed" {% if order.status=='confirmed' %}selected{% endif %}>✅ Confirmed</option>
+              <option value="completed" {% if order.status=='completed' %}selected{% endif %}>🎉 Completed</option>
+              <option value="cancelled" {% if order.status=='cancelled' %}selected{% endif %}>❌ Cancelled</option>
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>No orders yet</h3>
+    <p>Orders will appear here once customers book a service.</p>
+  </div>
+  {% endif %}
+</div>
+
+<div id="toast"></div>
+
+<script>
+function filterTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  document.querySelectorAll('#ordersTable tbody tr').forEach(row => {
+    const matchSearch = !search || row.dataset.search.toLowerCase().includes(search);
+    const matchStatus = !status || row.dataset.status === status;
+    row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+  });
+}
+
+function updateStatus(bookingId, newStatus) {
+  fetch('/api/orders/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ booking_id: bookingId, status: newStatus })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) showToast('Status updated!');
+    else showToast('Update failed', true);
+  });
+}
+
+function showToast(msg, error=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = error ? '#ef4444' : '#22c55e';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

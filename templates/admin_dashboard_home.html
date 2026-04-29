@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - NepSewa Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-item.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 0;
+        }
+        
+        .header {
+            padding: 32px 32px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .content-wrapper {
+            padding: 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .stat-icon {
+            font-size: 24px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-change.positive {
+            color: #059669;
+        }
+        
+        .stat-change.negative {
+            color: #dc2626;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .card-action {
+            color: #3b82f6;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .card-action:hover {
+            color: #2563eb;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-info {
+            flex: 1;
+        }
+        
+        .order-id {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .order-details {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-confirmed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .activity-icon.booking {
+            background: #dbeafe;
+        }
+        
+        .activity-icon.worker {
+            background: #d1fae5;
+        }
+        
+        .activity-icon.payment {
+            background: #fef3c7;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            color: #374151;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        
+        .activity-time {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">NepSewa</div>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/admin/dashboard" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/approvals" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Pending Approvals</span>
+                </a>
+                <a href="/orders" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/workers" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Workers</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <a href="/admin/payments" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span>Payments</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <div class="subtitle">Welcome back! Here's what's happening today.</div>
+        </div>
+        
+        <div class="content-wrapper">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Bookings</span>
+                        <span class="stat-icon">📦</span>
+                    </div>
+                    <div class="stat-number" id="totalBookings">-</div>
+                    <div class="stat-change positive">
+                        <span>↑ 12%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Revenue</span>
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-number" id="totalRevenue">-</div>
+                    <div class="stat-change positive">
+                        <span>↑ 8%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Active Workers</span>
+                        <span class="stat-icon">👥</span>
+                    </div>
+                    <div class="stat-number" id="activeWorkers">-</div>
+                    <div class="stat-change positive">
+                        <span>↑ 5</span>
+                        <span style="color: #6b7280;">new this week</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Avg Rating</span>
+                        <span class="stat-icon">⭐</span>
+                    </div>
+                    <div class="stat-number" id="avgRating">-</div>
+                    <div class="stat-change positive">
+                        <span>↑ 0.2</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Orders</h2>
+                        <a href="/orders" class="card-action">View all →</a>
+                    </div>
+                    <div id="recentOrders">
+                        <div class="empty-state">Loading orders...</div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Activity</h2>
+                    </div>
+                    <div id="recentActivity">
+                        <div class="empty-state">Loading activity...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Chart Placeholder -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Revenue Overview</h2>
+                    <select style="padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px;">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 3 months</option>
+                    </select>
+                </div>
+                <div class="chart-placeholder">
+                    📈 Revenue chart will be displayed here
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Load dashboard data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+            loadRecentOrders();
+            loadRecentActivity();
+        });
+        
+        async function loadDashboardStats() {
+            try {
+                // Load orders
+                const ordersResponse = await fetch('/api/orders');
+                const ordersData = await ordersResponse.json();
+                const orders = ordersData.orders || [];
+                
+                // Load workers
+                const workersResponse = await fetch('/api/admin/provider-stats');
+                const workersData = await workersResponse.json();
+                
+                // Calculate stats
+                const totalBookings = orders.length;
+                const totalRevenue = calculateTotalRevenue(orders);
+                const activeWorkers = workersData.stats?.total || 0;
+                const avgRating = workersData.stats?.avgRating || 0;
+                
+                // Update UI
+                document.getElementById('totalBookings').textContent = totalBookings;
+                document.getElementById('totalRevenue').textContent = 'Rs. ' + totalRevenue.toLocaleString();
+                document.getElementById('activeWorkers').textContent = activeWorkers;
+                document.getElementById('avgRating').textContent = avgRating;
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+        
+        async function loadRecentOrders() {
+            try {
+                const response = await fetch('/api/orders');
+                const data = await response.json();
+                const orders = data.orders || [];
+                
+                const container = document.getElementById('recentOrders');
+                
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No orders yet</div>';
+                    return;
+                }
+                
+                // Show last 5 orders
+                const recentOrders = orders.slice(-5).reverse();
+                
+                container.innerHTML = recentOrders.map(order => `
+                    <div class="order-item">
+                        <div class="order-info">
+                            <div class="order-id">${order.booking_id}</div>
+                            <div class="order-details">${order.name} • ${order.service}</div>
+                        </div>
+                        <span class="order-status status-${order.status}">
+                            ${order.status}
+                        </span>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading recent orders:', error);
+                document.getElementById('recentOrders').innerHTML = 
+                    '<div class="empty-state">Error loading orders</div>';
+            }
+        }
+        
+        async function loadRecentActivity() {
+            try {
+                const ordersResponse = await fetch('/api/orders');
+                const ordersData = await ordersResponse.json();
+                const orders = ordersData.orders || [];
+                
+                const container = document.getElementById('recentActivity');
+                
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No activity yet</div>';
+                    return;
+                }
+                
+                // Create activity feed from recent orders
+                const recentOrders = orders.slice(-5).reverse();
+                
+                container.innerHTML = recentOrders.map(order => {
+                    const timeAgo = getTimeAgo(order.booked_at);
+                    return `
+                        <div class="activity-item">
+                            <div class="activity-icon booking">📦</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    New booking for <strong>${order.service}</strong>
+                                </div>
+                                <div class="activity-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                document.getElementById('recentActivity').innerHTML = 
+                    '<div class="empty-state">Error loading activity</div>';
+            }
+        }
+        
+        function calculateTotalRevenue(orders) {
+            const prices = {
+                "maid": 500, "technician": 300, "plumber": 500,
+                "electrician": 500, "haircutting": 200, "gardener": 1000,
+                "makeup": 500, "photographer": 500, "cleaning": 500, "ac": 500,
+                "Maid Service": 500, "Technician Service": 300, "Plumbing": 500,
+                "Electric Repair": 500, "Hair Cutting": 200, "Gardener": 1000,
+                "Makeup Artist": 500, "Photographer": 500, "Home Cleaning": 500, "AC Service": 500
+            };
+            
+            return orders.reduce((total, order) => {
+                if (order.payment === 'paid') {
+                    const price = prices[order.service] || 500;
+                    return total + price;
+                }
+                return total;
+            }, 0);
+        }
+        
+        function getTimeAgo(dateString) {
+            if (!dateString) return 'Just now';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' minutes ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+            return Math.floor(seconds / 86400) + ' days ago';
+        }
+    </script>
+</body>
+</html>

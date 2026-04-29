@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NepSewa — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="nav-left">
+      <img src="/static/final_logo.png" alt="NepSewa Logo" class="logo-img">
+    </a>
+    <ul class="nav-menu">
+      <li><a href="/">Home</a></li>
+      <li><a href="/services">Services &amp; Providers</a></li>
+      <li><a href="/login" class="active">Login</a></li>
+    </ul>
+    <div class="nav-right">
+      <label class="theme-toggle">
+        <input type="checkbox" id="darkToggle">
+        <span class="toggle-track">
+          <span class="icon sun">☀️</span>
+          <span class="icon moon">🌙</span>
+          <span class="toggle-thumb"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="bg-orb orb3"></div>
+
+  <div class="container">
+    <div class="card">
+
+      <div class="brand">
+        <div class="brand-icon">🏡</div>
+        <h1>NepSewa</h1>
+        <p>Your trusted home services platform</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('login')">Login</button>
+        <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm" class="form-section active">
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="ico">✉️</span>
+            <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="ico">🔑</span>
+            <input type="password" id="l-pass" placeholder="Your password" autocomplete="current-password">
+          </div>
+        </div>
+        <button class="btn" id="loginBtn" onclick="doLogin()">Login to NepSewa</button>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div id="signupForm" class="form-section">
+        <div class="field">
+          <label>Full Name</label>
+          <div class="input-wrap">
+            <span class="ico">👤</span>
+            <input type="text" id="s-name" placeholder="Aarav Sharma" autocomplete="name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="ico">✉️</span>
+            <input type="email" id="s-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="ico">🔑</span>
+            <input type="password" id="s-pass" placeholder="Min. 6 characters"
+                   oninput="checkStrength(this.value)" autocomplete="new-password">
+          </div>
+          <div class="strength"><div class="strength-fill" id="strengthFill"></div></div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <span class="ico">🔒</span>
+            <input type="password" id="s-confirm" placeholder="Repeat password" autocomplete="new-password">
+          </div>
+        </div>
+        <button class="btn" id="signupBtn" onclick="doSignup()">Create Account</button>
+      </div>
+
+      <div class="foot">
+        By continuing you agree to our <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='login.js') }}"></script>
+</body>
+</html>

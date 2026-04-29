@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments - NepSewa Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-item.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 0;
+        }
+        
+        .header {
+            padding: 32px 32px 24px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .content-wrapper {
+            padding: 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .stat-icon {
+            font-size: 24px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .stat-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-change.positive {
+            color: #059669;
+        }
+        
+        .stat-change.negative {
+            color: #dc2626;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .card-action {
+            color: #3b82f6;
+            font-size: 13px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .card-action:hover {
+            color: #2563eb;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+        
+        .payment-info {
+            flex: 1;
+        }
+        
+        .payment-id {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        
+        .payment-details {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .payment-amount {
+            font-weight: 600;
+            color: #059669;
+            font-size: 16px;
+        }
+        
+        .payment-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 12px;
+        }
+        
+        .status-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-failed {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        
+        .filter-select, .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .export-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        
+        .export-btn:hover {
+            background: #047857;
+        }
+        
+        .table-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .payments-table th {
+            background: #f9fafb;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .payments-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        
+        .payments-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .payments-table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .method-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .method-esewa {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .method-cash {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .method-card {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">NepSewa</div>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/admin/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/approvals" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Pending Approvals</span>
+                </a>
+                <a href="/orders" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/workers" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Workers</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <a href="/admin/payments" class="nav-item active">
+                    <span class="nav-icon">💳</span>
+                    <span>Payments</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Payments & Finance</h1>
+            <div class="subtitle">Track revenue, payments, and financial analytics</div>
+        </div>
+        
+        <div class="content-wrapper">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Revenue</span>
+                        <span class="stat-icon">💰</span>
+                    </div>
+                    <div class="stat-number" id="totalRevenue">Rs. 0</div>
+                    <div class="stat-change positive">
+                        <span>↑ 12%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Paid Orders</span>
+                        <span class="stat-icon">✅</span>
+                    </div>
+                    <div class="stat-number" id="paidOrders">0</div>
+                    <div class="stat-change positive">
+                        <span>↑ 8%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Pending Payments</span>
+                        <span class="stat-icon">⏳</span>
+                    </div>
+                    <div class="stat-number" id="pendingPayments">0</div>
+                    <div class="stat-change negative">
+                        <span>↓ 3%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Avg Order Value</span>
+                        <span class="stat-icon">📈</span>
+                    </div>
+                    <div class="stat-number" id="avgOrderValue">Rs. 0</div>
+                    <div class="stat-change positive">
+                        <span>↑ 5%</span>
+                        <span style="color: #6b7280;">vs last month</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Recent Payments -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Payments</h2>
+                        <a href="#" class="card-action">View all →</a>
+                    </div>
+                    <div id="recentPayments">
+                        <div class="empty-state">Loading payments...</div>
+                    </div>
+                </div>
+                
+                <!-- Payment Methods -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Payment Methods</h2>
+                    </div>
+                    <div id="paymentMethods">
+                        <div class="empty-state">Loading data...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Revenue Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Revenue Trends</h2>
+                    <select class="filter-select">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 3 months</option>
+                    </select>
+                </div>
+                <div class="chart-placeholder">
+                    📈 Revenue chart will be displayed here
+                </div>
+            </div>
+            
+            <!-- Payment History Table -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">Payment History</h2>
+                    <div class="filters">
+                        <select class="filter-select" id="statusFilter" onchange="filterPayments()">
+                            <option value="">All Status</option>
+                            <option value="paid">Paid</option>
+                            <option value="pending">Pending</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                        <input type="text" class="filter-input" id="searchInput" placeholder="Search..." onkeyup="filterPayments()">
+                        <button class="export-btn" onclick="exportPayments()">📥 Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="payments-table">
+                        <thead>
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-state">Loading payment history...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allPayments = [];
+        let filteredPayments = [];
+        
+        // Service prices
+        const servicePrices = {
+            "maid": 500, "technician": 300, "plumber": 500,
+            "electrician": 500, "haircutting": 200, "gardener": 1000,
+            "makeup": 500, "photographer": 500, "cleaning": 500, "ac": 500,
+            "Maid Service": 500, "Technician Service": 300, "Plumbing": 500,
+            "Electric Repair": 500, "Hair Cutting": 200, "Gardener": 1000,
+            "Makeup Artist": 500, "Photographer": 500, "Home Cleaning": 500, "AC Service": 500
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPaymentData();
+        });
+        
+        async function loadPaymentData() {
+            try {
+                const response = await fetch('/api/orders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const orders = data.orders || [];
+                    processPaymentData(orders);
+                } else {
+                    showError('Failed to load payment data');
+                }
+            } catch (error) {
+                console.error('Error loading payment data:', error);
+                showError('Network error loading payments');
+            }
+        }
+        
+        function processPaymentData(orders) {
+            // Convert orders to payment records
+            allPayments = orders.map(order => ({
+                id: `PAY-${order.booking_id.replace('NS-', '')}`,
+                orderId: order.booking_id,
+                customer: order.name,
+                service: order.service,
+                amount: servicePrices[order.service] || 500,
+                method: getPaymentMethod(order),
+                status: order.payment || 'unpaid',
+                date: order.booked_at,
+                email: order.email,
+                phone: order.phone
+            }));
+            
+            filteredPayments = [...allPayments];
+            
+            updateStats();
+            renderRecentPayments();
+            renderPaymentMethods();
+            renderPaymentHistory();
+        }
+        
+        function getPaymentMethod(order) {
+            // Simulate payment methods based on order data
+            if (order.payment === 'paid') {
+                const methods = ['eSewa', 'Card', 'Cash'];
+                return methods[Math.floor(Math.random() * methods.length)];
+            }
+            return 'Pending';
+        }
+        
+        function updateStats() {
+            const paidPayments = allPayments.filter(p => p.status === 'paid');
+            const pendingPayments = allPayments.filter(p => p.status === 'unpaid');
+            
+            const totalRevenue = paidPayments.reduce((sum, p) => sum + p.amount, 0);
+            const avgOrderValue = paidPayments.length > 0 ? Math.round(totalRevenue / paidPayments.length) : 0;
+            
+            document.getElementById('totalRevenue').textContent = `Rs. ${totalRevenue.toLocaleString()}`;
+            document.getElementById('paidOrders').textContent = paidPayments.length;
+            document.getElementById('pendingPayments').textContent = pendingPayments.length;
+            document.getElementById('avgOrderValue').textContent = `Rs. ${avgOrderValue.toLocaleString()}`;
+        }
+        
+        function renderRecentPayments() {
+            const container = document.getElementById('recentPayments');
+            const recentPayments = allPayments.slice(-5).reverse();
+            
+            if (recentPayments.length === 0) {
+                container.innerHTML = '<div class="empty-state">No payments yet</div>';
+                return;
+            }
+            
+            container.innerHTML = recentPayments.map(payment => `
+                <div class="payment-item">
+                    <div class="payment-info">
+                        <div class="payment-id">${payment.id}</div>
+                        <div class="payment-details">${payment.customer} • ${payment.service}</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <div class="payment-amount">Rs. ${payment.amount.toLocaleString()}</div>
+                        <span class="payment-status status-${payment.status === 'paid' ? 'paid' : 'pending'}">
+                            ${payment.status === 'paid' ? 'Paid' : 'Pending'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderPaymentMethods() {
+            const container = document.getElementById('paymentMethods');
+            const paidPayments = allPayments.filter(p => p.status === 'paid');
+            
+            if (paidPayments.length === 0) {
+                container.innerHTML = '<div class="empty-state">No payment data</div>';
+                return;
+            }
+            
+            const methodCounts = {};
+            paidPayments.forEach(payment => {
+                methodCounts[payment.method] = (methodCounts[payment.method] || 0) + 1;
+            });
+            
+            const total = paidPayments.length;
+            
+            container.innerHTML = Object.entries(methodCounts).map(([method, count]) => {
+                const percentage = Math.round((count / total) * 100);
+                return `
+                    <div class="payment-item">
+                        <div class="payment-info">
+                            <div class="payment-id">${method}</div>
+                            <div class="payment-details">${count} transactions</div>
+                        </div>
+                        <div class="payment-amount">${percentage}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderPaymentHistory() {
+            const tbody = document.getElementById('paymentsTableBody');
+            
+            if (filteredPayments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No payments found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredPayments.map(payment => `
+                <tr>
+                    <td><span style="font-family: monospace; color: #3b82f6; font-weight: 500;">${payment.id}</span></td>
+                    <td><span style="font-family: monospace; color: #6b7280;">${payment.orderId}</span></td>
+                    <td>
+                        <div style="font-weight: 500;">${payment.customer}</div>
+                        <div style="font-size: 12px; color: #6b7280;">${payment.phone}</div>
+                    </td>
+                    <td>${payment.service}</td>
+                    <td style="font-weight: 600; color: #059669;">Rs. ${payment.amount.toLocaleString()}</td>
+                    <td>
+                        <span class="method-badge method-${payment.method.toLowerCase()}">
+                            ${payment.method}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="payment-status status-${payment.status === 'paid' ? 'paid' : 'pending'}">
+                            ${payment.status === 'paid' ? 'Paid' : 'Pending'}
+                        </span>
+                    </td>
+                    <td style="color: #6b7280; font-size: 13px;">${formatDate(payment.date)}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function filterPayments() {
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredPayments = allPayments.filter(payment => {
+                const matchesStatus = !status || 
+                    (status === 'pending' && payment.status === 'unpaid') ||
+                    (status === 'paid' && payment.status === 'paid') ||
+                    (status === 'failed' && payment.status === 'failed');
+                
+                const matchesSearch = !search ||
+                    payment.customer.toLowerCase().includes(search) ||
+                    payment.orderId.toLowerCase().includes(search) ||
+                    payment.service.toLowerCase().includes(search);
+                
+                return matchesStatus && matchesSearch;
+            });
+            
+            renderPaymentHistory();
+        }
+        
+        function exportPayments() {
+            const headers = ['Payment ID', 'Order ID', 'Customer', 'Service', 'Amount', 'Method', 'Status', 'Date'];
+            const csvRows = [headers.join(',')];
+            
+            filteredPayments.forEach(payment => {
+                const row = [
+                    payment.id,
+                    payment.orderId,
+                    `"${payment.customer}"`,
+                    `"${payment.service}"`,
+                    payment.amount,
+                    payment.method,
+                    payment.status,
+                    payment.date
+                ];
+                csvRows.push(row.join(','));
+            });
+            
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const timestamp = new Date().toISOString().split('T')[0];
+            link.setAttribute('href', url);
+            link.setAttribute('download', `nepsewa_payments_${timestamp}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`Exported ${filteredPayments.length} payments to CSV`);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        function showError(message) {
+            console.error(message);
+            document.getElementById('recentPayments').innerHTML = `<div class="empty-state">${message}</div>`;
+        }
+    </script>
+</body>
+</html>

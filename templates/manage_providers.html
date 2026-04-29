@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Providers - NepSewa Admin v2.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background: #f8fafc; color: #1e293b; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #6366f1, #06b6d4); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 2rem; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        
+        .actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.3s; }
+        .btn-primary { background: #6366f1; color: white; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        
+        .search-bar { margin-bottom: 20px; }
+        .search-bar input { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; }
+        
+        .filters { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filters select { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; }
+        
+        .providers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .provider-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: 0.3s; }
+        .provider-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        
+        .provider-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .provider-image { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+        .provider-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+        .provider-info p { color: #64748b; font-size: 0.9rem; }
+        
+        .provider-details { margin-bottom: 15px; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .detail-label { color: #64748b; }
+        .detail-value { font-weight: 600; }
+        
+        .provider-actions { display: flex; gap: 8px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { margin-bottom: 20px; }
+        .modal-header h2 { margin-bottom: 8px; }
+        .close-btn { float: right; font-size: 24px; cursor: pointer; color: #64748b; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; }
+        
+        .result { margin-top: 15px; padding: 12px; border-radius: 8px; }
+        .result.success { background: #d1fae5; color: #065f46; }
+        .result.error { background: #fee2e2; color: #991b1b; }
+        
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #6366f1; }
+        .stat-label { color: #64748b; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Manage Providers</h1>
+            <p>Add, edit, delete, and manage all service providers</p>
+        </div>
+        
+        <div class="stats" id="statsContainer">
+            <!-- Stats will be loaded here -->
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" onclick="openAddModal()">➕ Add New Provider</button>
+            <button class="btn btn-success" onclick="loadProviders()">🔄 Refresh</button>
+            <button class="btn btn-warning" onclick="exportProviders()">📥 Export CSV</button>
+            <button class="btn" onclick="testFilters()" style="background: #8b5cf6; color: white;">🧪 Test Filters</button>
+            <a href="/admin/add-providers" class="btn btn-danger">← Back to Admin</a>
+        </div>
+        
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Search providers by name, service, or location..." onkeyup="filterProviders()">
+        </div>
+        
+        <div class="filters">
+            <select id="serviceFilter" onchange="filterProviders()">
+                <option value="">All Services</option>
+            </select>
+            <select id="locationFilter" onchange="filterProviders()">
+                <option value="">All Locations</option>
+            </select>
+            <select id="verifiedFilter" onchange="filterProviders()">
+                <option value="">All Providers</option>
+                <option value="1">Verified Only</option>
+                <option value="0">Unverified Only</option>
+            </select>
+        </div>
+        
+        <div class="providers-grid" id="providersGrid">
+            <!-- Providers will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Add/Edit Provider Modal -->
+    <div class="modal" id="providerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h2 id="modalTitle">Add New Provider</h2>
+            </div>
+            
+            <form id="providerForm">
+                <input type="hidden" id="providerId">
+                
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="providerName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Service *</label>
+                    <select id="providerService" required>
+                        <option value="">Select Service</option>
+                        <option value="Home Cleaning">Home Cleaning</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Electric Repair">Electric Repair</option>
+                        <option value="AC Service">AC Service</option>
+                        <option value="Maid Service">Maid Service</option>
+                        <option value="Technician Service">Technician Service</option>
+                        <option value="Hair Cutting">Hair Cutting</option>
+                        <option value="Gardener">Gardener</option>
+                        <option value="Makeup Artist">Makeup Artist</option>
+                        <option value="Photographer">Photographer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Location *</label>
+                    <select id="providerLocation" required>
+                        <option value="">Select Location</option>
+                        <option value="Kathmandu">Kathmandu</option>
+                        <option value="Lalitpur">Lalitpur</option>
+                        <option value="Bhaktapur">Bhaktapur</option>
+                        <option value="Pokhara">Pokhara</option>
+                        <option value="Chitwan">Chitwan</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="providerPhone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Rating (1-5)</label>
+                    <input type="number" id="providerRating" min="1" max="5" step="0.1" value="4.0">
+                </div>
+                
+                <div class="form-group">
+                    <label>Experience (years)</label>
+                    <input type="number" id="providerExperience" min="0" max="20" value="2">
+                </div>
+                
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="providerImage" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="providerVerified"> Verified Provider
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Save Provider</button>
+                <div id="formResult" class="result" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let allProviders = [];
+        
+        // Load providers on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM Content Loaded - initializing...'); // Debug log
+            loadProviders();
+            loadStats();
+            
+            // Test if elements exist
+            console.log('Search input exists:', !!document.getElementById('searchInput'));
+            console.log('Service filter exists:', !!document.getElementById('serviceFilter'));
+            console.log('Location filter exists:', !!document.getElementById('locationFilter'));
+        });
+        
+        async function loadProviders() {
+            try {
+                console.log('Loading providers...'); // Debug log
+                const response = await fetch('/api/admin/providers');
+                const data = await response.json();
+                
+                console.log('API Response:', data); // Debug log
+                
+                if (data.success) {
+                    allProviders = data.providers;
+                    
+                    // Convert is_verified to boolean for consistency
+                    allProviders.forEach(provider => {
+                        provider.is_verified = Boolean(provider.is_verified);
+                    });
+                    
+                    console.log('Loaded', allProviders.length, 'providers'); // Debug log
+                    console.log('Sample provider:', allProviders[0]); // Debug log
+                    renderProviders(allProviders);
+                    populateFilters();
+                } else {
+                    console.error('API Error:', data.message);
+                    document.getElementById('providersGrid').innerHTML = '<p style="text-align: center; color: #ef4444;">Error loading providers: ' + data.message + '</p>';
+                }
+            } catch (error) {
+                console.error('Error loading providers:', error);
+                document.getElementById('providersGrid').innerHTML = '<p style="text-align: center; color: #ef4444;">Network error loading providers</p>';
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/admin/provider-stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('statsContainer').innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${data.stats.total}</div>
+                            <div class="stat-label">Total Providers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.stats.verified}</div>
+                            <div class="stat-label">Verified</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.stats.services}</div>
+                            <div class="stat-label">Services</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.stats.avgRating}</div>
+                            <div class="stat-label">Avg Rating</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        function renderProviders(providers) {
+            const grid = document.getElementById('providersGrid');
+            
+            if (providers.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #64748b; grid-column: 1/-1;">No providers found.</p>';
+                return;
+            }
+            
+            grid.innerHTML = providers.map(provider => `
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <img src="${provider.image || 'https://via.placeholder.com/60'}" alt="${provider.name}" class="provider-image">
+                        <div class="provider-info">
+                            <h3>${provider.name} ${provider.is_verified ? '✅' : ''}</h3>
+                            <p>${provider.service} • ${provider.location}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="provider-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Rating:</span>
+                            <span class="detail-value">⭐ ${provider.rating}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Experience:</span>
+                            <span class="detail-value">${provider.experience} years</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Jobs:</span>
+                            <span class="detail-value">${provider.completed_jobs}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">${provider.phone}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="provider-actions">
+                        <button class="btn btn-primary btn-sm" onclick="editProvider(${provider.id})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProvider(${provider.id}, '${provider.name}')">🗑️ Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function populateFilters() {
+            console.log('Populating filters with', allProviders.length, 'providers'); // Debug log
+            
+            if (!allProviders || allProviders.length === 0) {
+                console.log('No providers available for filtering');
+                return;
+            }
+            
+            // Extract unique services and locations
+            const services = [...new Set(allProviders.map(p => p.service).filter(s => s))];
+            const locations = [...new Set(allProviders.map(p => p.location).filter(l => l))];
+            
+            console.log('Unique services:', services); // Debug log
+            console.log('Unique locations:', locations); // Debug log
+            
+            // Populate service filter
+            const serviceFilter = document.getElementById('serviceFilter');
+            if (serviceFilter) {
+                const serviceOptions = services.map(s => `<option value="${s}">${s}</option>`).join('');
+                serviceFilter.innerHTML = '<option value="">All Services</option>' + serviceOptions;
+                console.log('Service filter populated with', services.length, 'options');
+            } else {
+                console.error('Service filter element not found');
+            }
+            
+            // Populate location filter
+            const locationFilter = document.getElementById('locationFilter');
+            if (locationFilter) {
+                const locationOptions = locations.map(l => `<option value="${l}">${l}</option>`).join('');
+                locationFilter.innerHTML = '<option value="">All Locations</option>' + locationOptions;
+                console.log('Location filter populated with', locations.length, 'options');
+            } else {
+                console.error('Location filter element not found');
+            }
+            
+            // Verify the filters are populated
+            setTimeout(() => {
+                console.log('Service filter options count:', serviceFilter ? serviceFilter.options.length : 'N/A');
+                console.log('Location filter options count:', locationFilter ? locationFilter.options.length : 'N/A');
+            }, 100);
+        }
+        
+        function filterProviders() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const service = document.getElementById('serviceFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            const verified = document.getElementById('verifiedFilter').value;
+            
+            console.log('Filtering with:', { search, service, location, verified }); // Debug log
+            console.log('Total providers before filter:', allProviders.length); // Debug log
+            
+            const filtered = allProviders.filter(provider => {
+                const matchesSearch = !search || 
+                    provider.name.toLowerCase().includes(search) ||
+                    provider.service.toLowerCase().includes(search) ||
+                    provider.location.toLowerCase().includes(search);
+                    
+                const matchesService = !service || provider.service === service;
+                const matchesLocation = !location || provider.location === location;
+                
+                let matchesVerified = true;
+                if (verified !== '') {
+                    matchesVerified = provider.is_verified === (verified === '1');
+                }
+                
+                const matches = matchesSearch && matchesService && matchesLocation && matchesVerified;
+                
+                if (search === 'debug' && provider.name.toLowerCase().includes('mamta')) {
+                    console.log('Debug provider:', provider.name, {
+                        matchesSearch, matchesService, matchesLocation, matchesVerified, matches
+                    });
+                }
+                
+                return matches;
+            });
+            
+            console.log('Filtered results:', filtered.length, 'out of', allProviders.length); // Debug log
+            renderProviders(filtered);
+        }
+        
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Provider';
+            document.getElementById('providerForm').reset();
+            document.getElementById('providerId').value = '';
+            document.getElementById('providerModal').classList.add('show');
+        }
+        
+        function editProvider(id) {
+            const provider = allProviders.find(p => p.id === id);
+            if (!provider) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Provider';
+            document.getElementById('providerId').value = provider.id;
+            document.getElementById('providerName').value = provider.name;
+            document.getElementById('providerService').value = provider.service;
+            document.getElementById('providerLocation').value = provider.location;
+            document.getElementById('providerPhone').value = provider.phone;
+            document.getElementById('providerRating').value = provider.rating;
+            document.getElementById('providerExperience').value = provider.experience;
+            document.getElementById('providerImage').value = provider.image || '';
+            document.getElementById('providerVerified').checked = provider.is_verified;
+            
+            document.getElementById('providerModal').classList.add('show');
+        }
+        
+        async function deleteProvider(id, name) {
+            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+            
+            try {
+                const response = await fetch(`/api/admin/providers/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadProviders();
+                    loadStats();
+                } else {
+                    alert('Error deleting provider: ' + data.message);
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('providerModal').classList.remove('show');
+        }
+        
+        // Form submission
+        document.getElementById('providerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: document.getElementById('providerId').value,
+                name: document.getElementById('providerName').value,
+                service: document.getElementById('providerService').value,
+                location: document.getElementById('providerLocation').value,
+                phone: document.getElementById('providerPhone').value,
+                rating: parseFloat(document.getElementById('providerRating').value),
+                experience: parseInt(document.getElementById('providerExperience').value),
+                image: document.getElementById('providerImage').value,
+                is_verified: document.getElementById('providerVerified').checked
+            };
+            
+            const isEdit = formData.id !== '';
+            const url = isEdit ? `/api/admin/providers/${formData.id}` : '/api/admin/providers';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                const result = document.getElementById('formResult');
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.textContent = data.message;
+                    result.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        closeModal();
+                        loadProviders();
+                        loadStats();
+                    }, 1500);
+                } else {
+                    result.className = 'result error';
+                    result.textContent = data.message;
+                    result.style.display = 'block';
+                }
+            } catch (error) {
+                const result = document.getElementById('formResult');
+                result.className = 'result error';
+                result.textContent = 'Network error: ' + error.message;
+                result.style.display = 'block';
+            }
+        });
+        
+        async function exportProviders() {
+            try {
+                const response = await fetch('/api/admin/providers/export');
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'providers.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                alert('Export failed: ' + error.message);
+            }
+        }
+        
+        function testFilters() {
+            console.log('=== FILTER TEST ===');
+            console.log('Total providers:', allProviders.length);
+            
+            // Force populate filters
+            console.log('Force populating filters...');
+            populateFilters();
+            
+            // Wait a moment then test service filter
+            setTimeout(() => {
+                console.log('Testing service filter...');
+                const serviceFilter = document.getElementById('serviceFilter');
+                console.log('Service filter options:', serviceFilter.options.length);
+                
+                // Set to first service option if available
+                if (serviceFilter.options.length > 1) {
+                    serviceFilter.selectedIndex = 1; // Select first non-"All" option
+                    console.log('Selected service:', serviceFilter.value);
+                    filterProviders();
+                }
+                
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    serviceFilter.selectedIndex = 0;
+                    filterProviders();
+                    console.log('Filter test completed');
+                }, 3000);
+            }, 500);
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('providerModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
