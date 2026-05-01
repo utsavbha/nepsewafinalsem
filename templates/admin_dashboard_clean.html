@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NepSewa Admin Panel v2.1</title>
+    <link rel="stylesheet" href="/static/alerts.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -542,6 +543,10 @@
                     <span class="nav-icon">👥</span>
                     <span>Workers</span>
                 </a>
+                <a href="/admin/map" class="nav-item">
+                    <span class="nav-icon">🗺️</span>
+                    <span>Service Map</span>
+                </a>
             </div>
             
             <div class="nav-section">
@@ -634,16 +639,16 @@
             </div>
             
             <form id="workerForm">
-                <input type="hidden" id="workerId">
+                <input type="hidden" id="workerId" name="workerId">
                 
                 <div class="form-group">
                     <label class="form-label">Name *</label>
-                    <input type="text" class="form-input" id="workerName" required>
+                    <input type="text" class="form-input" id="workerName" name="workerName" required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Service *</label>
-                    <select class="form-input" id="workerService" required>
+                    <select class="form-input" id="workerService" name="workerService" required>
                         <option value="">Select Service</option>
                         <option value="Home Cleaning">Home Cleaning</option>
                         <option value="Plumbing">Plumbing</option>
@@ -660,36 +665,49 @@
                 
                 <div class="form-group">
                     <label class="form-label">Location *</label>
-                    <select class="form-input" id="workerLocation" required>
+                    <select class="form-input" id="workerLocation" name="workerLocation" required>
                         <option value="">Select Location</option>
-                        <option value="Kathmandu">Kathmandu</option>
-                        <option value="Lalitpur">Lalitpur</option>
-                        <option value="Bhaktapur">Bhaktapur</option>
+                        <option value="Butwal">Butwal</option>
+                        <option value="Tilottama">Tilottama</option>
+                        <option value="Bhairahawa">Bhairahawa</option>
+                        <option value="Chitwan">Chitwan</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Phone *</label>
-                    <input type="tel" class="form-input" id="workerPhone" required>
+                    <input type="tel" class="form-input" id="workerPhone" name="workerPhone" required>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Experience (years)</label>
-                    <input type="number" class="form-input" id="workerExperience" min="0" max="20" value="2">
+                    <input type="number" class="form-input" id="workerExperience" name="workerExperience" min="0" max="20" value="2">
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Rating (1-5)</label>
-                    <input type="number" class="form-input" id="workerRating" min="1" max="5" step="0.1" value="4.0">
+                    <input type="number" class="form-input" id="workerRating" name="workerRating" min="1" max="5" step="0.1" value="4.0">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Image URL</label>
-                    <input type="url" class="form-input" id="workerImage" placeholder="https://...">
+                    <label class="form-label">Worker Image</label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <input type="radio" id="imageTypeUrl" name="imageType" value="url" checked onchange="toggleImageInput()">
+                        <label for="imageTypeUrl" style="margin: 0; font-weight: normal;">Image URL</label>
+                        <input type="radio" id="imageTypeFile" name="imageType" value="file" onchange="toggleImageInput()">
+                        <label for="imageTypeFile" style="margin: 0; font-weight: normal;">Upload New File</label>
+                    </div>
+                    <input type="url" class="form-input" id="workerImage" name="workerImage" placeholder="https://...">
+                    <input type="file" class="form-input" id="workerImageFile" name="workerImageFile" accept="image/*" style="display: none;" disabled>
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 5px;">Image Preview:</p>
+                        <img id="previewImg" style="max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover; border: 2px solid #e5e7eb;">
+                    </div>
+                </div>
                 </div>
                 
                 <div class="form-checkbox">
-                    <input type="checkbox" id="workerVerified">
+                    <input type="checkbox" id="workerVerified" name="workerVerified">
                     <label for="workerVerified">Verified Worker</label>
                 </div>
                 
@@ -706,7 +724,139 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadWorkers();
             loadStats();
+            
+            // Image handling event listeners
+            document.getElementById('workerImage').addEventListener('input', function(e) {
+                const preview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                const isUrl = document.getElementById('imageTypeUrl').checked;
+                
+                if (isUrl && e.target.value) {
+                    previewImg.src = e.target.value;
+                    preview.style.display = 'block';
+                    
+                    // Handle image load error
+                    previewImg.onerror = function() {
+                        preview.style.display = 'none';
+                    };
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+
+            // File preview function
+            document.getElementById('workerImageFile').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const preview = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('previewImg');
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.style.display = 'none';
+                }
+            });
+
+            // Ensure form submission handler is attached
+            const workerForm = document.getElementById('workerForm');
+            if (workerForm) {
+                console.log('Attaching form submission handler');
+                // Remove any existing listeners first
+                workerForm.removeEventListener('submit', handleFormSubmission);
+                workerForm.addEventListener('submit', handleFormSubmission);
+            } else {
+                console.error('Worker form not found!');
+            }
         });
+
+        // Separate function for form submission
+        function handleFormSubmission(e) {
+            e.preventDefault();
+            console.log('Form submitted'); // Debug log
+            
+            const isEdit = document.getElementById('workerId').value !== '';
+            const url = isEdit ? `/api/admin/providers/${document.getElementById('workerId').value}` : '/api/admin/providers';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            console.log('Is edit:', isEdit, 'URL:', url, 'Method:', method); // Debug log
+            
+            // Check if using file upload or URL
+            const isFileUpload = document.getElementById('imageTypeFile').checked;
+            const fileInput = document.getElementById('workerImageFile');
+            
+            console.log('Is file upload:', isFileUpload, 'Has file:', fileInput.files.length > 0); // Debug log
+            
+            let requestData;
+            let headers = {};
+            
+            if (isFileUpload && fileInput.files[0]) {
+                // Use FormData for file upload
+                requestData = new FormData();
+                requestData.append('id', document.getElementById('workerId').value);
+                requestData.append('name', document.getElementById('workerName').value);
+                requestData.append('service', document.getElementById('workerService').value);
+                requestData.append('location', document.getElementById('workerLocation').value);
+                requestData.append('phone', document.getElementById('workerPhone').value);
+                requestData.append('rating', document.getElementById('workerRating').value);
+                requestData.append('experience', document.getElementById('workerExperience').value);
+                requestData.append('is_verified', document.getElementById('workerVerified').checked);
+                requestData.append('image', fileInput.files[0]);
+                console.log('Using FormData for file upload'); // Debug log
+            } else {
+                // Use JSON for URL or no image
+                const formDataObj = {
+                    id: document.getElementById('workerId').value,
+                    name: document.getElementById('workerName').value,
+                    service: document.getElementById('workerService').value,
+                    location: document.getElementById('workerLocation').value,
+                    phone: document.getElementById('workerPhone').value,
+                    rating: parseFloat(document.getElementById('workerRating').value),
+                    experience: parseInt(document.getElementById('workerExperience').value),
+                    image: document.getElementById('workerImage').value,
+                    is_verified: document.getElementById('workerVerified').checked
+                };
+                requestData = JSON.stringify(formDataObj);
+                headers['Content-Type'] = 'application/json';
+                console.log('Using JSON data:', formDataObj); // Debug log
+            }
+            
+            submitWorkerData(url, method, headers, requestData);
+        }
+
+        // Separate function for API call
+        async function submitWorkerData(url, method, headers, requestData) {
+            try {
+                console.log('Sending request...'); // Debug log
+                const response = await fetch(url, {
+                    method: method,
+                    headers: headers,
+                    body: requestData
+                });
+                
+                console.log('Response status:', response.status); // Debug log
+                const data = await response.json();
+                console.log('Response data:', data); // Debug log
+                
+                if (data.success) {
+                    console.log('Success! Closing modal and reloading...'); // Debug log
+                    closeModal();
+                    loadWorkers();
+                    loadStats();
+                    showSuccess('Worker saved successfully!', 'Success'); // Professional alert
+                } else {
+                    console.error('API Error:', data.message); // Debug log
+                    showError('Error: ' + data.message, 'Save Failed');
+                }
+            } catch (error) {
+                console.error('Network error:', error); // Debug log
+                showError('Network error: ' + error.message, 'Connection Error');
+            }
+        }
         
         async function loadWorkers() {
             try {
@@ -880,6 +1030,9 @@
             document.getElementById('workerForm').reset();
             document.getElementById('workerId').value = '';
             document.getElementById('workerModal').classList.add('show');
+            // Reset image input
+            document.getElementById('imageTypeUrl').checked = true;
+            toggleImageInput();
         }
         
         function editWorker(id) {
@@ -894,14 +1047,68 @@
             document.getElementById('workerPhone').value = worker.phone;
             document.getElementById('workerExperience').value = worker.experience;
             document.getElementById('workerRating').value = worker.rating;
-            document.getElementById('workerImage').value = worker.image || '';
             document.getElementById('workerVerified').checked = worker.is_verified;
+            
+            // Handle image display for editing
+            const currentImage = worker.image || '';
+            document.getElementById('workerImage').value = currentImage;
+            
+            // Reset image inputs
+            document.getElementById('imageTypeUrl').checked = true;
+            document.getElementById('workerImageFile').value = '';
+            toggleImageInput();
+            
+            // Show current image preview if exists
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            if (currentImage && currentImage !== '') {
+                previewImg.src = currentImage;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
             
             document.getElementById('workerModal').classList.add('show');
         }
+
+        // Image input toggle function
+        function toggleImageInput() {
+            const urlInput = document.getElementById('workerImage');
+            const fileInput = document.getElementById('workerImageFile');
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const isUrl = document.getElementById('imageTypeUrl').checked;
+            
+            if (isUrl) {
+                urlInput.style.display = 'block';
+                urlInput.disabled = false;
+                fileInput.style.display = 'none';
+                fileInput.disabled = true;
+                fileInput.value = ''; // Clear file input
+                // Show preview if URL exists
+                if (urlInput.value) {
+                    previewImg.src = urlInput.value;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+            } else {
+                urlInput.style.display = 'none';
+                urlInput.disabled = true;
+                urlInput.value = ''; // Clear URL input
+                fileInput.style.display = 'block';
+                fileInput.disabled = false;
+                preview.style.display = 'none';
+            }
+        }
         
         async function deleteWorker(id, name) {
-            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+            const confirmed = await showConfirm(
+                `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+                'Delete Worker'
+            );
+            
+            if (!confirmed) return;
             
             try {
                 const response = await fetch(`/api/admin/providers/${id}`, {
@@ -913,11 +1120,12 @@
                 if (data.success) {
                     loadWorkers();
                     loadStats();
+                    showSuccess('Worker deleted successfully!', 'Deleted');
                 } else {
-                    alert('Error deleting worker: ' + data.message);
+                    showError('Error deleting worker: ' + data.message, 'Delete Failed');
                 }
             } catch (error) {
-                alert('Network error: ' + error.message);
+                showError('Network error: ' + error.message, 'Connection Error');
             }
         }
         
@@ -978,40 +1186,78 @@
         // Form submission
         document.getElementById('workerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('Form submitted'); // Debug log
             
-            const formData = {
-                id: document.getElementById('workerId').value,
-                name: document.getElementById('workerName').value,
-                service: document.getElementById('workerService').value,
-                location: document.getElementById('workerLocation').value,
-                phone: document.getElementById('workerPhone').value,
-                rating: parseFloat(document.getElementById('workerRating').value),
-                experience: parseInt(document.getElementById('workerExperience').value),
-                image: document.getElementById('workerImage').value,
-                is_verified: document.getElementById('workerVerified').checked
-            };
-            
-            const isEdit = formData.id !== '';
-            const url = isEdit ? `/api/admin/providers/${formData.id}` : '/api/admin/providers';
+            const isEdit = document.getElementById('workerId').value !== '';
+            const url = isEdit ? `/api/admin/providers/${document.getElementById('workerId').value}` : '/api/admin/providers';
             const method = isEdit ? 'PUT' : 'POST';
             
+            console.log('Is edit:', isEdit, 'URL:', url, 'Method:', method); // Debug log
+            
+            // Check if using file upload or URL
+            const isFileUpload = document.getElementById('imageTypeFile').checked;
+            const fileInput = document.getElementById('workerImageFile');
+            
+            console.log('Is file upload:', isFileUpload, 'Has file:', fileInput.files.length > 0); // Debug log
+            
+            let requestData;
+            let headers = {};
+            
+            if (isFileUpload && fileInput.files[0]) {
+                // Use FormData for file upload
+                requestData = new FormData();
+                requestData.append('id', document.getElementById('workerId').value);
+                requestData.append('name', document.getElementById('workerName').value);
+                requestData.append('service', document.getElementById('workerService').value);
+                requestData.append('location', document.getElementById('workerLocation').value);
+                requestData.append('phone', document.getElementById('workerPhone').value);
+                requestData.append('rating', document.getElementById('workerRating').value);
+                requestData.append('experience', document.getElementById('workerExperience').value);
+                requestData.append('is_verified', document.getElementById('workerVerified').checked);
+                requestData.append('image', fileInput.files[0]);
+                console.log('Using FormData for file upload'); // Debug log
+            } else {
+                // Use JSON for URL or no image
+                const formDataObj = {
+                    id: document.getElementById('workerId').value,
+                    name: document.getElementById('workerName').value,
+                    service: document.getElementById('workerService').value,
+                    location: document.getElementById('workerLocation').value,
+                    phone: document.getElementById('workerPhone').value,
+                    rating: parseFloat(document.getElementById('workerRating').value),
+                    experience: parseInt(document.getElementById('workerExperience').value),
+                    image: document.getElementById('workerImage').value,
+                    is_verified: document.getElementById('workerVerified').checked
+                };
+                requestData = JSON.stringify(formDataObj);
+                headers['Content-Type'] = 'application/json';
+                console.log('Using JSON data:', formDataObj); // Debug log
+            }
+            
             try {
+                console.log('Sending request...'); // Debug log
                 const response = await fetch(url, {
                     method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    headers: headers,
+                    body: requestData
                 });
                 
+                console.log('Response status:', response.status); // Debug log
                 const data = await response.json();
+                console.log('Response data:', data); // Debug log
                 
                 if (data.success) {
+                    console.log('Success! Closing modal and reloading...'); // Debug log
                     closeModal();
                     loadWorkers();
                     loadStats();
+                    alert('Worker saved successfully!'); // Success feedback
                 } else {
+                    console.error('API Error:', data.message); // Debug log
                     alert('Error: ' + data.message);
                 }
             } catch (error) {
+                console.error('Network error:', error); // Debug log
                 alert('Network error: ' + error.message);
             }
         });
@@ -1024,5 +1270,6 @@
             }
         }
     </script>
+    <script src="/static/alerts.js"></script>
 </body>
 </html>

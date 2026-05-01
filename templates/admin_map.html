@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Map - NepSewa Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        
+        .sidebar-logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .sidebar-nav {
+            padding: 0 12px;
+        }
+        
+        .nav-section {
+            margin-bottom: 24px;
+        }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            color: #6b7280;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        
+        .nav-item.active {
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 240px;
+            flex: 1;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .header {
+            padding: 24px 32px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .header .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .map-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-label {
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .filter-select {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+        }
+        
+        .toggle-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .toggle-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #f3f4f6;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 16px;
+            min-width: 200px;
+            z-index: 1000;
+        }
+        
+        .overlay-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .stat-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+        
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 16px;
+            z-index: 1000;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .legend-text {
+            font-size: 13px;
+            color: #374151;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .info-window {
+            max-width: 250px;
+        }
+        
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .info-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .info-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .info-service {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .info-details {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        
+        .info-label {
+            color: #6b7280;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #111827;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">NepSewa</div>
+            <div class="sidebar-subtitle">Admin Panel</div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="/admin/dashboard" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/approvals" class="nav-item">
+                    <span class="nav-icon">✅</span>
+                    <span>Pending Approvals</span>
+                </a>
+                <a href="/orders" class="nav-item">
+                    <span class="nav-icon">📦</span>
+                    <span>Orders</span>
+                </a>
+                <a href="/admin/workers" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span>Workers</span>
+                </a>
+                <a href="/admin/map" class="nav-item active">
+                    <span class="nav-icon">🗺️</span>
+                    <span>Service Map</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon">💳</span>
+                    <span>Payments</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="header-top">
+                <div>
+                    <h1>Service Coverage Map</h1>
+                    <div class="subtitle">Visualize worker locations and service coverage across Nepal</div>
+                </div>
+            </div>
+            
+            <div class="map-controls">
+                <div class="control-group">
+                    <span class="control-label">Service:</span>
+                    <select class="filter-select" id="serviceFilter" onchange="filterMarkers()">
+                        <option value="">All Services</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <span class="control-label">Location:</span>
+                    <select class="filter-select" id="locationFilter" onchange="filterMarkers()">
+                        <option value="">All Locations</option>
+                        <option value="Butwal">Butwal</option>
+                        <option value="Tilottama">Tilottama</option>
+                        <option value="Bhairahawa">Bhairahawa</option>
+                        <option value="Chitwan">Chitwan</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <button class="toggle-btn active" id="workersToggle" onclick="toggleLayer('workers')">
+                        👥 Workers
+                    </button>
+                    <button class="toggle-btn" id="ordersToggle" onclick="toggleLayer('orders')">
+                        📦 Orders
+                    </button>
+                    <button class="toggle-btn" id="coverageToggle" onclick="toggleLayer('coverage')">
+                        📍 Coverage
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <div class="loading-overlay" id="loadingOverlay">
+                🗺️ Loading map data...
+            </div>
+            
+            <!-- Map Statistics Overlay -->
+            <div class="map-overlay">
+                <div class="overlay-title">Map Statistics</div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Workers</span>
+                    <span class="stat-value" id="totalWorkers">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Verified Workers</span>
+                    <span class="stat-value" id="verifiedWorkers">-</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Service Areas</span>
+                    <span class="stat-value" id="serviceAreas">3</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Orders</span>
+                    <span class="stat-value" id="totalOrders">-</span>
+                </div>
+            </div>
+            
+            <!-- Map Legend -->
+            <div class="legend">
+                <div class="legend-title">Legend</div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span class="legend-text">Verified Workers</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <span class="legend-text">Unverified Workers</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3b82f6;"></div>
+                    <span class="legend-text">Customer Orders</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(59, 130, 246, 0.2); border: 2px solid #3b82f6;"></div>
+                    <span class="legend-text">Service Coverage</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let map;
+        let workers = [];
+        let orders = [];
+        let workerMarkers = [];
+        let orderMarkers = [];
+        let coverageCircles = [];
+        
+        // Nepal coordinates (Butwal center - main service area)
+        const nepalCenter = { lat: 27.7000, lng: 83.4500 };
+        
+        // Location coordinates for service areas
+        const locationCoords = {
+            'Butwal': { lat: 27.7000, lng: 83.4500 },
+            'Tilottama': { lat: 27.7200, lng: 83.4300 },
+            'Bhairahawa': { lat: 27.5081, lng: 83.4519 },
+            'Chitwan': { lat: 27.5291, lng: 84.3542 }
+        };
+        
+        // Initialize map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: nepalCenter,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+            
+            loadMapData();
+        }
+        
+        async function loadMapData() {
+            try {
+                // Load workers
+                const workersResponse = await fetch('/api/admin/providers');
+                const workersData = await workersResponse.json();
+                
+                if (workersData.success) {
+                    workers = workersData.providers;
+                    updateStats();
+                    populateFilters();
+                    showWorkers();
+                    showCoverage();
+                }
+                
+                // Load orders
+                const ordersResponse = await fetch('/api/orders');
+                const ordersData = await ordersResponse.json();
+                
+                if (ordersData.success) {
+                    orders = ordersData.orders || [];
+                    updateStats();
+                }
+                
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error loading map data:', error);
+                document.getElementById('loadingOverlay').innerHTML = '❌ Error loading map data';
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalWorkers').textContent = workers.length;
+            document.getElementById('verifiedWorkers').textContent = workers.filter(w => w.is_verified).length;
+            document.getElementById('totalOrders').textContent = orders.length;
+        }
+        
+        function populateFilters() {
+            const services = [...new Set(workers.map(w => w.service))];
+            const serviceFilter = document.getElementById('serviceFilter');
+            
+            serviceFilter.innerHTML = '<option value="">All Services</option>' + 
+                services.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        
+        function showWorkers() {
+            clearMarkers(workerMarkers);
+            
+            const filteredWorkers = getFilteredWorkers();
+            
+            filteredWorkers.forEach(worker => {
+                const coords = getWorkerCoordinates(worker);
+                if (!coords) return;
+                
+                const marker = new google.maps.Marker({
+                    position: coords,
+                    map: map,
+                    title: worker.name,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: worker.is_verified ? '#10b981' : '#f59e0b',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 2
+                    }
+                });
+                
+                const infoWindow = new google.maps.InfoWindow({
+                    content: createWorkerInfoWindow(worker)
+                });
+                
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+                
+                workerMarkers.push(marker);
+            });
+        }
+        
+        function showOrders() {
+            clearMarkers(orderMarkers);
+            
+            orders.forEach((order, index) => {
+                const coords = getOrderCoordinates(order);
+                if (!coords) return;
+                
+                const marker = new google.maps.Marker({
+                    position: coords,
+                    map: map,
+                    title: `Order ${order.booking_id}`,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 6,
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.8,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 1
+                    }
+                });
+                
+                const infoWindow = new google.maps.InfoWindow({
+                    content: createOrderInfoWindow(order)
+                });
+                
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+                
+                orderMarkers.push(marker);
+            });
+        }
+        
+        function showCoverage() {
+            clearCircles();
+            
+            Object.entries(locationCoords).forEach(([location, coords]) => {
+                const circle = new google.maps.Circle({
+                    strokeColor: '#3b82f6',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#3b82f6',
+                    fillOpacity: 0.1,
+                    map: map,
+                    center: coords,
+                    radius: 5000 // 5km radius
+                });
+                
+                coverageCircles.push(circle);
+            });
+        }
+        
+        function getWorkerCoordinates(worker) {
+            const baseCoords = locationCoords[worker.location];
+            if (!baseCoords) return null;
+            
+            // Add small random offset to avoid overlapping markers
+            const offset = 0.01;
+            return {
+                lat: baseCoords.lat + (Math.random() - 0.5) * offset,
+                lng: baseCoords.lng + (Math.random() - 0.5) * offset
+            };
+        }
+        
+        function getOrderCoordinates(order) {
+            // For demo, randomly place orders within service areas
+            const locations = Object.values(locationCoords);
+            const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+            
+            const offset = 0.02;
+            return {
+                lat: randomLocation.lat + (Math.random() - 0.5) * offset,
+                lng: randomLocation.lng + (Math.random() - 0.5) * offset
+            };
+        }
+        
+        function createWorkerInfoWindow(worker) {
+            return `
+                <div class="info-window">
+                    <div class="info-header">
+                        <img src="${worker.image || 'https://via.placeholder.com/40'}" alt="${worker.name}" class="info-avatar">
+                        <div>
+                            <div class="info-name">${worker.name}</div>
+                            <div class="info-service">${worker.service}</div>
+                        </div>
+                    </div>
+                    <div class="info-details">
+                        <div class="info-row">
+                            <span class="info-label">Location:</span>
+                            <span class="info-value">${worker.location}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Rating:</span>
+                            <span class="info-value">⭐ ${worker.rating}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Experience:</span>
+                            <span class="info-value">${worker.experience} years</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Jobs:</span>
+                            <span class="info-value">${worker.completed_jobs}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">${worker.is_verified ? '✅ Verified' : '⏳ Pending'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function createOrderInfoWindow(order) {
+            return `
+                <div class="info-window">
+                    <div class="info-details">
+                        <div class="info-name">Order ${order.booking_id}</div>
+                        <div class="info-row">
+                            <span class="info-label">Customer:</span>
+                            <span class="info-value">${order.name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Service:</span>
+                            <span class="info-value">${order.service}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value">${order.status}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Payment:</span>
+                            <span class="info-value">${order.payment}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getFilteredWorkers() {
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            const locationFilter = document.getElementById('locationFilter').value;
+            
+            return workers.filter(worker => {
+                const matchesService = !serviceFilter || worker.service === serviceFilter;
+                const matchesLocation = !locationFilter || worker.location === locationFilter;
+                return matchesService && matchesLocation;
+            });
+        }
+        
+        function filterMarkers() {
+            showWorkers();
+        }
+        
+        function toggleLayer(layer) {
+            const button = document.getElementById(layer + 'Toggle');
+            const isActive = button.classList.contains('active');
+            
+            if (isActive) {
+                button.classList.remove('active');
+                if (layer === 'workers') {
+                    clearMarkers(workerMarkers);
+                } else if (layer === 'orders') {
+                    clearMarkers(orderMarkers);
+                } else if (layer === 'coverage') {
+                    clearCircles();
+                }
+            } else {
+                button.classList.add('active');
+                if (layer === 'workers') {
+                    showWorkers();
+                } else if (layer === 'orders') {
+                    showOrders();
+                } else if (layer === 'coverage') {
+                    showCoverage();
+                }
+            }
+        }
+        
+        function clearMarkers(markers) {
+            markers.forEach(marker => marker.setMap(null));
+            markers.length = 0;
+        }
+        
+        function clearCircles() {
+            coverageCircles.forEach(circle => circle.setMap(null));
+            coverageCircles.length = 0;
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map will be initialized by Google Maps callback
+        });
+    </script>
+    
+    <!-- Google Maps API -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw&callback=initMap">
+    </script>
+</body>
+</html>

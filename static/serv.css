@@ -523,6 +523,10 @@ body {
     font-size: 0.95rem;
     position: relative;
     transition: 0.3s;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Premium underline animation */
@@ -1051,15 +1055,40 @@ body.light .time-slot {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .navbar {
-        flex-direction: column;
+        padding: 8px 15px;
+    }
+    
+    .nav-container {
+        flex-wrap: nowrap;
+        gap: 8px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .nav-left {
+        flex-shrink: 0;
+    }
+    
+    .nav-menu {
+        position: static;
+        transform: none;
         gap: 15px;
-        padding: 15px;
+        margin: 0;
+        flex-shrink: 1;
+        min-width: 0;
     }
 
-    .navbar ul {
-        margin-left: 0;
-        gap: 15px;
-        flex-wrap: wrap;
+    .nav-menu a {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-right {
+        gap: 8px;
+        flex-shrink: 0;
         justify-content: center;
     }
 
@@ -1107,9 +1136,21 @@ body.light .time-slot {
 }
 
 @media (max-width: 480px) {
-    .navbar ul {
-        flex-direction: column;
+    .navbar {
+        padding: 6px 10px;
+    }
+    
+    .nav-container {
+        gap: 5px;
+    }
+    
+    .nav-menu {
         gap: 10px;
+    }
+    
+    .nav-menu a {
+        font-size: 0.8rem;
+        max-width: 100px;
     }
 
     .provider-link {

@@ -90,6 +90,8 @@ def init_db():
                 service_key         VARCHAR(50)  NOT NULL,
                 location            VARCHAR(100) NOT NULL,
                 district            VARCHAR(100) NOT NULL,
+                latitude            DECIMAL(10,8) DEFAULT NULL,
+                longitude           DECIMAL(11,8) DEFAULT NULL,
                 rating              DECIMAL(3,2) DEFAULT 0.0,
                 experience          INT          DEFAULT 0,
                 completed_jobs      INT          DEFAULT 0,
@@ -107,7 +109,8 @@ def init_db():
                 INDEX idx_service_key (service_key),
                 INDEX idx_location (location),
                 INDEX idx_rating (rating),
-                INDEX idx_email (email)
+                INDEX idx_email (email),
+                INDEX idx_coordinates (latitude, longitude)
             )
         """)
     conn.commit()
@@ -173,7 +176,7 @@ def insert_sample_providers():
         providers = [
             {
                 "name": "Ram Bahadur", "service": "Electric Repair", "service_key": "electrician",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.8, "experience": 5,
+                "location": "Butwal", "district": "Rupandehi", "rating": 4.8, "experience": 5,
                 "completed_jobs": 312, "cancellation_rate": 0.02, "response_time_hours": 1.5,
                 "is_verified": True, "review_count": 148, "phone": "9801000001",
                 "image": "https://randomuser.me/api/portraits/men/32.jpg",
@@ -181,7 +184,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Sita Lama", "service": "Home Cleaning", "service_key": "cleaning",
-                "location": "Lalitpur", "district": "Lalitpur", "rating": 4.9, "experience": 6,
+                "location": "Tilottama", "district": "Rupandehi", "rating": 4.9, "experience": 6,
                 "completed_jobs": 420, "cancellation_rate": 0.01, "response_time_hours": 1.0,
                 "is_verified": True, "review_count": 210, "phone": "9801000002",
                 "image": "https://randomuser.me/api/portraits/women/44.jpg",
@@ -189,7 +192,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Hari Sharma", "service": "Plumbing", "service_key": "plumber",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.7, "experience": 4,
+                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.7, "experience": 4,
                 "completed_jobs": 198, "cancellation_rate": 0.03, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 95, "phone": "9801000003",
                 "image": "https://randomuser.me/api/portraits/men/76.jpg",
@@ -197,7 +200,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Gita KC", "service": "Spa & Massage", "service_key": "makeup",
-                "location": "Bhaktapur", "district": "Bhaktapur", "rating": 5.0, "experience": 4,
+                "location": "Chitwan", "district": "Chitwan", "rating": 5.0, "experience": 4,
                 "completed_jobs": 175, "cancellation_rate": 0.00, "response_time_hours": 2.5,
                 "is_verified": True, "review_count": 88, "phone": "9801000004",
                 "image": "https://randomuser.me/api/portraits/women/65.jpg",
@@ -205,7 +208,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Ramesh Tamang", "service": "Hair Cutting", "service_key": "haircutting",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.2, "experience": 2,
+                "location": "Butwal", "district": "Rupandehi", "rating": 4.2, "experience": 2,
                 "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.0,
                 "is_verified": False, "review_count": 42, "phone": "9801000005",
                 "image": "https://randomuser.me/api/portraits/men/55.jpg",
@@ -213,7 +216,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Suman Rai", "service": "Home Cleaning", "service_key": "cleaning",
-                "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 3,
+                "location": "Tilottama", "district": "Rupandehi", "rating": 4.7, "experience": 3,
                 "completed_jobs": 134, "cancellation_rate": 0.04, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 67, "phone": "9801000006",
                 "image": "https://randomuser.me/api/portraits/men/66.jpg",
@@ -221,7 +224,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Binod KC", "service": "AC Service", "service_key": "ac",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.5, "experience": 4,
+                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.5, "experience": 4,
                 "completed_jobs": 220, "cancellation_rate": 0.03, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 110, "phone": "9801000007",
                 "image": "https://randomuser.me/api/portraits/men/88.jpg",
@@ -229,7 +232,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Anita Thapa", "service": "Maid Service", "service_key": "maid",
-                "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.6, "experience": 7,
+                "location": "Chitwan", "district": "Chitwan", "rating": 4.6, "experience": 7,
                 "completed_jobs": 380, "cancellation_rate": 0.02, "response_time_hours": 1.5,
                 "is_verified": True, "review_count": 190, "phone": "9801000008",
                 "image": "https://randomuser.me/api/portraits/women/33.jpg",
@@ -237,7 +240,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Deepak Gurung", "service": "Plumbing", "service_key": "plumber",
-                "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.4, "experience": 3,
+                "location": "Butwal", "district": "Rupandehi", "rating": 4.4, "experience": 3,
                 "completed_jobs": 112, "cancellation_rate": 0.05, "response_time_hours": 3.5,
                 "is_verified": False, "review_count": 55, "phone": "9801000009",
                 "image": "https://randomuser.me/api/portraits/men/41.jpg",
@@ -245,7 +248,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Priya Shrestha", "service": "Makeup Artist", "service_key": "makeup",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.8, "experience": 5,
+                "location": "Tilottama", "district": "Rupandehi", "rating": 4.8, "experience": 5,
                 "completed_jobs": 260, "cancellation_rate": 0.02, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 130, "phone": "9801000010",
                 "image": "https://randomuser.me/api/portraits/women/58.jpg",
@@ -253,7 +256,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Rajesh Pandey", "service": "Gardener", "service_key": "gardener",
-                "location": "Lalitpur", "district": "Lalitpur", "rating": 4.3, "experience": 6,
+                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.3, "experience": 6,
                 "completed_jobs": 145, "cancellation_rate": 0.06, "response_time_hours": 4.0,
                 "is_verified": False, "review_count": 72, "phone": "9801000011",
                 "image": "https://randomuser.me/api/portraits/men/62.jpg",
@@ -261,7 +264,7 @@ def insert_sample_providers():
             },
             {
                 "name": "Nisha Maharjan", "service": "Photographer", "service_key": "photographer",
-                "location": "Kathmandu", "district": "Kathmandu", "rating": 4.9, "experience": 8,
+                "location": "Chitwan", "district": "Chitwan", "rating": 4.9, "experience": 8,
                 "completed_jobs": 310, "cancellation_rate": 0.01, "response_time_hours": 3.0,
                 "is_verified": True, "review_count": 155, "phone": "9801000012",
                 "image": "https://randomuser.me/api/portraits/women/22.jpg",
@@ -357,6 +360,28 @@ def admin_payments():
     if not session.get("is_admin"):
         return redirect(url_for("admin_login_page"))
     return render_template("admin_payments.html")
+
+@app.route("/admin/map")
+def admin_map():
+    """Service coverage map page"""
+    if not session.get("is_admin"):
+        return redirect(url_for("admin_login_page"))
+    return render_template("admin_map.html")
+
+@app.route("/map")
+def customer_map():
+    """Real GPS-based nearby provider map"""
+    return render_template("nearby_map.html")
+
+@app.route("/map-old")
+def customer_map_old():
+    """Old simulated customer service provider map"""
+    return render_template("customer_map.html")
+
+@app.route("/track")
+def order_tracking():
+    """Order tracking page"""
+    return render_template("order_tracking.html")
 def admin_workers():
     """Workers management page"""
     return render_template("admin_dashboard_clean.html")
@@ -763,6 +788,54 @@ def api_me():
 # ─────────────────────────────────────────────
 # BOOKING API
 # ─────────────────────────────────────────────
+@app.route("/api/book-provider", methods=["POST"])
+def api_book_provider():
+    """Book a specific provider directly"""
+    try:
+        data = request.get_json(silent=True) or {}
+        
+        # Generate booking ID
+        booking_id = "NS-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        # Create order with provider information
+        order = {
+            "booking_id": booking_id,
+            "name": data.get("name"),
+            "phone": data.get("phone"),
+            "address": data.get("address"),
+            "service": data.get("service"),
+            "service_key": data.get("service_key"),
+            "provider_id": data.get("provider_id"),
+            "provider_name": data.get("provider_name"),
+            "preferred_date": data.get("date"),
+            "preferred_time": data.get("time"),
+            "notes": data.get("notes", ""),
+            "status": "confirmed",  # Direct booking is pre-confirmed
+            "payment": "pending",
+            "booked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "booking_type": "direct_provider"
+        }
+        
+        # Validate required fields
+        required_fields = ["name", "phone", "address", "service", "provider_id", "provider_name"]
+        for field in required_fields:
+            if not order.get(field):
+                return jsonify(success=False, message=f"Missing required field: {field}"), 400
+        
+        # Save order
+        save_order(order)
+        
+        return jsonify(
+            success=True, 
+            booking_id=booking_id,
+            message="Booking confirmed successfully!",
+            order=order
+        )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Booking failed: {str(e)}"), 500
+
+
 @app.route("/api/book", methods=["POST"])
 def api_book():
     # Check if user is logged in
@@ -908,6 +981,259 @@ def api_payment_history():
 # ─────────────────────────────────────────────
 # PROVIDERS API
 # ─────────────────────────────────────────────
+@app.route("/api/providers/nearby")
+def api_nearby_providers():
+    """Get providers near a specific location"""
+    try:
+        # Get user's location from request
+        user_lat = float(request.args.get("lat", 27.7000))  # Default to Butwal
+        user_lng = float(request.args.get("lng", 83.4500))
+        radius_km = float(request.args.get("radius", 10))  # Default 10km radius
+        service_key = request.args.get("service_key", "")
+        
+        conn = get_db()
+        with conn.cursor() as cur:
+            # First try to get providers with GPS coordinates
+            query = """
+                SELECT *, 
+                (6371 * acos(cos(radians(%s)) * cos(radians(latitude)) * 
+                cos(radians(longitude) - radians(%s)) + sin(radians(%s)) * 
+                sin(radians(latitude)))) AS distance_km
+                FROM service_providers 
+                WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+            """
+            params = [user_lat, user_lng, user_lat]
+            
+            if service_key:
+                query += " AND service_key = %s"
+                params.append(service_key)
+            
+            query += " HAVING distance_km <= %s ORDER BY distance_km ASC LIMIT 20"
+            params.append(radius_km)
+            
+            cur.execute(query, params)
+            providers = cur.fetchall()
+            
+            # If no providers with GPS coordinates found, fall back to location-based filtering
+            if not providers:
+                # Define location coordinates and their approximate coverage
+                location_coords = {
+                    'Butwal': {'lat': 27.7000, 'lng': 83.4500, 'radius_km': 8},
+                    'Tilottama': {'lat': 27.7200, 'lng': 83.4300, 'radius_km': 6}, 
+                    'Bhairahawa': {'lat': 27.5081, 'lng': 83.4519, 'radius_km': 10},
+                    'Chitwan': {'lat': 27.5291, 'lng': 84.3542, 'radius_km': 12}
+                }
+                
+                # Calculate distance to each location and find nearby ones
+                nearby_locations = []
+                for location, coords in location_coords.items():
+                    # Calculate distance from user to this location center
+                    import math
+                    lat1, lng1 = math.radians(user_lat), math.radians(user_lng)
+                    lat2, lng2 = math.radians(coords['lat']), math.radians(coords['lng'])
+                    
+                    dlat = lat2 - lat1
+                    dlng = lng2 - lng1
+                    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+                    c = 2 * math.asin(math.sqrt(a))
+                    distance_to_location = 6371 * c  # Earth radius in km
+                    
+                    # Only include if user is within the requested radius AND the location's coverage area
+                    max_distance = min(radius_km, coords['radius_km'])
+                    if distance_to_location <= max_distance:
+                        nearby_locations.append((location, distance_to_location))
+                
+                # Sort by distance and limit to closest locations
+                nearby_locations.sort(key=lambda x: x[1])
+                
+                # Only take locations within reasonable distance
+                filtered_locations = []
+                for location, distance in nearby_locations:
+                    if distance <= radius_km:  # Strict radius check
+                        filtered_locations.append(location)
+                
+                # Get providers from nearby locations only
+                if filtered_locations:
+                    location_placeholders = ','.join(['%s'] * len(filtered_locations))
+                    fallback_query = f"""
+                        SELECT *, NULL as distance_km
+                        FROM service_providers 
+                        WHERE location IN ({location_placeholders}) AND is_verified = 1
+                    """
+                    fallback_params = filtered_locations
+                    
+                    if service_key:
+                        fallback_query += " AND service_key = %s"
+                        fallback_params.append(service_key)
+                    
+                    fallback_query += " ORDER BY rating DESC, completed_jobs DESC LIMIT 15"
+                    
+                    cur.execute(fallback_query, fallback_params)
+                    providers = cur.fetchall()
+                    
+                    # Add estimated distances for fallback providers
+                    for provider in providers:
+                        if provider['location'] in location_coords:
+                            loc_coords = location_coords[provider['location']]
+                            # Calculate actual distance from user to location center
+                            import math
+                            lat1, lng1 = math.radians(user_lat), math.radians(user_lng)
+                            lat2, lng2 = math.radians(loc_coords['lat']), math.radians(loc_coords['lng'])
+                            
+                            dlat = lat2 - lat1
+                            dlng = lng2 - lng1
+                            a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+                            c = 2 * math.asin(math.sqrt(a))
+                            base_distance = 6371 * c
+                            
+                            # Add small random offset within location area (0-2km)
+                            import random
+                            estimated_distance = base_distance + random.uniform(0, 2)
+                            provider['distance_km'] = round(estimated_distance, 1)
+                        else:
+                            provider['distance_km'] = None
+        
+        # Convert to list and process
+        providers = list(providers)
+        for provider in providers:
+            try:
+                provider["availability"] = json.loads(provider["availability"]) if provider["availability"] else []
+            except:
+                provider["availability"] = []
+            
+            # Ensure distance is properly formatted
+            if provider.get("distance_km") is not None:
+                provider["distance_km"] = round(float(provider["distance_km"]), 1)
+        
+        # Sort by distance if available
+        providers.sort(key=lambda x: x.get("distance_km") or 999)
+        
+        return jsonify(success=True, providers=providers, user_location={"lat": user_lat, "lng": user_lng})
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error finding nearby providers: {str(e)}"), 500
+
+
+@app.route("/api/debug-location")
+def debug_location():
+    """Debug endpoint to check location calculations"""
+    try:
+        user_lat = float(request.args.get("lat", 27.7000))
+        user_lng = float(request.args.get("lng", 83.4500))
+        radius_km = float(request.args.get("radius", 10))
+        
+        # Location coordinates
+        location_coords = {
+            'Butwal': {'lat': 27.7000, 'lng': 83.4500, 'radius_km': 8},
+            'Tilottama': {'lat': 27.7200, 'lng': 83.4300, 'radius_km': 6}, 
+            'Bhairahawa': {'lat': 27.5081, 'lng': 83.4519, 'radius_km': 10},
+            'Chitwan': {'lat': 27.5291, 'lng': 84.3542, 'radius_km': 12}
+        }
+        
+        # Calculate distances to each location
+        distances = {}
+        import math
+        
+        for location, coords in location_coords.items():
+            lat1, lng1 = math.radians(user_lat), math.radians(user_lng)
+            lat2, lng2 = math.radians(coords['lat']), math.radians(coords['lng'])
+            
+            dlat = lat2 - lat1
+            dlng = lng2 - lng1
+            a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng/2)**2
+            c = 2 * math.asin(math.sqrt(a))
+            distance = 6371 * c
+            
+            distances[location] = {
+                'distance_km': round(distance, 2),
+                'within_radius': distance <= radius_km,
+                'location_coords': coords
+            }
+        
+        # Check GPS providers
+        conn = get_db()
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) as count FROM service_providers WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+            gps_count = cur.fetchone()['count']
+            
+            cur.execute("SELECT COUNT(*) as count FROM service_providers")
+            total_count = cur.fetchone()['count']
+        
+        return jsonify({
+            'success': True,
+            'user_location': {'lat': user_lat, 'lng': user_lng},
+            'search_radius_km': radius_km,
+            'distances_to_locations': distances,
+            'providers_with_gps': gps_count,
+            'total_providers': total_count,
+            'message': f'You are searching within {radius_km}km radius'
+        })
+        
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
+
+
+@app.route("/api/add-gps-coordinates", methods=["POST"])
+def add_gps_coordinates():
+    """Add GPS coordinates to existing providers based on their locations"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Define precise coordinates for each location with realistic spread
+            location_coordinates = {
+                'Butwal': {
+                    'center': {'lat': 27.7000, 'lng': 83.4500},
+                    'spread': 0.02  # ~2km spread
+                },
+                'Tilottama': {
+                    'center': {'lat': 27.7200, 'lng': 83.4300}, 
+                    'spread': 0.015  # ~1.5km spread
+                },
+                'Bhairahawa': {
+                    'center': {'lat': 27.5081, 'lng': 83.4519},
+                    'spread': 0.025  # ~2.5km spread
+                },
+                'Chitwan': {
+                    'center': {'lat': 27.5291, 'lng': 84.3542},
+                    'spread': 0.03  # ~3km spread
+                }
+            }
+            
+            # Get all providers without GPS coordinates
+            cur.execute("SELECT id, name, location FROM service_providers WHERE latitude IS NULL OR longitude IS NULL")
+            providers = cur.fetchall()
+            
+            updated_count = 0
+            import random
+            
+            for provider in providers:
+                location = provider['location']
+                if location in location_coordinates:
+                    coords = location_coordinates[location]
+                    
+                    # Generate random coordinates within the location area
+                    lat_offset = (random.random() - 0.5) * coords['spread']
+                    lng_offset = (random.random() - 0.5) * coords['spread']
+                    
+                    provider_lat = coords['center']['lat'] + lat_offset
+                    provider_lng = coords['center']['lng'] + lng_offset
+                    
+                    # Update provider with GPS coordinates
+                    cur.execute("""
+                        UPDATE service_providers 
+                        SET latitude = %s, longitude = %s 
+                        WHERE id = %s
+                    """, (provider_lat, provider_lng, provider['id']))
+                    
+                    updated_count += 1
+            
+            conn.commit()
+            return jsonify(success=True, message=f"Added GPS coordinates to {updated_count} providers")
+            
+    except Exception as e:
+        return jsonify(success=False, message=f"Error adding GPS coordinates: {str(e)}"), 500
+
+
 @app.route("/api/providers")
 def api_providers():
     service_key = request.args.get("service_key", "")
@@ -1222,7 +1548,30 @@ def get_all_providers():
 def add_provider():
     """Add a new provider"""
     try:
-        data = request.get_json()
+        # Check if this is a file upload (multipart/form-data) or JSON
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle file upload
+            data = request.form.to_dict()
+            image_file = request.files.get('image')
+            
+            # Convert string values to appropriate types
+            data['rating'] = float(data.get('rating', 4.0))
+            data['experience'] = int(data.get('experience', 1))
+            data['is_verified'] = data.get('is_verified') == 'true'
+            
+            # Handle image upload
+            image_path = None
+            if image_file and image_file.filename:
+                image_path = save_provider_image(image_file)
+                if not image_path:
+                    return jsonify(success=False, message="Invalid image file. Please use PNG, JPG, or JPEG format."), 400
+            
+            data['image'] = image_path or "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+        else:
+            # Handle JSON data (existing functionality)
+            data = request.get_json()
+            if not data.get('image'):
+                data['image'] = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
         
         # Map service names to keys
         service_mapping = {
@@ -1255,7 +1604,7 @@ def add_provider():
                 2.0,  # response_time_hours
                 data.get("is_verified", False),
                 0,  # review_count
-                data.get("image") or "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                data.get("image"),
                 data.get("phone"),
                 '["Mon","Tue","Wed","Thu","Fri","Sat"]'  # default availability
             ))
@@ -1291,7 +1640,35 @@ def approve_provider(provider_id):
 def update_provider(provider_id):
     """Update an existing provider"""
     try:
-        data = request.get_json()
+        # Check if this is a file upload (multipart/form-data) or JSON
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle file upload
+            data = request.form.to_dict()
+            image_file = request.files.get('image')
+            
+            # Convert string values to appropriate types
+            data['rating'] = float(data.get('rating', 4.0))
+            data['experience'] = int(data.get('experience', 1))
+            data['is_verified'] = data.get('is_verified') == 'true'
+            
+            # Handle image upload
+            if image_file and image_file.filename:
+                image_path = save_provider_image(image_file)
+                if not image_path:
+                    return jsonify(success=False, message="Invalid image file. Please use PNG, JPG, or JPEG format."), 400
+                data['image'] = image_path
+            else:
+                # Keep existing image if no new file uploaded
+                conn = get_db()
+                with conn.cursor() as cur:
+                    cur.execute("SELECT image FROM service_providers WHERE id = %s", (provider_id,))
+                    result = cur.fetchone()
+                    data['image'] = result['image'] if result else "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+        else:
+            # Handle JSON data (existing functionality)
+            data = request.get_json()
+            if not data.get('image'):
+                data['image'] = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
         
         # Map service names to keys
         service_mapping = {
@@ -1319,7 +1696,7 @@ def update_provider(provider_id):
                 data.get("rating", 4.0),
                 data.get("experience", 1),
                 data.get("is_verified", False),
-                data.get("image") or "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                data.get("image"),
                 data.get("phone"),
                 provider_id
             ))
@@ -1735,6 +2112,23 @@ def register_provider():
             if not image_url:
                 return jsonify(success=False, message="Failed to save image"), 500
         
+        # Get GPS coordinates if provided
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+        
+        # Validate GPS coordinates
+        if latitude and longitude:
+            try:
+                latitude = float(latitude)
+                longitude = float(longitude)
+                
+                # Basic validation for Nepal coordinates
+                if not (26.0 <= latitude <= 31.0 and 80.0 <= longitude <= 89.0):
+                    return jsonify(success=False, message="GPS coordinates must be within Nepal"), 400
+                    
+            except (ValueError, TypeError):
+                return jsonify(success=False, message="Invalid GPS coordinates"), 400
+        
         # Map service names to service keys
         service_mapping = {
             "Home Cleaning": {"key": "cleaning", "name": "Home Cleaning"},
@@ -1793,8 +2187,8 @@ def register_provider():
                     INSERT INTO service_providers 
                     (name, service, service_key, location, district, rating, experience, 
                      completed_jobs, cancellation_rate, response_time_hours, is_verified, 
-                     review_count, image, phone, availability, email, password)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     review_count, image, phone, availability, email, password, latitude, longitude)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     data.get("name").strip(),
                     service_info["name"],
@@ -1812,12 +2206,14 @@ def register_provider():
                     phone,
                     json.dumps(availability_days),
                     email if email else None,
-                    hashed_password
+                    hashed_password,
+                    latitude,
+                    longitude
                 ))
             except pymysql.err.OperationalError as e:
                 if "Unknown column" in str(e):
-                    # Fallback to old schema without email/password columns
-                    print("Warning: Using fallback insert without email/password columns")
+                    # Fallback to old schema without email/password/GPS columns
+                    print("Warning: Using fallback insert without email/password/GPS columns")
                     cur.execute("""
                         INSERT INTO service_providers 
                         (name, service, service_key, location, district, rating, experience, 
@@ -1968,3 +2364,392 @@ if __name__ == "__main__":
     print("📍 Health check: http://127.0.0.1:8000/health")
     print("📍 Services page: http://127.0.0.1:8000/services")
     app.run(debug=True, host='127.0.0.1', port=8000)
+
+@app.route("/api/add-nepali-providers", methods=["POST"])
+def add_nepali_providers():
+    """Add providers with authentic Nepali names in local areas"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Get existing provider names to avoid duplicates
+            cur.execute("SELECT name FROM service_providers")
+            existing_names = {row['name'].lower() for row in cur.fetchall()}
+            
+            # Authentic Nepali names
+            male_names = [
+                "Aarav Sharma", "Aashish Karki", "Abhishek Adhikari", "Aditya Bhandari", 
+                "Ajay Thapa", "Akash Shrestha", "Amit Gurung", "Anil KC", "Anish Rana", 
+                "Arjun Basnet", "Ashok Bhattarai", "Bikash Giri", "Binod Joshi", 
+                "Bishal Rai", "Deepak Neupane", "Dhiraj Khadka", "Gopal Pandey", 
+                "Hari Koirala", "Hemant Bista", "Kiran Subedi"
+            ]
+            
+            female_names = [
+                "Aakriti Sharma", "Aashika Karki", "Anjana Adhikari", "Anusha Bhandari", 
+                "Apsara Thapa", "Arati Shrestha", "Bina Gurung", "Deepa Rana", 
+                "Gita Basnet", "Hema Bhattarai", "Indira Dahal", "Kabita Joshi", 
+                "Karuna Rai", "Laxmi Khatri", "Mamata Neupane", "Manisha Khadka", 
+                "Nisha Koirala", "Pabitra Bista", "Radhika Baral", "Sunita Oli"
+            ]
+            
+            # Filter out names that are too similar to existing ones
+            all_names = male_names + female_names
+            filtered_names = []
+            for name in all_names:
+                # Check if name is too similar to existing names
+                name_lower = name.lower()
+                first_name = name_lower.split()[0]
+                
+                # Skip if exact name exists or first name is very similar
+                is_similar = False
+                for existing in existing_names:
+                    existing_first = existing.split()[0]
+                    if (name_lower == existing or 
+                        first_name == existing_first or
+                        abs(len(first_name) - len(existing_first)) <= 1 and 
+                        first_name[:3] == existing_first[:3]):
+                        is_similar = True
+                        break
+                
+                if not is_similar:
+                    filtered_names.append(name)
+            
+            # Services and locations
+            services = [
+                {"service": "Home Cleaning", "service_key": "cleaning"},
+                {"service": "Electric Repair", "service_key": "electrician"},
+                {"service": "Plumbing", "service_key": "plumber"},
+                {"service": "AC Service", "service_key": "ac"},
+                {"service": "Maid Service", "service_key": "maid"},
+                {"service": "Hair Cutting", "service_key": "haircutting"},
+                {"service": "Gardener", "service_key": "gardener"},
+                {"service": "Makeup Artist", "service_key": "makeup"},
+                {"service": "Photographer", "service_key": "photographer"},
+                {"service": "Spa & Massage", "service_key": "spa"}
+            ]
+            
+            local_locations = [
+                {"location": "Butwal", "district": "Rupandehi"},
+                {"location": "Tilottama", "district": "Rupandehi"},
+                {"location": "Bhairahawa", "district": "Rupandehi"},
+                {"location": "Chitwan", "district": "Chitwan"},
+                {"location": "Siddharthanagar", "district": "Rupandehi"},
+                {"location": "Devdaha", "district": "Rupandehi"}
+            ]
+            
+            import random
+            
+            # Create providers with filtered names
+            new_providers = []
+            phone_counter = 44  # Start from 9801000044
+            
+            for i, name in enumerate(filtered_names[:30]):  # Limit to 30 providers
+                service = random.choice(services)
+                location = random.choice(local_locations)
+                
+                # Generate realistic stats
+                rating = round(random.uniform(3.8, 5.0), 1)
+                experience = random.randint(1, 10)
+                completed_jobs = random.randint(20, 500)
+                cancellation_rate = round(random.uniform(0.0, 0.15), 3)
+                response_time = round(random.uniform(0.5, 6.0), 1)
+                is_verified = random.choice([True, False, True])  # 2/3 chance of being verified
+                review_count = random.randint(10, completed_jobs // 2)
+                
+                # Generate availability (random 3-6 days)
+                days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                num_days = random.randint(3, 6)
+                availability = random.sample(days, num_days)
+                
+                # Generate image URL (using diverse portraits)
+                gender = "men" if name in male_names else "women"
+                image_id = random.randint(1, 99)
+                image_url = f"https://randomuser.me/api/portraits/{gender}/{image_id}.jpg"
+                
+                provider = {
+                    "name": name,
+                    "service": service["service"],
+                    "service_key": service["service_key"],
+                    "location": location["location"],
+                    "district": location["district"],
+                    "rating": rating,
+                    "experience": experience,
+                    "completed_jobs": completed_jobs,
+                    "cancellation_rate": cancellation_rate,
+                    "response_time_hours": response_time,
+                    "is_verified": is_verified,
+                    "review_count": review_count,
+                    "phone": f"98010000{phone_counter:02d}",
+                    "image": image_url,
+                    "availability": json.dumps(availability)
+                }
+                
+                new_providers.append(provider)
+                phone_counter += 1
+            
+            # Insert new providers
+            for provider in new_providers:
+                cur.execute("""
+                    INSERT INTO service_providers 
+                    (name, service, service_key, location, district, rating, experience, 
+                     completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                     review_count, image, phone, availability)
+                    VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s, 
+                            %(rating)s, %(experience)s, %(completed_jobs)s, %(cancellation_rate)s, 
+                            %(response_time_hours)s, %(is_verified)s, %(review_count)s, 
+                            %(image)s, %(phone)s, %(availability)s)
+                """, provider)
+        
+        conn.commit()
+        return jsonify(
+            success=True, 
+            message=f"Added {len(new_providers)} new providers with authentic Nepali names in local areas!",
+            added_count=len(new_providers),
+            skipped_similar=len(all_names) - len(filtered_names)
+        )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error adding Nepali providers: {str(e)}"), 500
+
+
+@app.route("/api/update-locations-to-local", methods=["POST"])
+def update_locations_to_local():
+    """Update Kathmandu Valley providers to local areas"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Map of old locations to new local locations
+            location_mapping = {
+                "Kathmandu": {"location": "Butwal", "district": "Rupandehi"},
+                "Lalitpur": {"location": "Tilottama", "district": "Rupandehi"},
+                "Bhaktapur": {"location": "Bhairahawa", "district": "Rupandehi"}
+            }
+            
+            updated_count = 0
+            for old_location, new_location in location_mapping.items():
+                cur.execute("""
+                    UPDATE service_providers 
+                    SET location = %s, district = %s 
+                    WHERE location = %s
+                """, (new_location["location"], new_location["district"], old_location))
+                updated_count += cur.rowcount
+        
+        conn.commit()
+        return jsonify(
+            success=True, 
+            message=f"Updated {updated_count} providers to local areas (Butwal, Tilottama, Bhairahawa)"
+        )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error updating locations: {str(e)}"), 500
+@app.route("/api/clean-and-add-nepali-names", methods=["POST"])
+def clean_and_add_nepali_names():
+    """Remove all providers and add fresh ones with authentic Nepali names"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Clear all existing providers
+            cur.execute("DELETE FROM service_providers")
+            
+            # Authentic Nepali names (exactly as you provided)
+            male_names = [
+                "Aarav Sharma", "Aashish Karki", "Abhishek Adhikari", "Aditya Bhandari", 
+                "Ajay Thapa", "Akash Shrestha", "Amit Gurung", "Anil KC", "Anish Rana", 
+                "Arjun Basnet", "Ashok Bhattarai", "Bikash Giri", "Binod Joshi", 
+                "Bishal Rai", "Deepak Neupane", "Dhiraj Khadka", "Gopal Pandey", 
+                "Hari Koirala", "Hemant Bista", "Kiran Subedi"
+            ]
+            
+            female_names = [
+                "Aakriti Sharma", "Aashika Karki", "Anjana Adhikari", "Anusha Bhandari", 
+                "Apsara Thapa", "Arati Shrestha", "Bina Gurung", "Deepa Rana", 
+                "Gita Basnet", "Hema Bhattarai", "Indira Dahal", "Kabita Joshi", 
+                "Karuna Rai", "Laxmi Khatri", "Mamata Neupane", "Manisha Khadka", 
+                "Nisha Koirala", "Pabitra Bista", "Radhika Baral", "Sunita Oli"
+            ]
+            
+            # Services with proper mapping
+            services = [
+                {"service": "Home Cleaning", "service_key": "cleaning"},
+                {"service": "Electric Repair", "service_key": "electrician"},
+                {"service": "Plumbing", "service_key": "plumber"},
+                {"service": "AC Service", "service_key": "ac"},
+                {"service": "Maid Service", "service_key": "maid"},
+                {"service": "Hair Cutting", "service_key": "haircutting"},
+                {"service": "Gardener", "service_key": "gardener"},
+                {"service": "Makeup Artist", "service_key": "makeup"},
+                {"service": "Photographer", "service_key": "photographer"},
+                {"service": "Spa & Massage", "service_key": "spa"},
+                {"service": "Toilet Cleaning", "service_key": "toilet"}
+            ]
+            
+            # Local locations only
+            local_locations = [
+                {"location": "Butwal", "district": "Rupandehi"},
+                {"location": "Tilottama", "district": "Rupandehi"},
+                {"location": "Bhairahawa", "district": "Rupandehi"},
+                {"location": "Chitwan", "district": "Chitwan"},
+                {"location": "Siddharthanagar", "district": "Rupandehi"},
+                {"location": "Devdaha", "district": "Rupandehi"}
+            ]
+            
+            import random
+            
+            # Combine all names
+            all_names = male_names + female_names
+            
+            # Create providers - ensure good distribution across services
+            new_providers = []
+            phone_counter = 1
+            
+            # Create multiple providers per service to have good variety
+            for service in services:
+                # Add 3-5 providers per service
+                providers_per_service = random.randint(3, 5)
+                
+                for i in range(providers_per_service):
+                    if not all_names:  # If we run out of names, break
+                        break
+                        
+                    name = all_names.pop(0)  # Take names in order to avoid duplicates
+                    location = random.choice(local_locations)
+                    
+                    # Generate realistic stats
+                    rating = round(random.uniform(3.8, 5.0), 1)
+                    experience = random.randint(1, 10)
+                    completed_jobs = random.randint(20, 500)
+                    cancellation_rate = round(random.uniform(0.0, 0.15), 3)
+                    response_time = round(random.uniform(0.5, 6.0), 1)
+                    is_verified = random.choice([True, False, True])  # 2/3 chance of being verified
+                    review_count = random.randint(10, completed_jobs // 2)
+                    
+                    # Generate availability (random 3-6 days)
+                    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                    num_days = random.randint(3, 6)
+                    availability = random.sample(days, num_days)
+                    
+                    # Generate image URL (using diverse portraits)
+                    gender = "men" if name in male_names else "women"
+                    image_id = random.randint(1, 99)
+                    image_url = f"https://randomuser.me/api/portraits/{gender}/{image_id}.jpg"
+                    
+                    provider = {
+                        "name": name,
+                        "service": service["service"],
+                        "service_key": service["service_key"],
+                        "location": location["location"],
+                        "district": location["district"],
+                        "rating": rating,
+                        "experience": experience,
+                        "completed_jobs": completed_jobs,
+                        "cancellation_rate": cancellation_rate,
+                        "response_time_hours": response_time,
+                        "is_verified": is_verified,
+                        "review_count": review_count,
+                        "phone": f"98010000{phone_counter:02d}",
+                        "image": image_url,
+                        "availability": json.dumps(availability)
+                    }
+                    
+                    new_providers.append(provider)
+                    phone_counter += 1
+            
+            # Insert new providers
+            for provider in new_providers:
+                cur.execute("""
+                    INSERT INTO service_providers 
+                    (name, service, service_key, location, district, rating, experience, 
+                     completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                     review_count, image, phone, availability)
+                    VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s, 
+                            %(rating)s, %(experience)s, %(completed_jobs)s, %(cancellation_rate)s, 
+                            %(response_time_hours)s, %(is_verified)s, %(review_count)s, 
+                            %(image)s, %(phone)s, %(availability)s)
+                """, provider)
+        
+        conn.commit()
+        return jsonify(
+            success=True, 
+            message=f"Database cleaned and added {len(new_providers)} providers with unique Nepali names!",
+            total_providers=len(new_providers),
+            services_covered=len(services)
+        )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error cleaning and adding providers: {str(e)}"), 500
+@app.route("/api/search-provider/<name>")
+def search_provider(name):
+    """Search for a specific provider by name"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Search for providers with similar names (case insensitive)
+            cur.execute("""
+                SELECT id, name, service, location, image, phone, rating, experience, 
+                       completed_jobs, is_verified, created_at
+                FROM service_providers 
+                WHERE LOWER(name) LIKE LOWER(%s)
+                ORDER BY name
+            """, (f"%{name}%",))
+            
+            providers = cur.fetchall()
+            
+            if providers:
+                return jsonify(
+                    success=True, 
+                    found=True,
+                    count=len(providers),
+                    providers=list(providers)
+                )
+            else:
+                return jsonify(
+                    success=True, 
+                    found=False,
+                    message=f"No provider found with name containing '{name}'"
+                )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error searching provider: {str(e)}"), 500
+@app.route("/api/check-custom-uploads")
+def check_custom_uploads():
+    """Check for providers with custom uploaded images"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Find providers with custom uploaded images (not randomuser.me URLs)
+            cur.execute("""
+                SELECT id, name, service, location, image, phone, created_at
+                FROM service_providers 
+                WHERE image NOT LIKE '%randomuser.me%' 
+                AND image NOT LIKE '%via.placeholder.com%'
+                ORDER BY created_at DESC
+            """)
+            
+            custom_providers = cur.fetchall()
+            
+            return jsonify(
+                success=True,
+                count=len(custom_providers),
+                providers=list(custom_providers)
+            )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error checking custom uploads: {str(e)}"), 500
+@app.route("/api/debug/arjun")
+def debug_arjun():
+    """Debug endpoint to check Arjun Basnet's service"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT id, name, service, service_key, location, rating, experience
+                FROM service_providers 
+                WHERE LOWER(name) LIKE '%arjun%'
+                ORDER BY name
+            """)
+            
+            providers = cur.fetchall()
+            return jsonify(success=True, providers=list(providers))
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}"), 500

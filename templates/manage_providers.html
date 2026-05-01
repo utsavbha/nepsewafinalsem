@@ -144,11 +144,11 @@
                     <label>Location *</label>
                     <select id="providerLocation" required>
                         <option value="">Select Location</option>
-                        <option value="Kathmandu">Kathmandu</option>
-                        <option value="Lalitpur">Lalitpur</option>
-                        <option value="Bhaktapur">Bhaktapur</option>
-                        <option value="Pokhara">Pokhara</option>
+                        <option value="Butwal">Butwal</option>
+                        <option value="Tilottama">Tilottama</option>
+                        <option value="Bhairahawa">Bhairahawa</option>
                         <option value="Chitwan">Chitwan</option>
+                        <option value="Pokhara">Pokhara</option>
                     </select>
                 </div>
                 
@@ -168,8 +168,19 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Image URL</label>
+                    <label>Provider Image</label>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                        <input type="radio" id="imageTypeUrl" name="imageType" value="url" checked onchange="toggleImageInput()">
+                        <label for="imageTypeUrl" style="margin: 0;">Image URL</label>
+                        <input type="radio" id="imageTypeFile" name="imageType" value="file" onchange="toggleImageInput()">
+                        <label for="imageTypeFile" style="margin: 0;">Upload New File</label>
+                    </div>
                     <input type="url" id="providerImage" placeholder="https://...">
+                    <input type="file" id="providerImageFile" accept="image/*" style="display: none;">
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 5px;">Image Preview:</p>
+                        <img id="previewImg" style="max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover; border: 2px solid #e5e7eb;">
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -389,7 +400,72 @@
             document.getElementById('providerForm').reset();
             document.getElementById('providerId').value = '';
             document.getElementById('providerModal').classList.add('show');
+            // Reset image input
+            document.getElementById('imageTypeUrl').checked = true;
+            toggleImageInput();
         }
+
+        // Image input toggle function
+        function toggleImageInput() {
+            const urlInput = document.getElementById('providerImage');
+            const fileInput = document.getElementById('providerImageFile');
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const isUrl = document.getElementById('imageTypeUrl').checked;
+            
+            if (isUrl) {
+                urlInput.style.display = 'block';
+                fileInput.style.display = 'none';
+                // Show preview if URL exists
+                if (urlInput.value) {
+                    previewImg.src = urlInput.value;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+            } else {
+                urlInput.style.display = 'none';
+                fileInput.style.display = 'block';
+                preview.style.display = 'none';
+            }
+        }
+
+        // URL input change event to show preview
+        document.getElementById('providerImage').addEventListener('input', function(e) {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const isUrl = document.getElementById('imageTypeUrl').checked;
+            
+            if (isUrl && e.target.value) {
+                previewImg.src = e.target.value;
+                preview.style.display = 'block';
+                
+                // Handle image load error
+                previewImg.onerror = function() {
+                    preview.style.display = 'none';
+                };
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // File preview function
+        document.getElementById('providerImageFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
         
         function editProvider(id) {
             const provider = allProviders.find(p => p.id === id);
@@ -403,8 +479,26 @@
             document.getElementById('providerPhone').value = provider.phone;
             document.getElementById('providerRating').value = provider.rating;
             document.getElementById('providerExperience').value = provider.experience;
-            document.getElementById('providerImage').value = provider.image || '';
             document.getElementById('providerVerified').checked = provider.is_verified;
+            
+            // Handle image display for editing
+            const currentImage = provider.image || '';
+            document.getElementById('providerImage').value = currentImage;
+            
+            // Reset image inputs
+            document.getElementById('imageTypeUrl').checked = true;
+            document.getElementById('providerImageFile').value = '';
+            toggleImageInput();
+            
+            // Show current image preview if exists
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            if (currentImage && currentImage !== '') {
+                previewImg.src = currentImage;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
             
             document.getElementById('providerModal').classList.add('show');
         }
@@ -438,27 +532,51 @@
         document.getElementById('providerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const formData = {
-                id: document.getElementById('providerId').value,
-                name: document.getElementById('providerName').value,
-                service: document.getElementById('providerService').value,
-                location: document.getElementById('providerLocation').value,
-                phone: document.getElementById('providerPhone').value,
-                rating: parseFloat(document.getElementById('providerRating').value),
-                experience: parseInt(document.getElementById('providerExperience').value),
-                image: document.getElementById('providerImage').value,
-                is_verified: document.getElementById('providerVerified').checked
-            };
-            
-            const isEdit = formData.id !== '';
-            const url = isEdit ? `/api/admin/providers/${formData.id}` : '/api/admin/providers';
+            const isEdit = document.getElementById('providerId').value !== '';
+            const url = isEdit ? `/api/admin/providers/${document.getElementById('providerId').value}` : '/api/admin/providers';
             const method = isEdit ? 'PUT' : 'POST';
+            
+            // Check if using file upload or URL
+            const isFileUpload = document.getElementById('imageTypeFile').checked;
+            const fileInput = document.getElementById('providerImageFile');
+            
+            let requestData;
+            let headers = {};
+            
+            if (isFileUpload && fileInput.files[0]) {
+                // Use FormData for file upload
+                requestData = new FormData();
+                requestData.append('id', document.getElementById('providerId').value);
+                requestData.append('name', document.getElementById('providerName').value);
+                requestData.append('service', document.getElementById('providerService').value);
+                requestData.append('location', document.getElementById('providerLocation').value);
+                requestData.append('phone', document.getElementById('providerPhone').value);
+                requestData.append('rating', document.getElementById('providerRating').value);
+                requestData.append('experience', document.getElementById('providerExperience').value);
+                requestData.append('is_verified', document.getElementById('providerVerified').checked);
+                requestData.append('image', fileInput.files[0]);
+                // Don't set Content-Type header for FormData
+            } else {
+                // Use JSON for URL or no image
+                requestData = JSON.stringify({
+                    id: document.getElementById('providerId').value,
+                    name: document.getElementById('providerName').value,
+                    service: document.getElementById('providerService').value,
+                    location: document.getElementById('providerLocation').value,
+                    phone: document.getElementById('providerPhone').value,
+                    rating: parseFloat(document.getElementById('providerRating').value),
+                    experience: parseInt(document.getElementById('providerExperience').value),
+                    image: document.getElementById('providerImage').value,
+                    is_verified: document.getElementById('providerVerified').checked
+                });
+                headers['Content-Type'] = 'application/json';
+            }
             
             try {
                 const response = await fetch(url, {
                     method: method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    headers: headers,
+                    body: requestData
                 });
                 
                 const data = await response.json();

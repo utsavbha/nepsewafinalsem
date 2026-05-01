@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Order - NepSewa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .tracking-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .input-field {
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 200px;
+        }
+        
+        .track-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .track-btn:hover {
+            background: #2563eb;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 32px;
+            height: calc(100vh - 100px);
+        }
+        
+        .order-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        
+        .order-header {
+            margin-bottom: 24px;
+        }
+        
+        .order-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-confirmed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-in-progress {
+            background: #e0e7ff;
+            color: #5b21b6;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .order-details {
+            margin-bottom: 24px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .provider-info {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .provider-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .provider-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .provider-service {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        .provider-contact {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .contact-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .contact-btn:hover {
+            background: #f3f4f6;
+        }
+        
+        .timeline {
+            margin-bottom: 24px;
+        }
+        
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 16px;
+        }
+        
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        
+        .timeline-dot.completed {
+            background: #10b981;
+        }
+        
+        .timeline-dot.current {
+            background: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+        
+        .timeline-dot.pending {
+            background: #d1d5db;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-text {
+            color: #374151;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+        
+        .timeline-time {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        
+        .map-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .map-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        
+        .map-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .map-subtitle {
+            color: #6b7280;
+            font-size: 13px;
+        }
+        
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        
+        .no-order {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .no-order-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .no-order-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .no-order-text {
+            margin-bottom: 20px;
+        }
+        
+        .sample-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .sample-btn:hover {
+            background: #2563eb;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .tracking-input {
+                width: 100%;
+            }
+            
+            .input-field {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">NepSewa</div>
+            <div class="tracking-input">
+                <input type="text" class="input-field" id="orderIdInput" placeholder="Enter Order ID (e.g., NS-ABC123)">
+                <button class="track-btn" onclick="trackOrder()">Track Order</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="order-panel" id="orderPanel">
+            <div class="no-order">
+                <div class="no-order-icon">📦</div>
+                <div class="no-order-title">Track Your Order</div>
+                <div class="no-order-text">Enter your order ID above to see real-time tracking information</div>
+                <button class="sample-btn" onclick="loadSampleOrder()">View Sample Order</button>
+            </div>
+        </div>
+        
+        <div class="map-container">
+            <div class="map-header">
+                <div class="map-title">Live Tracking</div>
+                <div class="map-subtitle">Real-time location of your service provider</div>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+    
+    <script>
+        let map;
+        let currentOrder = null;
+        let providerMarker = null;
+        let customerMarker = null;
+        let routePolyline = null;
+        
+        // Service area center
+        const serviceCenter = { lat: 27.7000, lng: 83.4500 };
+        
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: serviceCenter,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+            
+            // Check for order ID in URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order');
+            if (orderId) {
+                document.getElementById('orderIdInput').value = orderId;
+                trackOrder();
+            }
+        }
+        
+        async function trackOrder() {
+            const orderId = document.getElementById('orderIdInput').value.trim();
+            if (!orderId) {
+                alert('Please enter an order ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/orders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const order = data.orders.find(o => o.booking_id === orderId);
+                    if (order) {
+                        currentOrder = order;
+                        displayOrderInfo(order);
+                        showOrderOnMap(order);
+                    } else {
+                        showOrderNotFound();
+                    }
+                } else {
+                    showError('Failed to load order information');
+                }
+            } catch (error) {
+                console.error('Error tracking order:', error);
+                showError('Network error while tracking order');
+            }
+        }
+        
+        function loadSampleOrder() {
+            // Load a sample order for demonstration
+            const sampleOrder = {
+                booking_id: 'NS-DEMO123',
+                name: 'John Doe',
+                service: 'Home Cleaning',
+                status: 'in-progress',
+                payment: 'paid',
+                address: 'Butwal-10, Traffic Chowk',
+                phone: '9801234567',
+                booked_at: new Date().toISOString(),
+                provider: {
+                    name: 'Sita Lama',
+                    image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+                    phone: '9801000002',
+                    rating: 4.9
+                }
+            };
+            
+            currentOrder = sampleOrder;
+            displayOrderInfo(sampleOrder);
+            showOrderOnMap(sampleOrder);
+        }
+        
+        function displayOrderInfo(order) {
+            const panel = document.getElementById('orderPanel');
+            
+            // Determine status class and text
+            let statusClass = 'status-pending';
+            let statusText = 'Pending';
+            
+            switch (order.status) {
+                case 'confirmed':
+                    statusClass = 'status-confirmed';
+                    statusText = 'Confirmed';
+                    break;
+                case 'in-progress':
+                    statusClass = 'status-in-progress';
+                    statusText = 'In Progress';
+                    break;
+                case 'completed':
+                    statusClass = 'status-completed';
+                    statusText = 'Completed';
+                    break;
+            }
+            
+            panel.innerHTML = `
+                <div class="order-header">
+                    <div class="order-id">Order ${order.booking_id}</div>
+                    <span class="order-status ${statusClass}">${statusText}</span>
+                </div>
+                
+                <div class="order-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Service</span>
+                        <span class="detail-value">${order.service}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Customer</span>
+                        <span class="detail-value">${order.name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address</span>
+                        <span class="detail-value">${order.address || 'Butwal-10, Traffic Chowk'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Booked</span>
+                        <span class="detail-value">${formatDateTime(order.booked_at)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment</span>
+                        <span class="detail-value">${order.payment === 'paid' ? '✅ Paid' : '⏳ Pending'}</span>
+                    </div>
+                </div>
+                
+                ${order.provider ? `
+                <div class="provider-info">
+                    <div class="provider-header">
+                        <img src="${order.provider.image}" alt="${order.provider.name}" class="provider-avatar">
+                        <div>
+                            <div class="provider-name">${order.provider.name}</div>
+                            <div class="provider-service">⭐ ${order.provider.rating} • ${order.service}</div>
+                        </div>
+                    </div>
+                    <div class="provider-contact">
+                        <a href="tel:${order.provider.phone}" class="contact-btn">📞 Call</a>
+                        <a href="sms:${order.provider.phone}" class="contact-btn">💬 SMS</a>
+                    </div>
+                </div>
+                ` : ''}
+                
+                <div class="timeline">
+                    <div class="timeline-title">Order Timeline</div>
+                    ${generateTimeline(order)}
+                </div>
+            `;
+        }
+        
+        function generateTimeline(order) {
+            const steps = [
+                { text: 'Order placed', status: 'completed', time: order.booked_at },
+                { text: 'Payment confirmed', status: order.payment === 'paid' ? 'completed' : 'pending', time: order.payment === 'paid' ? order.booked_at : null },
+                { text: 'Provider assigned', status: order.provider ? 'completed' : 'pending', time: order.provider ? order.booked_at : null },
+                { text: 'Service in progress', status: order.status === 'in-progress' || order.status === 'completed' ? 'completed' : order.status === 'confirmed' ? 'current' : 'pending', time: order.status === 'in-progress' ? order.booked_at : null },
+                { text: 'Service completed', status: order.status === 'completed' ? 'completed' : 'pending', time: order.status === 'completed' ? order.booked_at : null }
+            ];
+            
+            return steps.map(step => `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${step.status}"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-text">${step.text}</div>
+                        <div class="timeline-time">${step.time ? formatDateTime(step.time) : 'Pending'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showOrderOnMap(order) {
+            // Clear existing markers
+            if (providerMarker) providerMarker.setMap(null);
+            if (customerMarker) customerMarker.setMap(null);
+            if (routePolyline) routePolyline.setMap(null);
+            
+            // Customer location (approximate)
+            const customerLocation = { lat: 27.7000, lng: 83.4500 };
+            
+            // Provider location (simulated - moving towards customer)
+            const providerLocation = { 
+                lat: 27.6950 + (Math.random() * 0.01), 
+                lng: 83.4450 + (Math.random() * 0.01) 
+            };
+            
+            // Customer marker
+            customerMarker = new google.maps.Marker({
+                position: customerLocation,
+                map: map,
+                title: 'Customer Location',
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 12,
+                    fillColor: '#ef4444',
+                    fillOpacity: 1,
+                    strokeColor: '#ffffff',
+                    strokeWeight: 3
+                }
+            });
+            
+            // Provider marker (if assigned)
+            if (order.provider && order.status !== 'pending') {
+                providerMarker = new google.maps.Marker({
+                    position: providerLocation,
+                    map: map,
+                    title: `${order.provider.name} - ${order.service}`,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 12,
+                        fillColor: '#10b981',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 3
+                    }
+                });
+                
+                // Route line
+                if (order.status === 'in-progress') {
+                    routePolyline = new google.maps.Polyline({
+                        path: [providerLocation, customerLocation],
+                        geodesic: true,
+                        strokeColor: '#3b82f6',
+                        strokeOpacity: 1.0,
+                        strokeWeight: 3,
+                        map: map
+                    });
+                }
+                
+                // Fit map to show both markers
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(customerLocation);
+                bounds.extend(providerLocation);
+                map.fitBounds(bounds);
+                
+                // Simulate provider movement (for demo)
+                if (order.status === 'in-progress') {
+                    simulateProviderMovement();
+                }
+            } else {
+                // Center on customer location
+                map.setCenter(customerLocation);
+                map.setZoom(14);
+            }
+        }
+        
+        function simulateProviderMovement() {
+            // Simulate provider moving towards customer (for demo purposes)
+            let moveCount = 0;
+            const maxMoves = 10;
+            
+            const moveInterval = setInterval(() => {
+                if (moveCount >= maxMoves || !providerMarker) {
+                    clearInterval(moveInterval);
+                    return;
+                }
+                
+                const currentPos = providerMarker.getPosition();
+                const customerPos = customerMarker.getPosition();
+                
+                // Move slightly towards customer
+                const newLat = currentPos.lat() + (customerPos.lat() - currentPos.lat()) * 0.1;
+                const newLng = currentPos.lng() + (customerPos.lng() - currentPos.lng()) * 0.1;
+                
+                const newPos = { lat: newLat, lng: newLng };
+                providerMarker.setPosition(newPos);
+                
+                // Update route
+                if (routePolyline) {
+                    routePolyline.setPath([newPos, customerPos]);
+                }
+                
+                moveCount++;
+            }, 3000); // Move every 3 seconds
+        }
+        
+        function showOrderNotFound() {
+            const panel = document.getElementById('orderPanel');
+            panel.innerHTML = `
+                <div class="no-order">
+                    <div class="no-order-icon">❌</div>
+                    <div class="no-order-title">Order Not Found</div>
+                    <div class="no-order-text">The order ID you entered could not be found. Please check and try again.</div>
+                    <button class="sample-btn" onclick="loadSampleOrder()">View Sample Order</button>
+                </div>
+            `;
+        }
+        
+        function showError(message) {
+            const panel = document.getElementById('orderPanel');
+            panel.innerHTML = `
+                <div class="no-order">
+                    <div class="no-order-icon">⚠️</div>
+                    <div class="no-order-title">Error</div>
+                    <div class="no-order-text">${message}</div>
+                    <button class="sample-btn" onclick="loadSampleOrder()">View Sample Order</button>
+                </div>
+            `;
+        }
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Allow Enter key to track order
+        document.getElementById('orderIdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                trackOrder();
+            }
+        });
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map will be initialized by Google Maps callback
+        });
+    </script>
+    
+    <!-- Google Maps API -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw&callback=initMap">
+    </script>
+</body>
+</html>

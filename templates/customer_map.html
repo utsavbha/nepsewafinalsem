@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Service Providers - NepSewa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .map-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .search-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 250px;
+        }
+        
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .map-container {
+            height: calc(100vh - 80px);
+            position: relative;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .sidebar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 350px;
+            max-height: calc(100vh - 120px);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        
+        .results-count {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .providers-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .provider-card {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .provider-card:hover {
+            background: #f9fafb;
+        }
+        
+        .provider-card.selected {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .provider-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .provider-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .provider-info {
+            flex: 1;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+        
+        .provider-service {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .provider-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+        }
+        
+        .rating-stars {
+            color: #fbbf24;
+        }
+        
+        .rating-text {
+            color: #374151;
+        }
+        
+        .provider-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .detail-label {
+            color: #6b7280;
+        }
+        
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+        }
+        
+        .book-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.2s;
+        }
+        
+        .book-btn:hover {
+            background: #2563eb;
+        }
+        
+        .info-window {
+            max-width: 280px;
+        }
+        
+        .info-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .info-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .info-name {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+        
+        .info-service {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .info-details {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .info-label {
+            color: #6b7280;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #111827;
+        }
+        
+        .info-book-btn {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-header">
+        <div class="header-content">
+            <div class="logo">NepSewa</div>
+            <div class="search-controls">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search providers..." onkeyup="filterProviders()">
+                <select class="filter-select" id="serviceFilter" onchange="filterProviders()">
+                    <option value="">All Services</option>
+                </select>
+                <select class="filter-select" id="locationFilter" onchange="filterProviders()">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <div id="map"></div>
+        
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Available Providers</div>
+                <div class="results-count" id="resultsCount">Loading...</div>
+            </div>
+            
+            <div class="providers-list" id="providersList">
+                <div class="loading">🔍 Finding providers near you...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let map;
+        let providers = [];
+        let filteredProviders = [];
+        let markers = [];
+        let selectedProvider = null;
+        let infoWindow;
+        
+        // Service area center (Butwal)
+        const serviceCenter = { lat: 27.7000, lng: 83.4500 };
+        
+        // Location coordinates
+        const locationCoords = {
+            'Butwal': { lat: 27.7000, lng: 83.4500 },
+            'Tilottama': { lat: 27.7200, lng: 83.4300 },
+            'Bhairahawa': { lat: 27.5081, lng: 83.4519 },
+            'Chitwan': { lat: 27.5291, lng: 84.3542 }
+        };
+        
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 11,
+                center: serviceCenter,
+                styles: [
+                    {
+                        featureType: 'poi',
+                        elementType: 'labels',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+            
+            infoWindow = new google.maps.InfoWindow();
+            
+            loadProviders();
+        }
+        
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/providers');
+                const data = await response.json();
+                
+                if (data.success) {
+                    providers = data.providers.filter(p => p.is_verified);
+                    filteredProviders = [...providers];
+                    
+                    populateFilters();
+                    renderProviders();
+                    showProvidersOnMap();
+                    updateResultsCount();
+                }
+            } catch (error) {
+                console.error('Error loading providers:', error);
+                showError('Failed to load providers');
+            }
+        }
+        
+        function populateFilters() {
+            // Populate service filter
+            const services = [...new Set(providers.map(p => p.service))];
+            const serviceFilter = document.getElementById('serviceFilter');
+            serviceFilter.innerHTML = '<option value="">All Services</option>' + 
+                services.map(s => `<option value="${s}">${s}</option>`).join('');
+            
+            // Populate location filter
+            const locations = [...new Set(providers.map(p => p.location))];
+            const locationFilter = document.getElementById('locationFilter');
+            locationFilter.innerHTML = '<option value="">All Locations</option>' + 
+                locations.map(l => `<option value="${l}">${l}</option>`).join('');
+        }
+        
+        function renderProviders() {
+            const container = document.getElementById('providersList');
+            
+            if (filteredProviders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div>🔍 No providers found</div>
+                        <div style="font-size: 12px; margin-top: 4px;">Try adjusting your filters</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredProviders.map(provider => `
+                <div class="provider-card" onclick="selectProvider(${provider.id})" id="provider-${provider.id}">
+                    <div class="provider-header">
+                        <img src="${provider.image}" alt="${provider.name}" class="provider-avatar">
+                        <div class="provider-info">
+                            <div class="provider-name">${provider.name}</div>
+                            <div class="provider-service">${provider.service}</div>
+                            <div class="provider-rating">
+                                <span class="rating-stars">★</span>
+                                <span class="rating-text">${provider.rating} (${provider.review_count} reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="provider-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Location:</span>
+                            <span class="detail-value">${provider.location}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Experience:</span>
+                            <span class="detail-value">${provider.experience} years</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Jobs:</span>
+                            <span class="detail-value">${provider.completed_jobs}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Response:</span>
+                            <span class="detail-value">${provider.response_time_hours}h</span>
+                        </div>
+                    </div>
+                    
+                    <button class="book-btn" onclick="bookProvider(${provider.id}, event)">
+                        📞 Book Now
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function showProvidersOnMap() {
+            // Clear existing markers
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+            
+            filteredProviders.forEach(provider => {
+                const coords = getProviderCoordinates(provider);
+                if (!coords) return;
+                
+                const marker = new google.maps.Marker({
+                    position: coords,
+                    map: map,
+                    title: provider.name,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: '#3b82f6',
+                        fillOpacity: 1,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 3
+                    }
+                });
+                
+                marker.addListener('click', () => {
+                    selectProvider(provider.id);
+                    showProviderInfo(provider, marker);
+                });
+                
+                markers.push(marker);
+            });
+        }
+        
+        function getProviderCoordinates(provider) {
+            const baseCoords = locationCoords[provider.location];
+            if (!baseCoords) return null;
+            
+            // Add small random offset to avoid overlapping markers
+            const offset = 0.01;
+            return {
+                lat: baseCoords.lat + (Math.random() - 0.5) * offset,
+                lng: baseCoords.lng + (Math.random() - 0.5) * offset
+            };
+        }
+        
+        function selectProvider(providerId) {
+            // Remove previous selection
+            if (selectedProvider) {
+                const prevCard = document.getElementById(`provider-${selectedProvider}`);
+                if (prevCard) prevCard.classList.remove('selected');
+            }
+            
+            // Select new provider
+            selectedProvider = providerId;
+            const card = document.getElementById(`provider-${providerId}`);
+            if (card) {
+                card.classList.add('selected');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            
+            // Center map on provider
+            const provider = providers.find(p => p.id === providerId);
+            if (provider) {
+                const coords = getProviderCoordinates(provider);
+                if (coords) {
+                    map.panTo(coords);
+                    map.setZoom(14);
+                }
+            }
+        }
+        
+        function showProviderInfo(provider, marker) {
+            const content = `
+                <div class="info-window">
+                    <div class="info-header">
+                        <img src="${provider.image}" alt="${provider.name}" class="info-avatar">
+                        <div>
+                            <div class="info-name">${provider.name}</div>
+                            <div class="info-service">${provider.service}</div>
+                        </div>
+                    </div>
+                    <div class="info-details">
+                        <div class="info-row">
+                            <span class="info-label">Rating:</span>
+                            <span class="info-value">⭐ ${provider.rating}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Experience:</span>
+                            <span class="info-value">${provider.experience} years</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Jobs:</span>
+                            <span class="info-value">${provider.completed_jobs}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Response:</span>
+                            <span class="info-value">${provider.response_time_hours}h</span>
+                        </div>
+                    </div>
+                    <button class="info-book-btn" onclick="bookProvider(${provider.id})">
+                        📞 Book ${provider.name}
+                    </button>
+                </div>
+            `;
+            
+            infoWindow.setContent(content);
+            infoWindow.open(map, marker);
+        }
+        
+        function filterProviders() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const service = document.getElementById('serviceFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            
+            filteredProviders = providers.filter(provider => {
+                const matchesSearch = !search || 
+                    provider.name.toLowerCase().includes(search) ||
+                    provider.service.toLowerCase().includes(search);
+                    
+                const matchesService = !service || provider.service === service;
+                const matchesLocation = !location || provider.location === location;
+                
+                return matchesSearch && matchesService && matchesLocation;
+            });
+            
+            renderProviders();
+            showProvidersOnMap();
+            updateResultsCount();
+        }
+        
+        function updateResultsCount() {
+            const count = filteredProviders.length;
+            document.getElementById('resultsCount').textContent = 
+                `${count} provider${count !== 1 ? 's' : ''} found`;
+        }
+        
+        function bookProvider(providerId, event) {
+            if (event) event.stopPropagation();
+            
+            const provider = providers.find(p => p.id === providerId);
+            if (provider) {
+                // Redirect to services page with pre-selected provider
+                window.location.href = `/services?provider=${providerId}&service=${encodeURIComponent(provider.service_key)}`;
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('providersList').innerHTML = `
+                <div class="empty-state">
+                    <div>❌ ${message}</div>
+                </div>
+            `;
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Map will be initialized by Google Maps callback
+        });
+    </script>
+    
+    <!-- Google Maps API -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw&callback=initMap">
+    </script>
+</body>
+</html>

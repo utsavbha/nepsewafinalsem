@@ -547,6 +547,9 @@ input:checked + .toggle-track .toggle-thumb { transform: translateX(30px); }
     .nav-menu a {
         font-size: 0.85rem;
         white-space: nowrap;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .nav-right {
@@ -848,3 +851,762 @@ body.light .stat-num    { color: #0f172a; }
 body.light .score-bar-bg { background: rgba(0,0,0,0.08); }
 body.light .filters select { background: #e2e8f0; color: #0f172a; }
 body.light .sort-btn    { color: #475569; border-color: rgba(99,102,241,0.3); }
+/* ===== MODAL STYLES ===== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--card);
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.modal-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.service-image-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.service-image-large {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.image-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.nav-btn {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.modal-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-right h3 {
+    margin-top: 0;
+    color: #6366f1;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.booking-section {
+    margin-bottom: 25px;
+}
+
+.booking-section label {
+    display: block;
+    font-weight: bold;
+    color: #7c3aed;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.price-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #059669;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.selected-date {
+    font-size: 16px;
+    color: #dc2626;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.date-picker {
+    margin-bottom: 15px;
+}
+
+.calendar-days {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.date-day {
+    min-width: 60px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.date-day:hover {
+    border-color: var(--primary);
+}
+
+.date-day.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.day-name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.day-num {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.day-month {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.time-note {
+    font-size: 14px;
+    color: #f59e0b;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.time-slot {
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.time-slot:hover {
+    border-color: var(--primary);
+}
+
+.time-slot.active-time {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: white;
+}
+
+.book-btn {
+    background: linear-gradient(to right, #6366f1, #06b6d4);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.book-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* ===== CONFIRMATION MODAL ===== */
+.confirm-modal-content {
+    max-width: 560px !important;
+    padding: 32px !important;
+}
+
+.confirm-header {
+    margin-bottom: 24px;
+}
+
+.confirm-service-badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.confirm-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 8px 0;
+}
+
+.confirm-timing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 14px;
+}
+
+.confirm-timing svg {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.confirm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.error-msg.show {
+    display: block;
+}
+
+.confirm-summary {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+    margin: 20px 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.summary-price {
+    font-weight: 600;
+    font-size: 16px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+.confirm-book-btn {
+    background: linear-gradient(to right, #6366f1, #06b6d4);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+.confirm-book-btn:hover {
+    opacity: 0.92;
+    transform: scale(1.02);
+}
+
+.confirm-book-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .modal-content {
+        padding: 15px;
+        width: 95%;
+    }
+    
+    .confirm-modal-content {
+        padding: 20px !important;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+/* Additional colorful text styles for booking modal */
+.price-desc {
+    color: #64748b;
+    font-size: 14px;
+    margin: 8px 0;
+    font-style: italic;
+}
+
+.worker-info {
+    color: #0ea5e9;
+    font-size: 14px;
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+#modalServiceTitle {
+    color: #1e40af;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Enhanced time slot colors */
+.time-slot {
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    color: #475569;
+    font-weight: 500;
+}
+
+.time-slot:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.time-slot.active-time {
+    border-color: #6366f1;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Enhanced date picker colors */
+.date-day {
+    min-width: 60px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #475569;
+}
+
+.date-day:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.05);
+}
+
+.date-day.selected {
+    border-color: #dc2626;
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.day-name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.day-num {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.day-month {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+/* Enhanced book button */
+.book-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.book-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #5b21b6, #7c3aed, #0891b2);
+}
+/* ===== FINAL POLISH TOUCHES ===== */
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: all 0.2s ease;
+}
+
+/* Enhanced card hover effects */
+.card:hover, .pro-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Professional loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced button styles */
+.btn, .book-btn, .confirm-book-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before, .book-btn::before, .confirm-book-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before, .book-btn:hover::before, .confirm-book-btn:hover::before {
+    left: 100%;
+}
+
+/* Professional scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5b21b6;
+}
+
+/* Enhanced modal animations */
+.modal.show .modal-content {
+    animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Professional focus states */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Enhanced navbar */
+.navbar {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Professional status indicators */
+.verified-badge {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* Enhanced grid layouts */
+.grid {
+    gap: 20px;
+}
+
+.grid > * {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Professional error states */
+.form-input.error {
+    border-color: #ef4444;
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+.form-input.success {
+    border-color: #22c55e;
+    background-color: rgba(34, 197, 94, 0.05);
+}
+
+/* Enhanced mobile responsiveness */
+@media (max-width: 768px) {
+    .card, .pro-card {
+        margin-bottom: 15px;
+    }
+    
+    .modal-content {
+        margin: 10px;
+        max-height: calc(100vh - 20px);
+    }
+    
+    .grid {
+        gap: 15px;
+    }
+}
+
+/* Professional loading overlay */
+.page-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.page-loading .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced success states */
+.success-message {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.error-message {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin: 15px 0;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Professional typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+p {
+    line-height: 1.6;
+}
+
+/* Enhanced accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Professional print styles */
+@media print {
+    .navbar, .modal, .btn, button {
+        display: none !important;
+    }
+    
+    .card, .pro-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}

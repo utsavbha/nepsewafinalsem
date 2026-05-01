@@ -195,5 +195,17 @@
     "payment": "unpaid",
     "booked_at": "2026-04-29 13:22:31",
     "user_id": 2
+  },
+  {
+    "booking_id": "NS-K4VYXI",
+    "name": "Mr Fury",
+    "email": "utsav1@gmail.com",
+    "phone": "9869423357",
+    "address": "butwal",
+    "service": "makeup",
+    "status": "pending",
+    "payment": "unpaid",
+    "booked_at": "2026-04-30 15:28:41",
+    "user_id": 2
   }
 ]

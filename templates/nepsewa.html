@@ -6,6 +6,7 @@
 <title>NepSewa — Trusted Services at Your Doorstep</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/nepsewa.css">
+<link rel="stylesheet" href="/static/alerts.css">
 </head>
 <body>
 
@@ -18,6 +19,7 @@
     <ul class="nav-menu">
       <li><a href="/">Home</a></li>
       <li><a href="/services">Services</a></li>
+      <li><a href="/map">Find Nearby</a></li>
       <li><a href="/login" id="loginNavLink">Login</a></li>
     </ul>
     <div class="nav-right">
@@ -62,31 +64,31 @@
 <section>
     <h2 class="section-title">Our Popular Services</h2>
     <div class="grid">
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('cleaning')">
             <img src="/static/cleaning.png">
             <p>Home Cleaning</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('plumbing')">
             <img src="/static/plumber.png">
             <p>Plumbing</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('electrical')">
             <img src="/static/technician.png">
             <p>Electric Repair</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('ac-service')">
             <img src="/static/air-conditioner.png">
             <p>AC Service</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('toilet-cleaning')">
             <img src="/static/toilet.png">
             <p>Toilet Cleaning</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('spa-massage')">
             <img src="/static/facial-massage.png">
             <p>Spa &amp; Massage</p>
         </div>
-        <div class="card" onclick="window.location.href='/services'">
+        <div class="card" onclick="openBookingModal('hair-cutting')">
             <img src="/static/hair-cutting.png">
             <p>Hair Cutting</p>
         </div>
@@ -120,10 +122,117 @@
     </div>
 </section>
 
+<!-- BOOKING MODAL -->
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-grid">
+            <div class="modal-left">
+                <div class="service-image-container">
+                    <img id="serviceImage" src="" alt="Service" class="service-image-large">
+                    <div class="image-nav">
+                        <button class="nav-btn" onclick="previousImage()">&lt;</button>
+                        <button class="nav-btn" onclick="nextImage()">&gt;</button>
+                    </div>
+                </div>
+                <h2 id="modalServiceTitle"></h2>
+                <p id="priceDescription" class="price-desc"></p>
+                <p id="workerInfo" class="worker-info"></p>
+            </div>
+            <div class="modal-right">
+                <h3>Book a Service</h3>
+                <div class="booking-section">
+                    <label>Price</label>
+                    <p class="price-display" id="priceDisplay">Rs 500.00 / Hour</p>
+                </div>
+                <div class="booking-section">
+                    <label>Select Date</label>
+                    <p class="selected-date" id="selectedDate"></p>
+                    <div class="date-picker"></div>
+                </div>
+                <div class="booking-section">
+                    <label>Choose a time period</label>
+                    <p class="time-note">Team will arrive within the selected time</p>
+                    <div class="time-slots">
+                        <button class="time-slot active-time" onclick="selectTime(this,'8AM - 9AM')">8AM - 9AM</button>
+                        <button class="time-slot" onclick="selectTime(this,'9AM - 10AM')">9AM - 10AM</button>
+                        <button class="time-slot" onclick="selectTime(this,'10AM - 11AM')">10AM - 11AM</button>
+                        <button class="time-slot" onclick="selectTime(this,'11AM - 12PM')">11AM - 12PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'12PM - 1PM')">12PM - 1PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'1PM - 2PM')">1PM - 2PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'2PM - 3PM')">2PM - 3PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'3PM - 4PM')">3PM - 4PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'4PM - 5PM')">4PM - 5PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'5PM - 6PM')">5PM - 6PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'6PM - 7PM')">6PM - 7PM</button>
+                        <button class="time-slot" onclick="selectTime(this,'7PM - 8PM')">7PM - 8PM</button>
+                    </div>
+                </div>
+                <button class="book-btn" onclick="proceedToBook()">Proceed to Book</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CONFIRMATION MODAL -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content confirm-modal-content">
+        <span class="close-btn" onclick="closeConfirmModal()">&times;</span>
+        <div class="confirm-header">
+            <div class="confirm-service-badge" id="confirmBadge"></div>
+            <h2 class="confirm-title">Book Service</h2>
+            <div class="confirm-timing">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="confirmTimingText"></span>
+            </div>
+        </div>
+        <div class="confirm-form">
+            <div class="form-group">
+                <label>Full Name <span class="required">*</span></label>
+                <input type="text" id="cf-name" placeholder="eg: Ram Sharma" class="form-input">
+                <small class="error-msg" id="error-name"></small>
+            </div>
+            <div class="form-group">
+                <label>Address <span class="required">*</span></label>
+                <input type="text" id="cf-address" placeholder="eg: Butwal-10, Rupandehi" class="form-input">
+                <small class="error-msg" id="error-address"></small>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="cf-phone" placeholder="eg: 9800000000" class="form-input">
+                    <small class="error-msg" id="error-phone"></small>
+                </div>
+                <div class="form-group">
+                    <label>Landmark</label>
+                    <input type="text" id="cf-landmark" placeholder="eg: Near Butwal Bus Park" class="form-input">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="cf-email" placeholder="eg: ram@gmail.com" class="form-input">
+                <small class="error-msg" id="error-mail"></small>
+            </div>
+            <div class="form-group">
+                <label>Order Note</label>
+                <textarea id="cf-note" placeholder="eg: Please bring extra tools." class="form-input form-textarea"></textarea>
+            </div>
+            <div class="confirm-summary">
+                <div class="summary-row"><span>Service</span><span id="summaryService">—</span></div>
+                <div class="summary-row"><span>Date &amp; Time</span><span id="summaryDateTime">—</span></div>
+                <div class="summary-row summary-price"><span>Price</span><span id="summaryPrice">—</span></div>
+            </div>
+            <button class="confirm-book-btn" onclick="confirmBooking()">Confirm Booking</button>
+        </div>
+    </div>
+</div>
+
 <footer>
     <p>© 2026 NepSewa</p>
 </footer>
 
 <script src="/static/nepsewa.js"></script>
+<script src="/static/alerts.js"></script>
+
 </body>
 </html>
