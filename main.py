@@ -304,13 +304,17 @@ def insert_sample_providers():
 # ─────────────────────────────────────────────
 # PAGES
 # ─────────────────────────────────────────────
+@app.route("/test")
+def test():
+    return "<h1>NepSewa Test Route Works! ✅</h1><p><a href='/'>Home</a> | <a href='/health'>Health</a></p>"
+
 @app.route("/")
 def home():
     try:
         return render_template("nepsewa.html")
     except Exception as e:
         print(f"Error in home route: {e}")
-        return f"Error loading home page: {str(e)}", 500
+        return f"<h1>NepSewa - Service Marketplace</h1><p>Error loading template: {str(e)}</p><p><a href='/health'>Check Health</a></p>", 500
 
 @app.route("/services")
 def services():
