@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import json, os, random, string, requests, hmac, hashlib, base64, uuid
 from datetime import datetime
-import pymysql
-import pymysql.cursors
+import psycopg2
+import psycopg2.extras
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -47,11 +47,10 @@ import os
 # Database configuration - supports both local and production
 DB_CONFIG = dict(
     host=os.environ.get("DB_HOST", "localhost"),
-    user=os.environ.get("DB_USER", "root"),
+    user=os.environ.get("DB_USER", "postgres"),
     password=os.environ.get("DB_PASSWORD", "nepsewa123"),
     database=os.environ.get("DB_NAME", "nepsewa"),
-    autocommit=True,
-    cursorclass=pymysql.cursors.DictCursor
+    port=int(os.environ.get("DB_PORT", 5432))
 )
 
 # Handle DATABASE_URL for Render deployment
@@ -60,20 +59,22 @@ if os.environ.get('DATABASE_URL'):
     url = urlparse.urlparse(os.environ['DATABASE_URL'])
     DB_CONFIG.update({
         'host': url.hostname,
-        'port': url.port or 3306,
+        'port': url.port or 5432,
         'user': url.username,
         'password': url.password,
         'database': url.path[1:],  # Remove leading slash
+        'sslmode': 'require'  # Required for Render PostgreSQL
     })
 
 def get_db():
     """Get a fresh database connection for each request"""
     try:
-        conn = pymysql.connect(**DB_CONFIG)
+        conn = psycopg2.connect(**DB_CONFIG)
+        conn.autocommit = True
         return conn
     except Exception as e:
         print(f"Database connection error: {e}")
-        print("Make sure MySQL is running and credentials are correct")
+        print("Make sure PostgreSQL is running and credentials are correct")
         raise e
 
 # ─────────────────────────────────────────────
@@ -85,18 +86,18 @@ def init_db():
         # Users table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id         INT AUTO_INCREMENT PRIMARY KEY,
+                id         SERIAL PRIMARY KEY,
                 name       VARCHAR(120)  NOT NULL,
                 email      VARCHAR(180)  NOT NULL UNIQUE,
                 password   VARCHAR(256)  NOT NULL,
-                created_at DATETIME      DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
             )
         """)
         
         # Service providers table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS service_providers (
-                id                  INT AUTO_INCREMENT PRIMARY KEY,
+                id                  SERIAL PRIMARY KEY,
                 name                VARCHAR(120) NOT NULL,
                 service             VARCHAR(100) NOT NULL,
                 service_key         VARCHAR(50)  NOT NULL,
@@ -105,27 +106,28 @@ def init_db():
                 latitude            DECIMAL(10,8) DEFAULT NULL,
                 longitude           DECIMAL(11,8) DEFAULT NULL,
                 rating              DECIMAL(3,2) DEFAULT 0.0,
-                experience          INT          DEFAULT 0,
-                completed_jobs      INT          DEFAULT 0,
+                experience          INTEGER      DEFAULT 0,
+                completed_jobs      INTEGER      DEFAULT 0,
                 cancellation_rate   DECIMAL(4,3) DEFAULT 0.0,
                 response_time_hours DECIMAL(4,1) DEFAULT 24.0,
                 is_verified         BOOLEAN      DEFAULT FALSE,
-                review_count        INT          DEFAULT 0,
+                review_count        INTEGER      DEFAULT 0,
                 image               TEXT,
                 phone               VARCHAR(15),
-                availability        JSON,
+                availability        JSONB,
                 email               VARCHAR(180) UNIQUE,
                 password            VARCHAR(256),
                 bio                 TEXT,
-                created_at          DATETIME     DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_service_key (service_key),
-                INDEX idx_location (location),
-                INDEX idx_rating (rating),
-                INDEX idx_email (email),
-                INDEX idx_coordinates (latitude, longitude)
+                created_at          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
             )
         """)
-    conn.commit()
+        
+        # Create indexes
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_service_key ON service_providers (service_key)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_location ON service_providers (location)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_rating ON service_providers (rating)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_email ON service_providers (email)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_coordinates ON service_providers (latitude, longitude)")
     
     # Insert sample data if table is empty
     insert_sample_providers()

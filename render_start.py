@@ -1,12 +1,7 @@
-#!/usr/bin/env python3
-"""
-Render Deployment Startup Script for NepSewa
-This script is optimized for Render's deployment environment
-"""
-
 import os
 import sys
-import pymysql
+import psycopg2
+import psycopg2.extras
 import urllib.parse as urlparse
 
 # Add current directory to Python path
@@ -15,28 +10,27 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from main import app, init_db
 
 def setup_database_config():
-    """Configure database connection for Render"""
+    """Configure database connection for Render PostgreSQL"""
     from main import DB_CONFIG
     
     if os.environ.get('DATABASE_URL'):
-        # Parse Render's DATABASE_URL
+        # Parse Render's DATABASE_URL for PostgreSQL
         url = urlparse.urlparse(os.environ['DATABASE_URL'])
         DB_CONFIG.update({
             'host': url.hostname,
-            'port': url.port or 3306,
+            'port': url.port or 5432,
             'user': url.username,
             'password': url.password,
             'database': url.path[1:],  # Remove leading slash
-            'autocommit': True,
-            'cursorclass': pymysql.cursors.DictCursor
+            'sslmode': 'require'  # Required for Render PostgreSQL
         })
-        print(f"✅ Database configured: {url.hostname}:{url.port or 3306}")
+        print(f"✅ PostgreSQL configured: {url.hostname}:{url.port or 5432}")
     else:
         print("⚠️  No DATABASE_URL found, using default config")
 
 def initialize_app():
     """Initialize the application for production"""
-    print("🚀 NepSewa - Initializing for Render deployment")
+    print("🚀 NepSewa - Initializing for Render deployment with PostgreSQL")
     
     # Setup database
     setup_database_config()
