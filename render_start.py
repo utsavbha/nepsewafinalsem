@@ -299,6 +299,146 @@ def api_providers():
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}")
 
+@app.route("/api/services")
+def api_services():
+    """Get all available service categories"""
+    try:
+        # Return the service categories that match your database
+        services = [
+            {
+                "service_key": "cleaning",
+                "service_name": "Home Cleaning",
+                "provider_count": 3,
+                "avg_rating": 4.7,
+                "title": "Home Cleaning",
+                "price": "Rs. 500 / Hour",
+                "image": "https://sunflowermaids.com/wp-content/uploads/2021/08/Signs-of-a-Bad-Cleaning-Lady.jpg",
+                "description": "Kitchens, bathrooms, bedrooms and living rooms cleaned thoroughly."
+            },
+            {
+                "service_key": "plumber",
+                "service_name": "Plumbing",
+                "provider_count": 2,
+                "avg_rating": 4.7,
+                "title": "Plumber Service",
+                "price": "Rs. 500 / Hour",
+                "image": "https://nnps.com.np/wp-content/uploads/2023/06/imgs-1.jpg",
+                "description": "Our plumbers fix leaking taps, blocked drains, broken pipes and bathroom fittings."
+            },
+            {
+                "service_key": "electrician",
+                "service_name": "Electric Repair",
+                "provider_count": 2,
+                "avg_rating": 4.8,
+                "title": "Electrician Service",
+                "price": "Rs. 500 / Hour",
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXwC_BznDpwyR2eeQpC7mAQTTisL33B2Mt3g&s",
+                "description": "Switch repairs, fan and light installations, power socket fitting, and circuit troubleshooting."
+            },
+            {
+                "service_key": "ac",
+                "service_name": "AC Service",
+                "provider_count": 1,
+                "avg_rating": 4.7,
+                "title": "AC Repair & Service",
+                "price": "Rs. 500 / Hour",
+                "image": "https://clareservices.com/wp-content/uploads/2020/07/air-conditioning-repair-service-hyderabad.jpg",
+                "description": "Regular servicing, filter cleaning, gas refilling and fault repairs for all major AC brands."
+            },
+            {
+                "service_key": "haircutting",
+                "service_name": "Hair Cutting",
+                "provider_count": 1,
+                "avg_rating": 4.2,
+                "title": "Hair Cutting",
+                "price": "Rs. 200 / Person",
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBOJdrtttgPWstF4HcMoxCwE8pU2dNwZEYQg&s",
+                "description": "Professional haircut at home. Our barbers bring all their own tools."
+            },
+            {
+                "service_key": "makeup",
+                "service_name": "Makeup Artist",
+                "provider_count": 1,
+                "avg_rating": 4.9,
+                "title": "Makeup Artist",
+                "price": "Rs. 500 / Hour",
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaaYzEvMXuqWZ5Hp5Q14B9vqRFu5fQvlfBEA&s",
+                "description": "Home visits for weddings, parties, photoshoots and daily events."
+            },
+            {
+                "service_key": "photographer",
+                "service_name": "Photographer",
+                "provider_count": 1,
+                "avg_rating": 4.9,
+                "title": "Photographer",
+                "price": "Rs. 500 / Hour",
+                "image": "https://img.freepik.com/free-photo/young-stylish-photographer-holds-professional-camera-taking-photos_8353-6506.jpg",
+                "description": "Family events, product shoots, birthdays, ceremonies. Camera and lighting provided."
+            },
+            {
+                "service_key": "gardener",
+                "service_name": "Gardener",
+                "provider_count": 1,
+                "avg_rating": 4.3,
+                "title": "Gardener Service",
+                "price": "Rs. 1,000 / Day",
+                "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC99OjYEYoOEna34FkVD741eZRu7AUVtSO3w&s",
+                "description": "Lawn mowing, plant trimming, weeding, watering and basic garden maintenance."
+            }
+        ]
+        
+        return jsonify(success=True, services=services)
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/add-sample-data", methods=["POST"])
+def add_sample_data():
+    """Add sample data if database is empty"""
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+        
+        # Check if we already have providers
+        with conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM service_providers")
+            count = cur.fetchone()[0]
+            
+            if count > 0:
+                return jsonify(success=True, message=f"Already have {count} providers")
+            
+            # Add sample providers
+            providers = [
+                ("Aarav Sharma", "Home Cleaning", "cleaning", "Butwal", "Rupandehi", 4.8, 5, 312, 0.02, 1.5, True, 148, "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", "9801000001", '["Mon","Tue","Wed","Thu","Fri","Sat"]'),
+                ("Karuna Rai", "Makeup Artist", "makeup", "Tilottama", "Rupandehi", 4.9, 6, 420, 0.01, 1.0, True, 210, "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face", "9801000002", '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'),
+                ("Arjun Basnet", "Plumbing", "plumber", "Bhairahawa", "Rupandehi", 4.7, 4, 198, 0.03, 2.0, True, 95, "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", "9801000003", '["Mon","Tue","Wed","Thu","Fri"]'),
+                ("Deepa Rana", "Electric Repair", "electrician", "Chitwan", "Chitwan", 5.0, 4, 175, 0.00, 2.5, True, 88, "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", "9801000004", '["Tue","Wed","Thu","Fri","Sat","Sun"]'),
+                ("Binod Joshi", "Hair Cutting", "haircutting", "Butwal", "Rupandehi", 4.2, 2, 89, 0.07, 3.0, False, 42, "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", "9801000005", '["Mon","Wed","Fri","Sat","Sun"]'),
+                ("Sunita Oli", "AC Service", "ac", "Tilottama", "Rupandehi", 4.7, 3, 134, 0.04, 2.0, True, 67, "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face", "9801000006", '["Mon","Tue","Thu","Fri","Sat"]'),
+                ("Nisha Koirala", "Photographer", "photographer", "Chitwan", "Chitwan", 4.9, 8, 310, 0.01, 3.0, True, 155, "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face", "9801000007", '["Fri","Sat","Sun"]'),
+                ("Mamata Neupane", "Gardener", "gardener", "Bhairahawa", "Rupandehi", 4.3, 6, 145, 0.06, 4.0, False, 72, "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face", "9801000008", '["Mon","Tue","Thu","Sat","Sun"]')
+            ]
+            
+            for provider in providers:
+                cur.execute("""
+                    INSERT INTO service_providers 
+                    (name, service, service_key, location, district, rating, experience, 
+                     completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                     review_count, image, phone, availability)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, provider)
+            
+            # Get final count
+            cur.execute("SELECT COUNT(*) FROM service_providers")
+            final_count = cur.fetchone()[0]
+        
+        conn.close()
+        return jsonify(success=True, message=f"Added {final_count} providers successfully!")
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
 @app.route("/api/debug/db")
 def debug_database():
     """Debug database connection"""
@@ -371,6 +511,265 @@ def api_nearby_providers():
         
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}")
+
+# ─────────────────────────────────────────────
+# AUTH API
+# ─────────────────────────────────────────────
+@app.route("/api/signup", methods=["POST"])
+def signup():
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+
+    if not name or not email or not password:
+        return jsonify(success=False, message="All fields are required")
+    if len(password) < 6:
+        return jsonify(success=False, message="Password must be at least 6 characters")
+
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE email=%s", (email,))
+            if cur.fetchone():
+                return jsonify(success=False, message="Email already registered")
+            
+            from werkzeug.security import generate_password_hash
+            cur.execute(
+                "INSERT INTO users (name, email, password) VALUES (%s, %s, %s)",
+                (name, email, generate_password_hash(password))
+            )
+        conn.close()
+        return jsonify(success=True, message="Account created successfully")
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+
+    if not email or not password:
+        return jsonify(success=False, message="All fields are required")
+
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, name, email, password, created_at FROM users WHERE email=%s", (email,))
+            user = cur.fetchone()
+
+        if not user:
+            return jsonify(success=False, message="Invalid email or password")
+            
+        from werkzeug.security import check_password_hash
+        if not check_password_hash(user[3], password):
+            return jsonify(success=False, message="Invalid email or password")
+
+        session["user_id"] = user[0]
+        session["user_name"] = user[1]
+        session["user_email"] = user[2]
+        
+        redirect_url = data.get("redirect_url", "/profile")
+        conn.close()
+        return jsonify(success=True, message="Login successful", redirect_url=redirect_url)
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/me")
+def api_me():
+    if not session.get("user_id"):
+        return jsonify(success=False, message="Not logged in"), 401
+
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, name, email, created_at FROM users WHERE id=%s",
+                (session["user_id"],)
+            )
+            user = cur.fetchone()
+
+        if not user:
+            session.clear()
+            return jsonify(success=False, message="User not found"), 404
+
+        # Simulate bookings for now
+        bookings = []
+
+        conn.close()
+        return jsonify(
+            success=True,
+            user=dict(
+                id=user[0],
+                name=user[1],
+                email=user[2],
+                member_since=str(user[3])[:10],
+                total_bookings=len(bookings),
+                bookings=bookings,
+                initials="".join(w[0].upper() for w in user[1].split()[:2])
+            )
+        )
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+# ─────────────────────────────────────────────
+# BOOKING API
+# ─────────────────────────────────────────────
+@app.route("/api/book-provider", methods=["POST"])
+def api_book_provider():
+    """Book a specific provider directly"""
+    try:
+        data = request.get_json(silent=True) or {}
+        
+        # Generate booking ID
+        booking_id = "NS-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+        
+        # Create order with provider information
+        order = {
+            "booking_id": booking_id,
+            "name": data.get("name"),
+            "phone": data.get("phone"),
+            "address": data.get("address"),
+            "service": data.get("service"),
+            "service_key": data.get("service_key"),
+            "provider_id": data.get("provider_id"),
+            "provider_name": data.get("provider_name"),
+            "preferred_date": data.get("date"),
+            "preferred_time": data.get("time"),
+            "notes": data.get("notes", ""),
+            "status": "confirmed",
+            "payment": "pending",
+            "booked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "booking_type": "direct_provider"
+        }
+        
+        # Validate required fields
+        required_fields = ["name", "phone", "address", "service", "provider_id", "provider_name"]
+        for field in required_fields:
+            if not order.get(field):
+                return jsonify(success=False, message=f"Missing required field: {field}"), 400
+        
+        # For now, just return success (you can add file storage later)
+        return jsonify(
+            success=True, 
+            booking_id=booking_id,
+            message="Booking confirmed successfully!",
+            order=order
+        )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Booking failed: {str(e)}"), 500
+
+@app.route("/api/book", methods=["POST"])
+def api_book():
+    # Check if user is logged in
+    if not session.get("user_id"):
+        return jsonify(success=False, message="Please log in to book services"), 401
+    
+    data = request.get_json(silent=True) or {}
+    booking_id = "NS-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+    order = {
+        "booking_id": booking_id,
+        "name": data.get("name"),
+        "email": session.get("user_email", data.get("email", "")),
+        "phone": data.get("phone"),
+        "address": data.get("address"),
+        "service": data.get("service"),
+        "status": "pending",
+        "payment": "unpaid",
+        "booked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "user_id": session.get("user_id")
+    }
+    
+    # For now, just return success
+    return jsonify(success=True, booking_id=booking_id)
+
+@app.route("/api/locations")
+def api_locations():
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            cur.execute("SELECT DISTINCT location FROM service_providers ORDER BY location")
+            locations = [row[0] for row in cur.fetchall()]
+        
+        conn.close()
+        return jsonify(success=True, locations=locations)
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/fix-nearby-providers", methods=["POST"])
+def fix_nearby_providers():
+    """Add GPS coordinates to all providers so they show up in nearby search"""
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            # Location coordinates for your areas
+            location_coords = {
+                'Butwal': {'lat': 27.7000, 'lng': 83.4500},
+                'Tilottama': {'lat': 27.7200, 'lng': 83.4300}, 
+                'Bhairahawa': {'lat': 27.5081, 'lng': 83.4519},
+                'Chitwan': {'lat': 27.5291, 'lng': 84.3542},
+                'Siddharthanagar': {'lat': 27.5200, 'lng': 83.4600},
+                'Devdaha': {'lat': 27.6800, 'lng': 83.4200}
+            }
+            
+            # Get all providers without GPS coordinates
+            cur.execute("""
+                SELECT id, name, location 
+                FROM service_providers 
+                WHERE latitude IS NULL OR longitude IS NULL
+            """)
+            providers_without_gps = cur.fetchall()
+            
+            updated_count = 0
+            
+            for provider in providers_without_gps:
+                location = provider[2]
+                if location in location_coords:
+                    base_coords = location_coords[location]
+                    
+                    # Add small random offset (within 2km) to spread providers around the area
+                    lat_offset = random.uniform(-0.018, 0.018)  # ~2km in degrees
+                    lng_offset = random.uniform(-0.018, 0.018)
+                    
+                    final_lat = base_coords['lat'] + lat_offset
+                    final_lng = base_coords['lng'] + lng_offset
+                    
+                    # Update provider with GPS coordinates
+                    cur.execute("""
+                        UPDATE service_providers 
+                        SET latitude = %s, longitude = %s 
+                        WHERE id = %s
+                    """, (final_lat, final_lng, provider[0]))
+                    
+                    updated_count += 1
+            
+            conn.close()
+            return jsonify(
+                success=True, 
+                message=f"Added GPS coordinates to {updated_count} providers",
+                updated_count=updated_count
+            )
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}"), 500
 
 def initialize_app():
     """Initialize the application for production"""
