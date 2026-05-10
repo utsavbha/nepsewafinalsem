@@ -50,34 +50,31 @@ def setup_database_config():
 def get_db():
     """Get database connection"""
     try:
-        import pg8000
-        # Create connection with proper SSL handling
-        conn = pg8000.connect(
-            host=DB_CONFIG['host'],
-            port=DB_CONFIG['port'],
-            user=DB_CONFIG['user'],
-            password=DB_CONFIG['password'],
-            database=DB_CONFIG['database'],
-            ssl_context=True  # Simplified SSL context
-        )
-        conn.autocommit = True
-        return conn
-    except Exception as e:
-        print(f"Database connection error: {e}")
-        # Try without SSL context as fallback
-        try:
+        # Try PostgreSQL first (for production)
+        if DB_CONFIG and DB_CONFIG.get('host'):
+            import pg8000
             conn = pg8000.connect(
                 host=DB_CONFIG['host'],
                 port=DB_CONFIG['port'],
                 user=DB_CONFIG['user'],
                 password=DB_CONFIG['password'],
-                database=DB_CONFIG['database']
+                database=DB_CONFIG['database'],
+                ssl_context=True
             )
             conn.autocommit = True
             return conn
-        except Exception as e2:
-            print(f"Database fallback connection error: {e2}")
-            return None
+    except Exception as e:
+        print(f"PostgreSQL connection failed: {e}")
+        
+    # Fallback to SQLite for local development
+    try:
+        import sqlite3
+        conn = sqlite3.connect('nepsewa_local.db')
+        conn.row_factory = sqlite3.Row  # Enable column access by name
+        return conn
+    except Exception as e:
+        print(f"SQLite connection failed: {e}")
+        return None
 
 def init_db():
     """Initialize database tables"""
@@ -85,10 +82,28 @@ def init_db():
         conn = get_db()
         if not conn:
             return False
+        
+        # Detect database type
+        is_sqlite = hasattr(conn, 'row_factory')
+        
+        if is_sqlite:
+            cursor = conn.cursor()
+        else:
+            cursor = conn.cursor()
             
-        with conn.cursor() as cur:
-            # Users table
-            cur.execute("""
+        # Users table
+        if is_sqlite:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    password TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+        else:
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(120) NOT NULL,
@@ -97,9 +112,34 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
-            # Service providers table
-            cur.execute("""
+        
+        # Service providers table
+        if is_sqlite:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS service_providers (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    service TEXT NOT NULL,
+                    service_key TEXT NOT NULL,
+                    location TEXT NOT NULL,
+                    district TEXT NOT NULL,
+                    latitude REAL DEFAULT NULL,
+                    longitude REAL DEFAULT NULL,
+                    rating REAL DEFAULT 4.0,
+                    experience INTEGER DEFAULT 1,
+                    completed_jobs INTEGER DEFAULT 0,
+                    cancellation_rate REAL DEFAULT 0.0,
+                    response_time_hours REAL DEFAULT 2.0,
+                    is_verified INTEGER DEFAULT 1,
+                    review_count INTEGER DEFAULT 0,
+                    image TEXT,
+                    phone TEXT,
+                    availability TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+        else:
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS service_providers (
                     id SERIAL PRIMARY KEY,
                     name VARCHAR(120) NOT NULL,
@@ -122,40 +162,54 @@ def init_db():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
-            # Check if we have providers
-            cur.execute("SELECT COUNT(*) FROM service_providers")
-            count = cur.fetchone()[0]
-            
-            if count == 0:
-                # Add sample providers
-                providers = [
-                    ("Aarav Sharma", "Home Cleaning", "cleaning", "Butwal", "Rupandehi", 4.8, 5, 312, 0.02, 1.5, True, 148, "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", "9801000001", '["Mon","Tue","Wed","Thu","Fri","Sat"]'),
-                    ("Karuna Rai", "Makeup Artist", "makeup", "Tilottama", "Rupandehi", 4.9, 6, 420, 0.01, 1.0, True, 210, "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face", "9801000002", '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'),
-                    ("Arjun Basnet", "Plumbing", "plumber", "Bhairahawa", "Rupandehi", 4.7, 4, 198, 0.03, 2.0, True, 95, "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", "9801000003", '["Mon","Tue","Wed","Thu","Fri"]'),
-                    ("Deepa Rana", "Electric Repair", "electrician", "Chitwan", "Chitwan", 5.0, 4, 175, 0.00, 2.5, True, 88, "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", "9801000004", '["Tue","Wed","Thu","Fri","Sat","Sun"]'),
-                    ("Binod Joshi", "Hair Cutting", "haircutting", "Butwal", "Rupandehi", 4.2, 2, 89, 0.07, 3.0, False, 42, "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", "9801000005", '["Mon","Wed","Fri","Sat","Sun"]'),
-                    ("Sunita Oli", "AC Service", "ac", "Tilottama", "Rupandehi", 4.7, 3, 134, 0.04, 2.0, True, 67, "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face", "9801000006", '["Mon","Tue","Thu","Fri","Sat"]'),
-                    ("Nisha Koirala", "Photographer", "photographer", "Chitwan", "Chitwan", 4.9, 8, 310, 0.01, 3.0, True, 155, "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face", "9801000007", '["Fri","Sat","Sun"]'),
-                    ("Mamata Neupane", "Gardener", "gardener", "Bhairahawa", "Rupandehi", 4.3, 6, 145, 0.06, 4.0, False, 72, "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face", "9801000008", '["Mon","Tue","Thu","Sat","Sun"]')
-                ]
-                
-                for provider in providers:
-                    cur.execute("""
-                        INSERT INTO service_providers 
-                        (name, service, service_key, location, district, rating, experience, 
-                         completed_jobs, cancellation_rate, response_time_hours, is_verified, 
-                         review_count, image, phone, availability)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """, provider)
-                
-                print("✅ Sample providers added")
         
+        # Check if we have providers
+        cursor.execute("SELECT COUNT(*) FROM service_providers")
+        count = cursor.fetchone()[0]
+        
+        if count == 0:
+            print("📊 Database is empty, adding sample providers...")
+            # Add sample providers for local development
+            add_sample_providers_local(cursor, is_sqlite)
+            print("✅ Sample providers added")
+        
+        conn.commit()
         conn.close()
         return True
     except Exception as e:
         print(f"Database initialization error: {e}")
         return False
+
+def add_sample_providers_local(cursor, is_sqlite):
+    """Add sample providers for local development"""
+    providers = [
+        ("Aarav Sharma", "Home Cleaning", "cleaning", "Butwal", "Rupandehi", 27.7012, 83.4523, 4.8, 5, 312, 0.02, 1.5, 1, 148, "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", "9801000001", '["Mon","Tue","Wed","Thu","Fri","Sat"]'),
+        ("Karuna Rai", "Makeup Artist", "makeup", "Tilottama", "Rupandehi", 27.7189, 83.4287, 4.9, 6, 420, 0.01, 1.0, 1, 210, "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face", "9801000002", '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'),
+        ("Arjun Basnet", "Plumbing", "plumber", "Bhairahawa", "Rupandehi", 27.5095, 83.4534, 4.7, 4, 198, 0.03, 2.0, 1, 95, "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", "9801000003", '["Mon","Tue","Wed","Thu","Fri"]'),
+        ("Deepa Rana", "Electric Repair", "electrician", "Chitwan", "Chitwan", 27.5278, 84.3567, 5.0, 4, 175, 0.00, 2.5, 1, 88, "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", "9801000004", '["Tue","Wed","Thu","Fri","Sat","Sun"]'),
+        ("Binod Joshi", "Hair Cutting", "haircutting", "Butwal", "Rupandehi", 27.6987, 83.4478, 4.2, 2, 89, 0.07, 3.0, 0, 42, "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", "9801000005", '["Mon","Wed","Fri","Sat","Sun"]'),
+        ("Sunita Oli", "AC Service", "ac", "Tilottama", "Rupandehi", 27.7156, 83.4298, 4.7, 3, 134, 0.04, 2.0, 1, 67, "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face", "9801000006", '["Mon","Tue","Thu","Fri","Sat"]'),
+        ("Nisha Koirala", "Photographer", "photographer", "Chitwan", "Chitwan", 27.5267, 84.3589, 4.9, 8, 310, 0.01, 3.0, 1, 155, "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face", "9801000007", '["Fri","Sat","Sun"]'),
+        ("Mamata Neupane", "Gardener", "gardener", "Bhairahawa", "Rupandehi", 27.5101, 83.4456, 4.3, 6, 145, 0.06, 4.0, 0, 72, "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face", "9801000008", '["Mon","Tue","Thu","Sat","Sun"]')
+    ]
+    
+    for provider in providers:
+        if is_sqlite:
+            cursor.execute("""
+                INSERT INTO service_providers 
+                (name, service, service_key, location, district, latitude, longitude, rating, experience, 
+                 completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                 review_count, image, phone, availability)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, provider)
+        else:
+            cursor.execute("""
+                INSERT INTO service_providers 
+                (name, service, service_key, location, district, latitude, longitude, rating, experience, 
+                 completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                 review_count, image, phone, availability)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, provider)
 
 # Routes
 @app.route("/")
@@ -305,29 +359,67 @@ def api_top_professionals():
         if not conn:
             return jsonify(success=False, message="Database not available")
         
-        with conn.cursor() as cur:
-            cur.execute("""
+        # Detect database type
+        is_sqlite = hasattr(conn, 'row_factory')
+        
+        if is_sqlite:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM service_providers 
+                WHERE rating >= 4.5 AND is_verified = 1
+                ORDER BY rating DESC, completed_jobs DESC, review_count DESC
+                LIMIT 3
+            """)
+            rows = cursor.fetchall()
+        else:
+            cursor = conn.cursor()
+            cursor.execute("""
                 SELECT * FROM service_providers 
                 WHERE rating >= 4.5 AND is_verified = true
                 ORDER BY rating DESC, completed_jobs DESC, review_count DESC
                 LIMIT 3
             """)
-            professionals = []
-            for row in cur.fetchall():
+            rows = cursor.fetchall()
+        
+        professionals = []
+        for row in rows:
+            if is_sqlite:
+                # SQLite row access by index
+                professional = {
+                    'id': row[0], 'name': row[1], 'service': row[2], 'service_key': row[3],
+                    'location': row[4], 'district': row[5], 'latitude': row[6], 'longitude': row[7],
+                    'rating': float(row[8]), 'experience': row[9], 'completed_jobs': row[10],
+                    'cancellation_rate': float(row[11]), 'response_time_hours': float(row[12]),
+                    'is_verified': bool(row[13]), 'review_count': row[14], 'image': row[15],
+                    'phone': row[16], 'availability': row[17] if row[17] else '[]'
+                }
+            else:
+                # PostgreSQL row access by index
                 professional = {
                     'id': row[0], 'name': row[1], 'service': row[2], 'service_key': row[3],
                     'location': row[4], 'district': row[5], 'latitude': row[6], 'longitude': row[7],
                     'rating': float(row[8]), 'experience': row[9], 'completed_jobs': row[10],
                     'cancellation_rate': float(row[11]), 'response_time_hours': float(row[12]),
                     'is_verified': row[13], 'review_count': row[14], 'image': row[15],
-                    'phone': row[16], 'availability': json.loads(row[17]) if row[17] else []
+                    'phone': row[16], 'availability': row[17] if row[17] else '[]'
                 }
-                professionals.append(professional)
+            
+            # Parse availability if it's a string
+            if isinstance(professional['availability'], str):
+                try:
+                    import json
+                    professional['availability'] = json.loads(professional['availability'])
+                except:
+                    professional['availability'] = []
+            
+            professionals.append(professional)
         
         conn.close()
+        print(f"✅ Found {len(professionals)} top professionals")
         return jsonify(success=True, professionals=professionals)
         
     except Exception as e:
+        print(f"❌ Top professionals error: {e}")
         return jsonify(success=False, message=f"Error: {str(e)}")
 
 @app.route("/api/providers")

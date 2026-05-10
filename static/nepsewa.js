@@ -137,6 +137,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show loading indicator
     showPageLoading();
     
+    // Mobile menu functionality
+    initializeMobileMenu();
+    
     // Dark mode toggle - Default to light mode
     const toggle = document.getElementById("darkToggle");
     console.log('🌙 Dark mode toggle element:', toggle);
@@ -195,6 +198,49 @@ document.addEventListener('DOMContentLoaded', function() {
         hidePageLoading();
     });
 });
+
+function initializeMobileMenu() {
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const navMenu = document.getElementById('navMenu');
+    
+    if (mobileMenuToggle && navMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+            // Toggle hamburger animation
+            mobileMenuToggle.classList.toggle('active');
+            
+            // Toggle menu visibility
+            navMenu.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (navMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close menu when clicking on a link
+        const navLinks = navMenu.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenuToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileMenuToggle.contains(event.target) && !navMenu.contains(event.target)) {
+                mobileMenuToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        console.log('✅ Mobile menu initialized');
+    }
+}
 
 function showPageLoading() {
     const loader = document.createElement('div');
