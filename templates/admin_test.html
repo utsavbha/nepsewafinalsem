@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Test - NepSewa</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { padding: 12px 24px; margin: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #6366f1; color: white; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 6px; }
+        .success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .info { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NepSewa Admin Test Panel</h1>
+        <p>Use these buttons to test and populate your database:</p>
+        
+        <div>
+            <button class="btn btn-primary" onclick="checkStatus()">Check Status</button>
+            <button class="btn btn-success" onclick="populateDatabase()">Populate Database</button>
+            <button class="btn btn-danger" onclick="forcePopulate()">Force Populate (Clear & Add)</button>
+        </div>
+        
+        <div>
+            <button class="btn btn-primary" onclick="testTopProfessionals()">Test Top Professionals</button>
+            <button class="btn btn-primary" onclick="testNearbyProviders()">Test Nearby Providers</button>
+            <button class="btn btn-primary" onclick="testServices()">Test Services API</button>
+        </div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div style="margin-top: 30px;">
+            <h3>Quick Links:</h3>
+            <a href="/" style="margin-right: 15px;">Home</a>
+            <a href="/services" style="margin-right: 15px;">Services</a>
+            <a href="/map" style="margin-right: 15px;">Find Nearby</a>
+            <a href="/api/status" style="margin-right: 15px;">API Status</a>
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultDiv.style.display = 'block';
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                let message = `
+                    <h4>System Status</h4>
+                    <p><strong>App:</strong> ${data.app} v${data.version}</p>
+                    <p><strong>Database Connected:</strong> ${data.database.connected ? '✅ Yes' : '❌ No'}</p>
+                    <p><strong>Provider Count:</strong> ${data.database.provider_count}</p>
+                    <p><strong>Platform:</strong> ${data.platform}</p>
+                `;
+                
+                showResult(message, data.database.connected ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function populateDatabase() {
+            try {
+                showResult('Populating database...', 'info');
+                const response = await fetch('/api/populate-db', { method: 'POST' });
+                const data = await response.json();
+                
+                showResult(`${data.success ? '✅' : '❌'} ${data.message}`, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function forcePopulate() {
+            if (!confirm('This will clear all existing providers and add new ones. Continue?')) return;
+            
+            try {
+                showResult('Force populating database...', 'info');
+                const response = await fetch('/api/force-populate', { method: 'POST' });
+                const data = await response.json();
+                
+                showResult(`${data.success ? '✅' : '❌'} ${data.message}`, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testTopProfessionals() {
+            try {
+                const response = await fetch('/api/top-professionals');
+                const data = await response.json();
+                
+                let message = `
+                    <h4>Top Professionals Test</h4>
+                    <p><strong>Success:</strong> ${data.success ? '✅ Yes' : '❌ No'}</p>
+                    <p><strong>Count:</strong> ${data.professionals ? data.professionals.length : 0}</p>
+                `;
+                
+                if (data.professionals && data.professionals.length > 0) {
+                    message += '<p><strong>Sample:</strong></p><ul>';
+                    data.professionals.slice(0, 3).forEach(p => {
+                        message += `<li>${p.name} - ${p.service} (${p.rating}⭐)</li>`;
+                    });
+                    message += '</ul>';
+                }
+                
+                showResult(message, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNearbyProviders() {
+            try {
+                const response = await fetch('/api/providers/nearby');
+                const data = await response.json();
+                
+                let message = `
+                    <h4>Nearby Providers Test</h4>
+                    <p><strong>Success:</strong> ${data.success ? '✅ Yes' : '❌ No'}</p>
+                    <p><strong>Count:</strong> ${data.providers ? data.providers.length : 0}</p>
+                `;
+                
+                if (data.providers && data.providers.length > 0) {
+                    message += '<p><strong>Sample:</strong></p><ul>';
+                    data.providers.slice(0, 3).forEach(p => {
+                        message += `<li>${p.name} - ${p.service} (${p.distance_km}km away)</li>`;
+                    });
+                    message += '</ul>';
+                }
+                
+                showResult(message, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testServices() {
+            try {
+                const response = await fetch('/api/services');
+                const data = await response.json();
+                
+                let message = `
+                    <h4>Services API Test</h4>
+                    <p><strong>Success:</strong> ${data.success ? '✅ Yes' : '❌ No'}</p>
+                    <p><strong>Count:</strong> ${data.services ? data.services.length : 0}</p>
+                `;
+                
+                showResult(message, data.success ? 'success' : 'error');
+            } catch (error) {
+                showResult(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check status on load
+        window.onload = () => checkStatus();
+    </script>
+</body>
+</html>

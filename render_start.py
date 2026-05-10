@@ -191,6 +191,11 @@ def login_page():
     except Exception as e:
         return f"<h1>Login</h1><p>Template error: {str(e)}</p><p><a href='/'>← Back to Home</a></p>"
 
+@app.route("/admin/test")
+def admin_test():
+    """Admin test page for database population"""
+    return render_template("admin_test.html")
+
 @app.route("/api/status")
 def api_status():
     """Comprehensive status check"""
@@ -813,35 +818,67 @@ def logout():
 
 @app.route("/api/providers/nearby")
 def api_nearby_providers():
-    """Get nearby providers"""
+    """Get nearby providers with GPS coordinates"""
     try:
         conn = get_db()
         if not conn:
             return jsonify(success=False, message="Database not available")
         
-        # For now, return all providers since GPS coordinates might not be set
+        # Get user location from query parameters (optional)
+        user_lat = request.args.get('lat', type=float)
+        user_lng = request.args.get('lng', type=float)
+        
         with conn.cursor() as cur:
+            # Get all providers with GPS coordinates
             cur.execute("""
-                SELECT * FROM service_providers 
-                WHERE is_verified = true
-                ORDER BY rating DESC 
-                LIMIT 15
+                SELECT id, name, service, service_key, location, district, 
+                       latitude, longitude, rating, experience, completed_jobs, 
+                       is_verified, review_count, image, phone
+                FROM service_providers 
+                WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+                ORDER BY rating DESC, completed_jobs DESC
+                LIMIT 20
             """)
+            
             providers = []
             for row in cur.fetchall():
                 provider = {
                     'id': row[0], 'name': row[1], 'service': row[2], 'service_key': row[3],
-                    'location': row[4], 'district': row[5], 'rating': float(row[8]),
-                    'experience': row[9], 'completed_jobs': row[10], 'is_verified': row[13],
-                    'review_count': row[14], 'image': row[15], 'phone': row[16],
-                    'distance_km': round(random.uniform(0.5, 5.0), 1)  # Simulated distance
+                    'location': row[4], 'district': row[5], 'latitude': float(row[6]), 
+                    'longitude': float(row[7]), 'rating': float(row[8]), 'experience': row[9], 
+                    'completed_jobs': row[10], 'is_verified': row[11], 'review_count': row[12], 
+                    'image': row[13], 'phone': row[14]
                 }
+                
+                # Calculate distance if user location provided
+                if user_lat and user_lng:
+                    import math
+                    # Haversine formula for distance calculation
+                    lat1, lon1 = math.radians(user_lat), math.radians(user_lng)
+                    lat2, lon2 = math.radians(provider['latitude']), math.radians(provider['longitude'])
+                    
+                    dlat = lat2 - lat1
+                    dlon = lon2 - lon1
+                    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+                    c = 2 * math.asin(math.sqrt(a))
+                    distance_km = 6371 * c  # Earth's radius in km
+                    
+                    provider['distance_km'] = round(distance_km, 1)
+                else:
+                    # Simulate distance for demo
+                    provider['distance_km'] = round(random.uniform(0.5, 8.0), 1)
+                
                 providers.append(provider)
+            
+            # Sort by distance if user location provided
+            if user_lat and user_lng:
+                providers.sort(key=lambda x: x['distance_km'])
         
         conn.close()
-        return jsonify(success=True, providers=providers)
+        return jsonify(success=True, providers=providers, count=len(providers))
         
     except Exception as e:
+        print(f"Nearby providers error: {e}")
         return jsonify(success=False, message=f"Error: {str(e)}")
 
 # ─────────────────────────────────────────────
@@ -1043,6 +1080,93 @@ def api_locations():
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}")
 
+@app.route("/api/force-populate", methods=["POST", "GET"])
+def force_populate_database():
+    """Force populate database (clears existing data)"""
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+        
+        with conn.cursor() as cur:
+            # Clear existing providers
+            cur.execute("DELETE FROM service_providers")
+            print("🗑️ Cleared existing providers")
+            
+            # Add comprehensive providers with GPS coordinates
+            providers = [
+                # Home Cleaning Providers
+                ("Aarav Sharma", "Home Cleaning", "cleaning", "Butwal", "Rupandehi", 27.7012, 83.4523, 4.8, 5, 312, 0.02, 1.5, True, 148, "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face", "9801000001"),
+                ("Sita Lama", "Home Cleaning", "cleaning", "Tilottama", "Rupandehi", 27.7189, 83.4287, 4.9, 6, 420, 0.01, 1.0, True, 210, "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face", "9801000002"),
+                ("Maya Gurung", "Home Cleaning", "cleaning", "Bhairahawa", "Rupandehi", 27.5095, 83.4534, 4.3, 2, 67, 0.08, 4.0, False, 34, "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face", "9801000003"),
+                
+                # Plumbing Providers
+                ("Arjun Basnet", "Plumbing", "plumber", "Butwal", "Rupandehi", 27.6987, 83.4478, 4.7, 4, 198, 0.03, 2.0, True, 95, "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face", "9801000004"),
+                ("Hari Sharma", "Plumbing", "plumber", "Tilottama", "Rupandehi", 27.7234, 83.4312, 4.5, 3, 156, 0.05, 2.5, True, 78, "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", "9801000005"),
+                ("Raju Maharjan", "Plumbing", "plumber", "Chitwan", "Chitwan", 27.5278, 84.3567, 4.6, 6, 234, 0.02, 2.0, True, 117, "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face", "9801000006"),
+                
+                # Electrician Providers
+                ("Deepa Rana", "Electric Repair", "electrician", "Bhairahawa", "Rupandehi", 27.5067, 83.4501, 5.0, 4, 175, 0.00, 2.5, True, 88, "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face", "9801000007"),
+                ("Ram Bahadur", "Electric Repair", "electrician", "Butwal", "Rupandehi", 27.7023, 83.4489, 4.8, 5, 312, 0.02, 1.5, True, 148, "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face", "9801000008"),
+                ("Bikash Tamang", "Electric Repair", "electrician", "Chitwan", "Chitwan", 27.5312, 84.3523, 4.4, 3, 123, 0.05, 3.0, False, 61, "https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face", "9801000009"),
+                
+                # AC Service Providers
+                ("Sunita Oli", "AC Service", "ac", "Tilottama", "Rupandehi", 27.7156, 83.4298, 4.7, 3, 134, 0.04, 2.0, True, 67, "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face", "9801000010"),
+                ("Binod KC", "AC Service", "ac", "Butwal", "Rupandehi", 27.6998, 83.4512, 4.5, 4, 220, 0.03, 2.0, True, 110, "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face", "9801000011"),
+                ("Nabin Karki", "AC Service", "ac", "Bhairahawa", "Rupandehi", 27.5089, 83.4487, 4.6, 5, 178, 0.03, 2.0, True, 89, "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face", "9801000012"),
+                
+                # Hair Cutting Providers
+                ("Binod Joshi", "Hair Cutting", "haircutting", "Butwal", "Rupandehi", 27.7034, 83.4456, 4.2, 2, 89, 0.07, 3.0, False, 42, "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face", "9801000013"),
+                ("Ramesh Tamang", "Hair Cutting", "haircutting", "Tilottama", "Rupandehi", 27.7201, 83.4334, 4.5, 4, 145, 0.04, 2.5, True, 73, "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face", "9801000014"),
+                ("Sabita Chhetri", "Hair Cutting", "haircutting", "Chitwan", "Chitwan", 27.5289, 84.3578, 4.8, 7, 289, 0.02, 1.5, True, 145, "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=150&h=150&fit=crop&crop=face", "9801000015"),
+                
+                # Makeup Artist Providers
+                ("Karuna Rai", "Makeup Artist", "makeup", "Butwal", "Rupandehi", 27.6976, 83.4534, 4.9, 6, 420, 0.01, 1.0, True, 210, "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face", "9801000016"),
+                ("Gita KC", "Makeup Artist", "makeup", "Tilottama", "Rupandehi", 27.7178, 83.4267, 5.0, 4, 175, 0.00, 2.5, True, 88, "https://images.unsplash.com/photo-1590031905470-a1a1feacbb0b?w=150&h=150&fit=crop&crop=face", "9801000017"),
+                ("Priya Shrestha", "Makeup Artist", "makeup", "Bhairahawa", "Rupandehi", 27.5078, 83.4523, 4.8, 5, 260, 0.02, 2.0, True, 130, "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=150&h=150&fit=crop&crop=face", "9801000018"),
+                
+                # Photographer Providers
+                ("Nisha Koirala", "Photographer", "photographer", "Chitwan", "Chitwan", 27.5267, 84.3589, 4.9, 8, 310, 0.01, 3.0, True, 155, "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face", "9801000019"),
+                ("Anil Shakya", "Photographer", "photographer", "Butwal", "Rupandehi", 27.7045, 83.4467, 4.7, 6, 234, 0.02, 2.5, True, 117, "https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=150&h=150&fit=crop&crop=face", "9801000020"),
+                ("Puja Manandhar", "Photographer", "photographer", "Tilottama", "Rupandehi", 27.7167, 83.4289, 4.4, 3, 123, 0.04, 3.0, True, 62, "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=150&h=150&fit=crop&crop=face", "9801000021"),
+                
+                # Gardener Providers
+                ("Mamata Neupane", "Gardener", "gardener", "Bhairahawa", "Rupandehi", 27.5101, 83.4456, 4.3, 6, 145, 0.06, 4.0, False, 72, "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=150&h=150&fit=crop&crop=face", "9801000022"),
+                ("Rajesh Pandey", "Gardener", "gardener", "Butwal", "Rupandehi", 27.6989, 83.4501, 4.4, 5, 123, 0.05, 3.0, True, 62, "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&h=150&fit=crop&crop=face", "9801000023"),
+                ("Dilip Tharu", "Gardener", "gardener", "Chitwan", "Chitwan", 27.5301, 84.3534, 4.2, 4, 98, 0.07, 3.5, False, 49, "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop&crop=face", "9801000024"),
+                
+                # Maid Service Providers
+                ("Anita Thapa", "Maid Service", "maid", "Tilottama", "Rupandehi", 27.7145, 83.4323, 4.6, 7, 380, 0.02, 1.5, True, 190, "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&h=150&fit=crop&crop=face", "9801000025"),
+                ("Devi Pun", "Maid Service", "maid", "Butwal", "Rupandehi", 27.7056, 83.4478, 4.2, 3, 89, 0.07, 3.5, False, 45, "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=150&h=150&fit=crop&crop=face", "9801000026"),
+                ("Bishnu Ghale", "Maid Service", "maid", "Bhairahawa", "Rupandehi", 27.5112, 83.4467, 4.8, 9, 567, 0.01, 1.0, True, 284, "https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=150&h=150&fit=crop&crop=face", "9801000027"),
+                
+                # Technician Service Providers
+                ("Deepak Gurung", "Technician Service", "technician", "Chitwan", "Chitwan", 27.5323, 84.3545, 4.4, 3, 112, 0.05, 3.5, False, 55, "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=150&h=150&fit=crop&crop=face", "9801000028"),
+                ("Gopal Adhikari", "Technician Service", "technician", "Butwal", "Rupandehi", 27.7067, 83.4489, 4.7, 6, 234, 0.02, 1.5, True, 117, "https://images.unsplash.com/photo-1496345875659-11f7dd282d1d?w=150&h=150&fit=crop&crop=face", "9801000029"),
+                ("Mina Oli", "Technician Service", "technician", "Tilottama", "Rupandehi", 27.7189, 83.4301, 4.1, 2, 56, 0.08, 4.0, False, 28, "https://images.unsplash.com/photo-1521119989659-a83eee488004?w=150&h=150&fit=crop&crop=face", "9801000030")
+            ]
+            
+            for provider in providers:
+                cur.execute("""
+                    INSERT INTO service_providers 
+                    (name, service, service_key, location, district, latitude, longitude, rating, experience, 
+                     completed_jobs, cancellation_rate, response_time_hours, is_verified, 
+                     review_count, image, phone, availability)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, provider + ('["Mon","Tue","Wed","Thu","Fri","Sat"]',))
+            
+            # Get final count
+            cur.execute("SELECT COUNT(*) FROM service_providers")
+            final_count = cur.fetchone()[0]
+            print(f"✅ Added {final_count} providers")
+        
+        conn.close()
+        return jsonify(success=True, message=f"Force populated database with {final_count} providers!")
+        
+    except Exception as e:
+        print(f"❌ Force populate error: {e}")
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
 @app.route("/api/populate-db", methods=["POST", "GET"])
 def populate_db_endpoint():
     """Manually populate database with providers"""
@@ -1130,14 +1254,23 @@ def initialize_app():
                 with conn.cursor() as cur:
                     cur.execute("SELECT COUNT(*) FROM service_providers")
                     count = cur.fetchone()[0]
+                    print(f"📊 Current provider count: {count}")
                     if count == 0:
                         print("📊 Database is empty, auto-populating with sample data...")
                         # Call the populate function directly
                         populate_result = populate_database_internal()
                         print(f"✅ Auto-population: {populate_result}")
+                    else:
+                        print(f"✅ Database already has {count} providers")
                 conn.close()
         except Exception as e:
             print(f"⚠️ Auto-population warning: {e}")
+            # Force populate on error
+            try:
+                populate_result = populate_database_internal()
+                print(f"🔄 Force population result: {populate_result}")
+            except Exception as e2:
+                print(f"❌ Force population failed: {e2}")
     
     # Set Flask configuration for production
     app.config['DEBUG'] = False
