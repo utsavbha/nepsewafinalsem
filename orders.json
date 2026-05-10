@@ -207,5 +207,17 @@
     "payment": "unpaid",
     "booked_at": "2026-04-30 15:28:41",
     "user_id": 2
+  },
+  {
+    "booking_id": "NS-5AQVXU",
+    "name": "sa sa",
+    "email": "aanonymmouss01@gmail.com",
+    "phone": "9898989898",
+    "address": "new road 7",
+    "service": "ac",
+    "status": "confirmed",
+    "payment": "unpaid",
+    "booked_at": "2026-05-01 15:42:41",
+    "user_id": 1
   }
 ]

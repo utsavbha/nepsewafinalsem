@@ -191,7 +191,7 @@ def insert_sample_providers():
                 "location": "Butwal", "district": "Rupandehi", "rating": 4.8, "experience": 5,
                 "completed_jobs": 312, "cancellation_rate": 0.02, "response_time_hours": 1.5,
                 "is_verified": True, "review_count": 148, "phone": "9801000001",
-                "image": "https://randomuser.me/api/portraits/men/32.jpg",
+                "image": "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'
             },
             {
@@ -199,7 +199,7 @@ def insert_sample_providers():
                 "location": "Tilottama", "district": "Rupandehi", "rating": 4.9, "experience": 6,
                 "completed_jobs": 420, "cancellation_rate": 0.01, "response_time_hours": 1.0,
                 "is_verified": True, "review_count": 210, "phone": "9801000002",
-                "image": "https://randomuser.me/api/portraits/women/44.jpg",
+                "image": "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'
             },
             {
@@ -207,7 +207,7 @@ def insert_sample_providers():
                 "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.7, "experience": 4,
                 "completed_jobs": 198, "cancellation_rate": 0.03, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 95, "phone": "9801000003",
-                "image": "https://randomuser.me/api/portraits/men/76.jpg",
+                "image": "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Wed","Thu","Fri"]'
             },
             {
@@ -215,7 +215,7 @@ def insert_sample_providers():
                 "location": "Chitwan", "district": "Chitwan", "rating": 5.0, "experience": 4,
                 "completed_jobs": 175, "cancellation_rate": 0.00, "response_time_hours": 2.5,
                 "is_verified": True, "review_count": 88, "phone": "9801000004",
-                "image": "https://randomuser.me/api/portraits/women/65.jpg",
+                "image": "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Tue","Wed","Thu","Fri","Sat","Sun"]'
             },
             {
@@ -223,7 +223,7 @@ def insert_sample_providers():
                 "location": "Butwal", "district": "Rupandehi", "rating": 4.2, "experience": 2,
                 "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.0,
                 "is_verified": False, "review_count": 42, "phone": "9801000005",
-                "image": "https://randomuser.me/api/portraits/men/55.jpg",
+                "image": "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Wed","Fri","Sat","Sun"]'
             },
             {
@@ -231,7 +231,7 @@ def insert_sample_providers():
                 "location": "Tilottama", "district": "Rupandehi", "rating": 4.7, "experience": 3,
                 "completed_jobs": 134, "cancellation_rate": 0.04, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 67, "phone": "9801000006",
-                "image": "https://randomuser.me/api/portraits/men/66.jpg",
+                "image": "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Thu","Fri","Sat"]'
             },
             {
@@ -239,7 +239,7 @@ def insert_sample_providers():
                 "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.5, "experience": 4,
                 "completed_jobs": 220, "cancellation_rate": 0.03, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 110, "phone": "9801000007",
-                "image": "https://randomuser.me/api/portraits/men/88.jpg",
+                "image": "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'
             },
             {
@@ -247,7 +247,7 @@ def insert_sample_providers():
                 "location": "Chitwan", "district": "Chitwan", "rating": 4.6, "experience": 7,
                 "completed_jobs": 380, "cancellation_rate": 0.02, "response_time_hours": 1.5,
                 "is_verified": True, "review_count": 190, "phone": "9801000008",
-                "image": "https://randomuser.me/api/portraits/women/33.jpg",
+                "image": "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'
             },
             {
@@ -255,7 +255,7 @@ def insert_sample_providers():
                 "location": "Butwal", "district": "Rupandehi", "rating": 4.4, "experience": 3,
                 "completed_jobs": 112, "cancellation_rate": 0.05, "response_time_hours": 3.5,
                 "is_verified": False, "review_count": 55, "phone": "9801000009",
-                "image": "https://randomuser.me/api/portraits/men/41.jpg",
+                "image": "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Tue","Wed","Fri","Sat"]'
             },
             {
@@ -263,7 +263,7 @@ def insert_sample_providers():
                 "location": "Tilottama", "district": "Rupandehi", "rating": 4.8, "experience": 5,
                 "completed_jobs": 260, "cancellation_rate": 0.02, "response_time_hours": 2.0,
                 "is_verified": True, "review_count": 130, "phone": "9801000010",
-                "image": "https://randomuser.me/api/portraits/women/58.jpg",
+                "image": "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Wed","Thu","Fri","Sat","Sun"]'
             },
             {
@@ -271,7 +271,7 @@ def insert_sample_providers():
                 "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.3, "experience": 6,
                 "completed_jobs": 145, "cancellation_rate": 0.06, "response_time_hours": 4.0,
                 "is_verified": False, "review_count": 72, "phone": "9801000011",
-                "image": "https://randomuser.me/api/portraits/men/62.jpg",
+                "image": "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Mon","Tue","Thu","Sat","Sun"]'
             },
             {
@@ -279,7 +279,7 @@ def insert_sample_providers():
                 "location": "Chitwan", "district": "Chitwan", "rating": 4.9, "experience": 8,
                 "completed_jobs": 310, "cancellation_rate": 0.01, "response_time_hours": 3.0,
                 "is_verified": True, "review_count": 155, "phone": "9801000012",
-                "image": "https://randomuser.me/api/portraits/women/22.jpg",
+                "image": "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
                 "availability": '["Fri","Sat","Sun"]'
             }
         ]
@@ -1439,48 +1439,48 @@ def add_sample_providers():
             # Additional providers for better algorithm testing
             additional_providers = [
                 # More Cleaning providers
-                {"name": "Maya Gurung", "service": "Home Cleaning", "service_key": "cleaning", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 34, "phone": "9801000020", "image": "https://randomuser.me/api/portraits/women/20.jpg", "availability": '["Mon","Wed","Fri"]'},
-                {"name": "Kiran Shrestha", "service": "Home Cleaning", "service_key": "cleaning", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.8, "experience": 5, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000021", "image": "https://randomuser.me/api/portraits/men/21.jpg", "availability": '["Tue","Thu","Sat","Sun"]'},
-                {"name": "Sunita Rai", "service": "Home Cleaning", "service_key": "cleaning", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 156, "cancellation_rate": 0.03, "response_time_hours": 2.5, "is_verified": True, "review_count": 78, "phone": "9801000022", "image": "https://randomuser.me/api/portraits/women/23.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
+                {"name": "Maya Gurung", "service": "Home Cleaning", "service_key": "cleaning", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 34, "phone": "9801000020", "image": "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri"]'},
+                {"name": "Kiran Shrestha", "service": "Home Cleaning", "service_key": "cleaning", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.8, "experience": 5, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000021", "image": "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Sat","Sun"]'},
+                {"name": "Sunita Rai", "service": "Home Cleaning", "service_key": "cleaning", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 156, "cancellation_rate": 0.03, "response_time_hours": 2.5, "is_verified": True, "review_count": 78, "phone": "9801000022", "image": "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
                 
                 # More Electrician providers
-                {"name": "Bikash Tamang", "service": "Electric Repair", "service_key": "electrician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": False, "review_count": 61, "phone": "9801000023", "image": "https://randomuser.me/api/portraits/men/24.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
-                {"name": "Santosh KC", "service": "Electric Repair", "service_key": "electrician", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.9, "experience": 8, "completed_jobs": 445, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 223, "phone": "9801000024", "image": "https://randomuser.me/api/portraits/men/25.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
-                {"name": "Laxmi Thapa", "service": "Electric Repair", "service_key": "electrician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.1, "experience": 1, "completed_jobs": 34, "cancellation_rate": 0.12, "response_time_hours": 5.0, "is_verified": False, "review_count": 17, "phone": "9801000025", "image": "https://randomuser.me/api/portraits/women/26.jpg", "availability": '["Wed","Thu","Fri","Sat"]'},
+                {"name": "Bikash Tamang", "service": "Electric Repair", "service_key": "electrician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": False, "review_count": 61, "phone": "9801000023", "image": "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
+                {"name": "Santosh KC", "service": "Electric Repair", "service_key": "electrician", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.9, "experience": 8, "completed_jobs": 445, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 223, "phone": "9801000024", "image": "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
+                {"name": "Laxmi Thapa", "service": "Electric Repair", "service_key": "electrician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.1, "experience": 1, "completed_jobs": 34, "cancellation_rate": 0.12, "response_time_hours": 5.0, "is_verified": False, "review_count": 17, "phone": "9801000025", "image": "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat"]'},
                 
                 # More Plumber providers
-                {"name": "Raju Maharjan", "service": "Plumbing", "service_key": "plumber", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.0, "is_verified": True, "review_count": 117, "phone": "9801000026", "image": "https://randomuser.me/api/portraits/men/27.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Kamala Lama", "service": "Plumbing", "service_key": "plumber", "location": "Kathmandu", "district": "Kathmandu", "rating": 3.9, "experience": 2, "completed_jobs": 45, "cancellation_rate": 0.15, "response_time_hours": 6.0, "is_verified": False, "review_count": 23, "phone": "9801000027", "image": "https://randomuser.me/api/portraits/women/28.jpg", "availability": '["Sat","Sun"]'},
-                {"name": "Suresh Magar", "service": "Plumbing", "service_key": "plumber", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 84, "phone": "9801000028", "image": "https://randomuser.me/api/portraits/men/29.jpg", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
+                {"name": "Raju Maharjan", "service": "Plumbing", "service_key": "plumber", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.0, "is_verified": True, "review_count": 117, "phone": "9801000026", "image": "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
+                {"name": "Kamala Lama", "service": "Plumbing", "service_key": "plumber", "location": "Kathmandu", "district": "Kathmandu", "rating": 3.9, "experience": 2, "completed_jobs": 45, "cancellation_rate": 0.15, "response_time_hours": 6.0, "is_verified": False, "review_count": 23, "phone": "9801000027", "image": "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Sat","Sun"]'},
+                {"name": "Suresh Magar", "service": "Plumbing", "service_key": "plumber", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 84, "phone": "9801000028", "image": "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
                 
                 # More Maid providers
-                {"name": "Devi Pun", "service": "Maid Service", "service_key": "maid", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.2, "experience": 3, "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000029", "image": "https://randomuser.me/api/portraits/women/30.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Bishnu Ghale", "service": "Maid Service", "service_key": "maid", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 9, "completed_jobs": 567, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 284, "phone": "9801000030", "image": "https://randomuser.me/api/portraits/women/31.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
-                {"name": "Tek Bahadur Rana", "service": "Maid Service", "service_key": "maid", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.0, "experience": 1, "completed_jobs": 23, "cancellation_rate": 0.10, "response_time_hours": 4.5, "is_verified": False, "review_count": 12, "phone": "9801000031", "image": "https://randomuser.me/api/portraits/men/32.jpg", "availability": '["Tue","Thu","Sat"]'},
+                {"name": "Devi Pun", "service": "Maid Service", "service_key": "maid", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.2, "experience": 3, "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000029", "image": "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
+                {"name": "Bishnu Ghale", "service": "Maid Service", "service_key": "maid", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 9, "completed_jobs": 567, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 284, "phone": "9801000030", "image": "https://images.pexels.com/photos/6195365/pexels-photo-6195365.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
+                {"name": "Tek Bahadur Rana", "service": "Maid Service", "service_key": "maid", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.0, "experience": 1, "completed_jobs": 23, "cancellation_rate": 0.10, "response_time_hours": 4.5, "is_verified": False, "review_count": 12, "phone": "9801000031", "image": "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Sat"]'},
                 
                 # More AC providers
-                {"name": "Nabin Karki", "service": "AC Service", "service_key": "ac", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 5, "completed_jobs": 178, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 89, "phone": "9801000032", "image": "https://randomuser.me/api/portraits/men/33.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
-                {"name": "Sarita Basnet", "service": "AC Service", "service_key": "ac", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 34, "phone": "9801000033", "image": "https://randomuser.me/api/portraits/women/34.jpg", "availability": '["Wed","Thu","Fri","Sat","Sun"]'},
+                {"name": "Nabin Karki", "service": "AC Service", "service_key": "ac", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 5, "completed_jobs": 178, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 89, "phone": "9801000032", "image": "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
+                {"name": "Sarita Basnet", "service": "AC Service", "service_key": "ac", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 34, "phone": "9801000033", "image": "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat","Sun"]'},
                 
                 # More Technician providers
-                {"name": "Gopal Adhikari", "service": "Technician Service", "service_key": "technician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 117, "phone": "9801000034", "image": "https://randomuser.me/api/portraits/men/35.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Mina Oli", "service": "Technician Service", "service_key": "technician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.1, "experience": 2, "completed_jobs": 56, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 28, "phone": "9801000035", "image": "https://randomuser.me/api/portraits/women/36.jpg", "availability": '["Tue","Wed","Thu","Fri","Sat"]'},
+                {"name": "Gopal Adhikari", "service": "Technician Service", "service_key": "technician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 117, "phone": "9801000034", "image": "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
+                {"name": "Mina Oli", "service": "Technician Service", "service_key": "technician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.1, "experience": 2, "completed_jobs": 56, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 28, "phone": "9801000035", "image": "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Wed","Thu","Fri","Sat"]'},
                 
                 # More Hair Cutting providers
-                {"name": "Arjun Limbu", "service": "Hair Cutting", "service_key": "haircutting", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 145, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 73, "phone": "9801000036", "image": "https://randomuser.me/api/portraits/men/37.jpg", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
-                {"name": "Sabita Chhetri", "service": "Hair Cutting", "service_key": "haircutting", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 7, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000037", "image": "https://randomuser.me/api/portraits/women/38.jpg", "availability": '["Tue","Thu","Fri","Sat","Sun"]'},
+                {"name": "Arjun Limbu", "service": "Hair Cutting", "service_key": "haircutting", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 145, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 73, "phone": "9801000036", "image": "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
+                {"name": "Sabita Chhetri", "service": "Hair Cutting", "service_key": "haircutting", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 7, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000037", "image": "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Fri","Sat","Sun"]'},
                 
                 # More Gardener providers
-                {"name": "Dilip Tharu", "service": "Gardener", "service_key": "gardener", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.4, "experience": 5, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000038", "image": "https://randomuser.me/api/portraits/men/39.jpg", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Kamana Dahal", "service": "Gardener", "service_key": "gardener", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.1, "experience": 3, "completed_jobs": 78, "cancellation_rate": 0.07, "response_time_hours": 4.5, "is_verified": False, "review_count": 39, "phone": "9801000039", "image": "https://randomuser.me/api/portraits/women/40.jpg", "availability": '["Wed","Thu","Fri","Sat"]'},
+                {"name": "Dilip Tharu", "service": "Gardener", "service_key": "gardener", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.4, "experience": 5, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000038", "image": "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
+                {"name": "Kamana Dahal", "service": "Gardener", "service_key": "gardener", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.1, "experience": 3, "completed_jobs": 78, "cancellation_rate": 0.07, "response_time_hours": 4.5, "is_verified": False, "review_count": 39, "phone": "9801000039", "image": "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat"]'},
                 
                 # More Makeup providers
-                {"name": "Roshani Gurung", "service": "Makeup Artist", "service_key": "makeup", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 84, "phone": "9801000040", "image": "https://randomuser.me/api/portraits/women/41.jpg", "availability": '["Thu","Fri","Sat","Sun"]'},
-                {"name": "Sanjay Rana", "service": "Makeup Artist", "service_key": "makeup", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.2, "experience": 2, "completed_jobs": 89, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000041", "image": "https://randomuser.me/api/portraits/men/42.jpg", "availability": '["Fri","Sat","Sun"]'},
+                {"name": "Roshani Gurung", "service": "Makeup Artist", "service_key": "makeup", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 84, "phone": "9801000040", "image": "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Thu","Fri","Sat","Sun"]'},
+                {"name": "Sanjay Rana", "service": "Makeup Artist", "service_key": "makeup", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.2, "experience": 2, "completed_jobs": 89, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000041", "image": "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Fri","Sat","Sun"]'},
                 
                 # More Photographer providers
-                {"name": "Anil Shakya", "service": "Photographer", "service_key": "photographer", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.5, "is_verified": True, "review_count": 117, "phone": "9801000042", "image": "https://randomuser.me/api/portraits/men/43.jpg", "availability": '["Fri","Sat","Sun"]'},
-                {"name": "Puja Manandhar", "service": "Photographer", "service_key": "photographer", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.04, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000043", "image": "https://randomuser.me/api/portraits/women/44.jpg", "availability": '["Sat","Sun"]'}
+                {"name": "Anil Shakya", "service": "Photographer", "service_key": "photographer", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.5, "is_verified": True, "review_count": 117, "phone": "9801000042", "image": "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Fri","Sat","Sun"]'},
+                {"name": "Puja Manandhar", "service": "Photographer", "service_key": "photographer", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.04, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000043", "image": "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Sat","Sun"]'}
             ]
             
             # Insert additional providers
@@ -2474,10 +2474,114 @@ def add_nepali_providers():
                 num_days = random.randint(3, 6)
                 availability = random.sample(days, num_days)
                 
-                # Generate image URL (using diverse portraits)
-                gender = "men" if name in male_names else "women"
-                image_id = random.randint(1, 99)
-                image_url = f"https://randomuser.me/api/portraits/{gender}/{image_id}.jpg"
+                # Curated Pexels image pools — Nepali / South-Asian appearance
+                # keyed by (gender, service_key)
+                NEPALI_IMAGES = {
+                    ("male", "electrician"): [
+                        "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "plumber"): [
+                        "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "ac"): [
+                        "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "cleaning"): [
+                        "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/6195365/pexels-photo-6195365.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "haircutting"): [
+                        "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1319461/pexels-photo-1319461.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "gardener"): [
+                        "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "photographer"): [
+                        "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "maid"): [
+                        "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "makeup"): [
+                        "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("male", "spa"): [
+                        "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "electrician"): [
+                        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "plumber"): [
+                        "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "ac"): [
+                        "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "cleaning"): [
+                        "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "haircutting"): [
+                        "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1319461/pexels-photo-1319461.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "gardener"): [
+                        "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "photographer"): [
+                        "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "maid"): [
+                        "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "makeup"): [
+                        "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                    ("female", "spa"): [
+                        "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        "https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                    ],
+                }
+                gender = "male" if name in male_names else "female"
+                svc_key = service.get("service_key", "cleaning")
+                pool = NEPALI_IMAGES.get((gender, svc_key), NEPALI_IMAGES[("male", "cleaning")])
+                image_url = random.choice(pool)
                 
                 provider = {
                     "name": name,
@@ -2641,10 +2745,113 @@ def clean_and_add_nepali_names():
                     num_days = random.randint(3, 6)
                     availability = random.sample(days, num_days)
                     
-                    # Generate image URL (using diverse portraits)
-                    gender = "men" if name in male_names else "women"
-                    image_id = random.randint(1, 99)
-                    image_url = f"https://randomuser.me/api/portraits/{gender}/{image_id}.jpg"
+                    # Curated Pexels image pools — Nepali / South-Asian appearance
+                    NEPALI_IMAGES = {
+                        ("male", "electrician"): [
+                            "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "plumber"): [
+                            "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "ac"): [
+                            "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "cleaning"): [
+                            "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/6195365/pexels-photo-6195365.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "haircutting"): [
+                            "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1319461/pexels-photo-1319461.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "gardener"): [
+                            "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "photographer"): [
+                            "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "maid"): [
+                            "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "makeup"): [
+                            "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("male", "spa"): [
+                            "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "electrician"): [
+                            "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "plumber"): [
+                            "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "ac"): [
+                            "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "cleaning"): [
+                            "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "haircutting"): [
+                            "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1319461/pexels-photo-1319461.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "gardener"): [
+                            "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1453499/pexels-photo-1453499.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "photographer"): [
+                            "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "maid"): [
+                            "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "makeup"): [
+                            "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                        ("female", "spa"): [
+                            "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                            "https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
+                        ],
+                    }
+                    gender = "male" if name in male_names else "female"
+                    svc_key = service["service_key"]
+                    pool = NEPALI_IMAGES.get((gender, svc_key), NEPALI_IMAGES[("male", "cleaning")])
+                    image_url = random.choice(pool)
                     
                     provider = {
                         "name": name,
