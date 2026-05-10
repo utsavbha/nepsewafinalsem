@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import json, os, random, string, requests, hmac, hashlib, base64, uuid
 from datetime import datetime
-import psycopg2
-import psycopg2.extras
+import pg8000
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -63,13 +62,13 @@ if os.environ.get('DATABASE_URL'):
         'user': url.username,
         'password': url.password,
         'database': url.path[1:],  # Remove leading slash
-        'sslmode': 'require'  # Required for Render PostgreSQL
+        'ssl_context': True  # Required for Render PostgreSQL
     })
 
 def get_db():
     """Get a fresh database connection for each request"""
     try:
-        conn = psycopg2.connect(**DB_CONFIG)
+        conn = pg8000.connect(**DB_CONFIG)
         conn.autocommit = True
         return conn
     except Exception as e:

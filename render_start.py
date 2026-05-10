@@ -1,7 +1,6 @@
 import os
 import sys
-import psycopg2
-import psycopg2.extras
+import pg8000
 import urllib.parse as urlparse
 
 # Add current directory to Python path
@@ -22,7 +21,7 @@ def setup_database_config():
             'user': url.username,
             'password': url.password,
             'database': url.path[1:],  # Remove leading slash
-            'sslmode': 'require'  # Required for Render PostgreSQL
+            'ssl_context': True  # Required for Render PostgreSQL
         })
         print(f"✅ PostgreSQL configured: {url.hostname}:{url.port or 5432}")
     else:
