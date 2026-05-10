@@ -4,33 +4,39 @@
 
 // ===== DARK MODE =====
 const toggle = document.getElementById("darkToggle");
-// Clear any existing theme and default to light mode
-document.body.classList.remove("dark", "light");
+if (toggle) {
+    // Clear any existing theme and default to light mode
+    document.body.classList.remove("dark", "light");
 
-// Check saved theme or default to light
-const savedTheme = localStorage.getItem("theme");
-if (savedTheme === "dark") {
-    document.body.classList.add("dark");
-    toggle.checked = false;
-} else {
-    document.body.classList.add("light");
-    toggle.checked = true;
-    localStorage.setItem("theme", "light"); // Ensure light is saved as default
-}
-
-toggle.addEventListener("change", () => {
-    if (toggle.checked) {
-        // Switch to light mode
-        document.body.classList.remove("dark");
-        document.body.classList.add("light");
-        localStorage.setItem("theme", "light");
-    } else {
-        // Switch to dark mode
-        document.body.classList.remove("light");
+    // Check saved theme or default to light
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
         document.body.classList.add("dark");
-        localStorage.setItem("theme", "dark");
+        toggle.checked = false;
+    } else {
+        document.body.classList.add("light");
+        toggle.checked = true;
+        localStorage.setItem("theme", "light"); // Ensure light is saved as default
     }
-});
+
+    toggle.addEventListener("change", () => {
+        if (toggle.checked) {
+            // Switch to light mode
+            document.body.classList.remove("dark");
+            document.body.classList.add("light");
+            localStorage.setItem("theme", "light");
+        } else {
+            // Switch to dark mode
+            document.body.classList.remove("light");
+            document.body.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        }
+    });
+} else {
+    // Fallback: apply light theme directly to body
+    document.body.classList.remove("dark");
+    document.body.classList.add("light");
+}
 
 // ===== ERROR HELPERS =====
 function showError(inputId, message) {
@@ -609,31 +615,32 @@ async function payWithEsewa(bookingId) {
         const data = await res.json();
 
         if (data.success) {
-            // Create and submit eSewa v2 payment form
+            // Create and submit eSewa payment form
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = data.esewa_url;
 
-           const fields = {
-    'amount':                   data.amount,       // already a string from Flask
-    'tax_amount':               '0',
-    'total_amount':             data.amount,       // must exactly match what was signed
-    'transaction_uuid':         bookingId,
-    'product_code':             data.merchant_code,
-    'product_service_charge':   '0',
-    'product_delivery_charge':  '0',
-    'success_url':              data.success_url,
-    'failure_url':              data.failure_url,
-    'signed_field_names':       'total_amount,transaction_uuid,product_code',
-    'signature':                data.signature
-};
-            for (const [key, value] of Object.entries(fields)) {
+            const fields = {
+                'amount': data.amount,
+                'tax_amount': '0',
+                'total_amount': data.amount,
+                'transaction_uuid': data.transaction_uuid,
+                'product_code': data.product_code,
+                'product_service_charge': '0',
+                'product_delivery_charge': '0',
+                'success_url': data.success_url,
+                'failure_url': data.failure_url,
+                'signed_field_names': 'total_amount,transaction_uuid,product_code',
+                'signature': data.signature
+            };
+
+            Object.entries(fields).forEach(([key, value]) => {
                 const input = document.createElement('input');
-                input.type  = 'hidden';
-                input.name  = key;
+                input.type = 'hidden';
+                input.name = key;
                 input.value = value;
                 form.appendChild(input);
-            }
+            });
 
             document.body.appendChild(form);
             form.submit();

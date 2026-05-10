@@ -1,3 +1,13 @@
+// ===== ALERT SYSTEM INTEGRATION =====
+function showAlert(message, type = 'info', title = null) {
+    if (typeof alertSystem !== 'undefined') {
+        return alertSystem.show(message, type, title);
+    } else {
+        // Fallback to browser alert if alert system not loaded
+        alert(message);
+    }
+}
+
 // ===== AUTH MODAL LOGIC (kept from original) =====
 const authModal      = document.getElementById('authModal');
 const loginButtons   = document.querySelectorAll('.btn-login');
@@ -166,6 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Dark mode toggle initialized');
     } else {
         console.error('❌ Dark mode toggle element not found');
+        // Fallback: apply light theme directly to body
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+        console.log('🔧 Applied fallback light theme');
     }
     
     // Initialize all components
@@ -372,7 +386,7 @@ async function handleProviderRegistration(e) {
 
 // ===== BOOKING FUNCTIONALITY =====
 
-// Service data for home page booking
+// Service data for home page booking - Updated to match database service_key values
 const serviceData = {
     'cleaning': {
         title: 'Home Cleaning',
@@ -381,49 +395,35 @@ const serviceData = {
         workerInfo: 'Experienced cleaners with eco-friendly products',
         image: '/static/cleaning.png'
     },
-    'plumbing': {
+    'plumber': {
         title: 'Plumbing',
         price: 'Rs 800.00 / Hour',
         priceDesc: 'Expert plumbing repairs and installations',
         workerInfo: 'Licensed plumbers with 5+ years experience',
         image: '/static/plumber.png'
     },
-    'electrical': {
+    'electrician': {
         title: 'Electric Repair',
         price: 'Rs 700.00 / Hour',
         priceDesc: 'Safe and reliable electrical services',
         workerInfo: 'Certified electricians for all electrical needs',
         image: '/static/technician.png'
     },
-    'ac-service': {
+    'ac': {
         title: 'AC Service',
         price: 'Rs 1000.00 / Hour',
         priceDesc: 'AC repair, maintenance and installation',
         workerInfo: 'Specialized AC technicians with warranty',
         image: '/static/air-conditioner.png'
     },
-    'toilet-cleaning': {
-        title: 'Toilet Cleaning',
-        price: 'Rs 300.00 / Hour',
-        priceDesc: 'Deep toilet and bathroom cleaning',
-        workerInfo: 'Hygienic cleaning with sanitization',
-        image: '/static/toilet.png'
-    },
-    'spa-massage': {
-        title: 'Spa & Massage',
-        price: 'Rs 1200.00 / Hour',
-        priceDesc: 'Relaxing spa and massage services',
-        workerInfo: 'Professional therapists at your home',
-        image: '/static/facial-massage.png'
-    },
-    'hair-cutting': {
+    'haircutting': {
         title: 'Hair Cutting',
         price: 'Rs 400.00 / Hour',
         priceDesc: 'Professional hair cutting and styling',
         workerInfo: 'Experienced stylists with modern techniques',
         image: '/static/hair-cutting.png'
     },
-    'makeup-artist': {
+    'makeup': {
         title: 'Makeup Artist',
         price: 'Rs 1500.00 / Hour',
         priceDesc: 'Professional makeup for events and occasions',
@@ -444,7 +444,7 @@ const serviceData = {
         workerInfo: 'Expert gardeners for all your garden needs',
         image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=300&fit=crop'
     },
-    'maid-service': {
+    'maid': {
         title: 'Maid Service',
         price: 'Rs 450.00 / Hour',
         priceDesc: 'Daily household maintenance service',
@@ -460,36 +460,36 @@ const serviceData = {
     }
 };
 
-// Service name mapping
+// Service name mapping - Updated to match database service_key values
 const serviceNameMapping = {
     'Home Cleaning': 'cleaning',
     'Cleaning': 'cleaning',
-    'Plumbing': 'plumbing',  // Fixed: was 'plumber', now 'plumbing'
-    'Plumber': 'plumbing',
-    'Plumber Service': 'plumbing',
-    'Electric Repair': 'electrical',
-    'Electrical': 'electrical',
-    'Electrician': 'electrical',
-    'AC Service': 'ac-service',
-    'AC Repair': 'ac-service',
-    'Air Conditioning': 'ac-service',
-    'Toilet Cleaning': 'toilet-cleaning',
-    'Bathroom Cleaning': 'toilet-cleaning',
-    'Spa & Massage': 'spa-massage',
-    'Massage': 'spa-massage',
-    'Spa': 'spa-massage',
-    'Hair Cutting': 'hair-cutting',
-    'Hair Cut': 'hair-cutting',
-    'Barber': 'hair-cutting',
-    'Makeup Artist': 'makeup-artist',
-    'Makeup': 'makeup-artist',
-    'Photographer': 'photographer',
+    'Plumbing': 'plumber',  // Database uses 'plumber' as service_key
+    'Plumber': 'plumber',
+    'Plumber Service': 'plumber',
+    'Electric Repair': 'electrician',  // Database uses 'electrician' as service_key
+    'Electrical': 'electrician',
+    'Electrician': 'electrician',
+    'AC Service': 'ac',  // Database uses 'ac' as service_key
+    'AC Repair': 'ac',
+    'Air Conditioning': 'ac',
+    'Toilet Cleaning': 'cleaning',
+    'Bathroom Cleaning': 'cleaning',
+    'Spa & Massage': 'makeup',
+    'Massage': 'makeup',
+    'Spa': 'makeup',
+    'Hair Cutting': 'haircutting',  // Database uses 'haircutting' as service_key
+    'Hair Cut': 'haircutting',
+    'Barber': 'haircutting',
+    'Makeup Artist': 'makeup',  // Database uses 'makeup' as service_key
+    'Makeup': 'makeup',
+    'Photographer': 'photographer',  // Database uses 'photographer' as service_key
     'Photography': 'photographer',
-    'Gardener': 'gardener',
+    'Gardener': 'gardener',  // Database uses 'gardener' as service_key
     'Garden': 'gardener',
-    'Maid Service': 'maid-service',
-    'Maid': 'maid-service',
-    'Technician Service': 'technician',
+    'Maid Service': 'maid',  // Database uses 'maid' as service_key
+    'Maid': 'maid',
+    'Technician Service': 'technician',  // Database uses 'technician' as service_key
     'Technician': 'technician'
 };
 
