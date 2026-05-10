@@ -664,6 +664,23 @@ def payment_cash():
     except Exception as e:
         return jsonify(success=False, message=f"Payment processing failed: {str(e)}")
 
+@app.route("/api/orders/update", methods=["POST"])
+def update_order():
+    """Update order status"""
+    try:
+        data = request.get_json(silent=True) or {}
+        booking_id = data.get("booking_id")
+        status = data.get("status", "confirmed")
+        
+        if not booking_id:
+            return jsonify(success=False, message="Booking ID required")
+        
+        # For now, just return success (you can implement order storage later)
+        return jsonify(success=True, message=f"Order {booking_id} updated to {status}")
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Order update failed: {str(e)}")
+
 @app.route("/payment/success")
 def payment_success():
     """eSewa payment success callback"""
@@ -735,6 +752,14 @@ def register_provider_page():
         return render_template("register_provider.html")
     except Exception as e:
         return f"<h1>Register as Provider</h1><p>Template error: {str(e)}</p><p><a href='/'>← Back to Home</a></p>"
+
+@app.route("/provider/login")
+def provider_login_page():
+    """Provider login page"""
+    try:
+        return render_template("provider_login.html")
+    except Exception as e:
+        return f"<h1>Provider Login</h1><p>Template error: {str(e)}</p><p><a href='/'>← Back to Home</a></p>"
 
 @app.route("/api/register-provider", methods=["POST"])
 def register_provider():
@@ -815,6 +840,16 @@ def logout():
     """Logout user"""
     session.clear()
     return redirect("/")
+
+@app.route("/orders")
+def orders_page():
+    """Orders page"""
+    if not session.get("user_id"):
+        return redirect("/login?redirect=/orders")
+    try:
+        return render_template("orders.html")
+    except Exception as e:
+        return f"<h1>My Orders</h1><p>Template error: {str(e)}</p><p><a href='/'>← Back to Home</a></p>"
 
 @app.route("/api/providers/nearby")
 def api_nearby_providers():
@@ -990,6 +1025,103 @@ def api_me():
         )
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}")
+
+# ─────────────────────────────────────────────
+# PROVIDER AUTH API
+# ─────────────────────────────────────────────
+@app.route("/api/provider/login", methods=["POST"])
+def provider_login():
+    """Provider login API"""
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = (data.get("password") or "").strip()
+
+    if not email or not password:
+        return jsonify(success=False, message="All fields are required")
+
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            # Check if provider exists in service_providers table
+            cur.execute("SELECT id, name, phone FROM service_providers WHERE phone = %s", (email,))
+            provider = cur.fetchone()
+
+        if not provider:
+            return jsonify(success=False, message="Provider not found. Please register first.")
+            
+        # For now, accept any password (you can implement proper password hashing later)
+        # In production, you should hash passwords and verify them properly
+        
+        session["provider_id"] = provider[0]
+        session["provider_name"] = provider[1]
+        session["provider_phone"] = provider[2]
+        
+        conn.close()
+        return jsonify(success=True, message="Login successful", redirect_url="/provider/dashboard")
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/provider/me")
+def api_provider_me():
+    """Get current provider info"""
+    if not session.get("provider_id"):
+        return jsonify(success=False, message="Not logged in"), 401
+
+    try:
+        conn = get_db()
+        if not conn:
+            return jsonify(success=False, message="Database not available")
+            
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, name, service, location, rating, experience, completed_jobs, is_verified, review_count, image, phone FROM service_providers WHERE id=%s",
+                (session["provider_id"],)
+            )
+            provider = cur.fetchone()
+
+        if not provider:
+            session.clear()
+            return jsonify(success=False, message="Provider not found"), 404
+
+        conn.close()
+        return jsonify(
+            success=True,
+            provider=dict(
+                id=provider[0],
+                name=provider[1],
+                service=provider[2],
+                location=provider[3],
+                rating=float(provider[4]),
+                experience=provider[5],
+                completed_jobs=provider[6],
+                is_verified=provider[7],
+                review_count=provider[8],
+                image=provider[9],
+                phone=provider[10],
+                initials="".join(w[0].upper() for w in provider[1].split()[:2])
+            )
+        )
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/provider/dashboard")
+def provider_dashboard():
+    """Provider dashboard page"""
+    if not session.get("provider_id"):
+        return redirect("/provider/login")
+    try:
+        return render_template("provider_dashboard.html")
+    except Exception as e:
+        return f"<h1>Provider Dashboard</h1><p>Template error: {str(e)}</p><p><a href='/provider/login'>← Back to Login</a></p>"
+
+@app.route("/provider/logout")
+def provider_logout():
+    """Logout provider"""
+    session.clear()
+    return redirect("/provider/login")
 
 # ─────────────────────────────────────────────
 # BOOKING API

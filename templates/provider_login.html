@@ -16,12 +16,15 @@
             <img src="/static/final_logo.png" alt="NepSewa Logo" class="login-logo">
             <h1>Provider Login</h1>
             <p>Access your provider dashboard</p>
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin: 16px 0; font-size: 0.85rem; color: #475569;">
+                <strong>Demo Login:</strong> Use any registered provider phone number (e.g., 9801000001) with any password
+            </div>
         </div>
 
         <form id="providerLoginForm" class="login-form">
             <div class="form-group">
-                <input type="email" id="email" placeholder="Email Address" required>
-                <div class="error-message" id="error-email"></div>
+                <input type="tel" id="phone" placeholder="Phone Number (e.g., 9801000001)" required>
+                <div class="error-message" id="error-phone"></div>
             </div>
 
             <div class="form-group">
@@ -47,7 +50,7 @@
 document.getElementById('providerLoginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
     const password = document.getElementById('password').value.trim();
     const submitBtn = document.querySelector('.login-btn');
     const btnText = document.querySelector('.btn-text');
@@ -62,8 +65,11 @@ document.getElementById('providerLoginForm').addEventListener('submit', async fu
     // Validation
     let isValid = true;
     
-    if (!email) {
-        showError('email', 'Email is required');
+    if (!phone) {
+        showError('phone', 'Phone number is required');
+        isValid = false;
+    } else if (!/^98\d{8}$/.test(phone)) {
+        showError('phone', 'Enter a valid Nepal number (98XXXXXXXX)');
         isValid = false;
     }
     
@@ -86,7 +92,7 @@ document.getElementById('providerLoginForm').addEventListener('submit', async fu
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: email,
+                email: phone, // Using phone as email field for compatibility
                 password: password
             })
         });
