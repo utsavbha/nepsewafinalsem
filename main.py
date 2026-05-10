@@ -62,7 +62,7 @@ if os.environ.get('DATABASE_URL'):
         'user': url.username,
         'password': url.password,
         'database': url.path[1:],  # Remove leading slash
-        'ssl_context': True  # Required for Render PostgreSQL
+        'ssl_context': {'check_hostname': False, 'verify_mode': 0}  # Fix SSL issue
     })
 
 def get_db():
