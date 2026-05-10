@@ -42,17 +42,29 @@ def save_provider_image(file):
 # ─────────────────────────────────────────────
 # DB — reconnect-safe helper
 # ─────────────────────────────────────────────
-# ─────────────────────────────────────────────
-# DB — reconnect-safe helper
-# ─────────────────────────────────────────────
+import os
+
+# Database configuration - supports both local and production
 DB_CONFIG = dict(
-    host="localhost",
-    user="root",
-    password="nepsewa123",
-    database="nepsewa",
+    host=os.environ.get("DB_HOST", "localhost"),
+    user=os.environ.get("DB_USER", "root"),
+    password=os.environ.get("DB_PASSWORD", "nepsewa123"),
+    database=os.environ.get("DB_NAME", "nepsewa"),
     autocommit=True,
     cursorclass=pymysql.cursors.DictCursor
 )
+
+# Handle DATABASE_URL for Render deployment
+if os.environ.get('DATABASE_URL'):
+    import urllib.parse as urlparse
+    url = urlparse.urlparse(os.environ['DATABASE_URL'])
+    DB_CONFIG.update({
+        'host': url.hostname,
+        'port': url.port or 3306,
+        'user': url.username,
+        'password': url.password,
+        'database': url.path[1:],  # Remove leading slash
+    })
 
 def get_db():
     """Get a fresh database connection for each request"""
@@ -2359,11 +2371,12 @@ def payment_failure():
 # ─────────────────────────────────────────────
 if __name__ == "__main__":
     init_db()
+    port = int(os.environ.get('PORT', 8001))
     print("🚀 NepSewa server starting...")
-    print("📍 Server will be available at: http://127.0.0.1:8000")
-    print("📍 Health check: http://127.0.0.1:8000/health")
-    print("📍 Services page: http://127.0.0.1:8000/services")
-    app.run(debug=True, host='127.0.0.1', port=8000)
+    print(f"📍 Server will be available at: http://127.0.0.1:{port}")
+    print(f"📍 Health check: http://127.0.0.1:{port}/health")
+    print(f"📍 Services page: http://127.0.0.1:{port}/services")
+    app.run(debug=True, host='0.0.0.0', port=port)
 
 @app.route("/api/add-nepali-providers", methods=["POST"])
 def add_nepali_providers():
@@ -2750,6 +2763,63 @@ def debug_arjun():
             
             providers = cur.fetchall()
             return jsonify(success=True, providers=list(providers))
+        
+    except Exception as e:
+        return jsonify(success=False, message=f"Error: {str(e)}"), 500
+@app.route("/api/fix-nearby-providers", methods=["POST"])
+def fix_nearby_providers():
+    """Add GPS coordinates to all providers so they show up in nearby search"""
+    try:
+        conn = get_db()
+        with conn.cursor() as cur:
+            # Location coordinates for your areas
+            location_coords = {
+                'Butwal': {'lat': 27.7000, 'lng': 83.4500},
+                'Tilottama': {'lat': 27.7200, 'lng': 83.4300}, 
+                'Bhairahawa': {'lat': 27.5081, 'lng': 83.4519},
+                'Chitwan': {'lat': 27.5291, 'lng': 84.3542},
+                'Siddharthanagar': {'lat': 27.5200, 'lng': 83.4600},
+                'Devdaha': {'lat': 27.6800, 'lng': 83.4200}
+            }
+            
+            # Get all providers without GPS coordinates
+            cur.execute("""
+                SELECT id, name, location 
+                FROM service_providers 
+                WHERE latitude IS NULL OR longitude IS NULL
+            """)
+            providers_without_gps = cur.fetchall()
+            
+            import random
+            updated_count = 0
+            
+            for provider in providers_without_gps:
+                location = provider['location']
+                if location in location_coords:
+                    base_coords = location_coords[location]
+                    
+                    # Add small random offset (within 2km) to spread providers around the area
+                    lat_offset = random.uniform(-0.018, 0.018)  # ~2km in degrees
+                    lng_offset = random.uniform(-0.018, 0.018)
+                    
+                    final_lat = base_coords['lat'] + lat_offset
+                    final_lng = base_coords['lng'] + lng_offset
+                    
+                    # Update provider with GPS coordinates
+                    cur.execute("""
+                        UPDATE service_providers 
+                        SET latitude = %s, longitude = %s 
+                        WHERE id = %s
+                    """, (final_lat, final_lng, provider['id']))
+                    
+                    updated_count += 1
+            
+            conn.commit()
+            return jsonify(
+                success=True, 
+                message=f"Added GPS coordinates to {updated_count} providers",
+                updated_count=updated_count
+            )
         
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}"), 500
