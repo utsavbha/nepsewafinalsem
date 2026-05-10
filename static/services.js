@@ -4,13 +4,17 @@
 
 // ===== DARK MODE =====
 const toggle = document.getElementById("darkToggle");
-if (localStorage.getItem("theme") === "light") {
-    document.body.classList.add("light");
+// Default to light mode
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+    toggle.checked = false;
+} else {
+    document.body.classList.remove("dark");
     toggle.checked = true;
 }
 toggle.addEventListener("change", () => {
-    document.body.classList.toggle("light");
-    localStorage.setItem("theme", document.body.classList.contains("light") ? "light" : "dark");
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
 });
 
 // ===== ERROR HELPERS =====

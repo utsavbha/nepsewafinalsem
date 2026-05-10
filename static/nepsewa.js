@@ -127,20 +127,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show loading indicator
     showPageLoading();
     
-    // Dark mode toggle
+    // Dark mode toggle - Default to light mode
     const toggle = document.getElementById("darkToggle");
     console.log('🌙 Dark mode toggle element:', toggle);
     
     if (toggle) {
-        if (localStorage.getItem("theme") === "light") {
-            document.body.classList.add("light");
+        // Default to light mode
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+            toggle.checked = false;
+            console.log('🌙 Applied dark theme from localStorage');
+        } else {
+            document.body.classList.remove("dark");
             toggle.checked = true;
-            console.log('☀️ Applied light theme from localStorage');
+            console.log('☀️ Applied light theme (default)');
         }
 
         toggle.addEventListener("change", () => {
-            document.body.classList.toggle("light");
-            const theme = document.body.classList.contains("light") ? "light" : "dark";
+            document.body.classList.toggle("dark");
+            const theme = document.body.classList.contains("dark") ? "dark" : "light";
             localStorage.setItem("theme", theme);
             console.log('🎨 Theme changed to:', theme);
         });
