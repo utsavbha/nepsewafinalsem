@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import json, os, random, string, requests, hmac, hashlib, base64, uuid
 from datetime import datetime
-import pg8000
+# import pg8000  # Commented out for debugging
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 

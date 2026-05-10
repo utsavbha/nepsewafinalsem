@@ -1,58 +1,67 @@
+#!/usr/bin/env python3
+"""
+Minimal Flask app for Render deployment testing
+"""
+
 import os
-import sys
-import pg8000
-import urllib.parse as urlparse
+from flask import Flask, jsonify
 
-# Add current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Create Flask app
+app = Flask(__name__)
 
-from main import app, init_db
+@app.route("/")
+def home():
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>NepSewa - Live!</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+            .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #2c3e50; }
+            a { color: #3498db; text-decoration: none; margin-right: 15px; }
+            a:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 NepSewa is Live on Render!</h1>
+            <p>Your service marketplace platform has been successfully deployed!</p>
+            <h3>Test Links:</h3>
+            <p>
+                <a href="/health">Health Check</a>
+                <a href="/test">Test Route</a>
+                <a href="/api/services">API Test</a>
+            </p>
+            <p><strong>Status:</strong> ✅ Deployment Successful</p>
+        </div>
+    </body>
+    </html>
+    """
 
-def setup_database_config():
-    """Configure database connection for Render PostgreSQL"""
-    from main import DB_CONFIG
-    
-    if os.environ.get('DATABASE_URL'):
-        # Parse Render's DATABASE_URL for PostgreSQL
-        url = urlparse.urlparse(os.environ['DATABASE_URL'])
-        DB_CONFIG.update({
-            'host': url.hostname,
-            'port': url.port or 5432,
-            'user': url.username,
-            'password': url.password,
-            'database': url.path[1:],  # Remove leading slash
-            'ssl_context': {'check_hostname': False, 'verify_mode': 0}  # Fix SSL issue
-        })
-        print(f"✅ PostgreSQL configured: {url.hostname}:{url.port or 5432}")
-    else:
-        print("⚠️  No DATABASE_URL found, using default config")
+@app.route("/test")
+def test():
+    return "<h1>✅ Test Route Works!</h1><p>Flask routing is working correctly on Render.</p>"
 
-def initialize_app():
-    """Initialize the application for production"""
-    print("🚀 NepSewa - Initializing for Render deployment with PostgreSQL")
-    
-    # Setup database
-    setup_database_config()
-    
-    # Initialize database tables
-    try:
-        init_db()
-        print("✅ Database tables initialized")
-    except Exception as e:
-        print(f"⚠️  Database init warning: {e}")
-        print("   (Tables might already exist)")
-    
-    # Set Flask configuration for production
-    app.config['DEBUG'] = False
-    app.config['ENV'] = 'production'
-    
-    print("✅ Application initialized successfully")
-    return app
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "healthy",
+        "message": "NepSewa API is running on Render",
+        "platform": "Render Cloud",
+        "database": "not connected (minimal mode)"
+    })
 
-# Initialize the app when this module is imported
-application = initialize_app()
+@app.route("/api/services")
+def api_test():
+    return jsonify({
+        "success": True,
+        "message": "API is working",
+        "services": ["cleaning", "plumber", "electrician"]
+    })
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8001))
-    print(f"🌐 Starting server on port {port}")
-    application.run(host='0.0.0.0', port=port, debug=False)
+    print(f"🌐 Starting NepSewa test server on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
