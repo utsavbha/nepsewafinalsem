@@ -132,22 +132,36 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🌙 Dark mode toggle element:', toggle);
     
     if (toggle) {
-        // Default to light mode
-        if (localStorage.getItem("theme") === "dark") {
+        // Clear any existing theme and default to light mode
+        document.body.classList.remove("dark", "light");
+        
+        // Check saved theme or default to light
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") {
             document.body.classList.add("dark");
             toggle.checked = false;
             console.log('🌙 Applied dark theme from localStorage');
         } else {
-            document.body.classList.remove("dark");
+            document.body.classList.add("light");
             toggle.checked = true;
+            localStorage.setItem("theme", "light"); // Ensure light is saved as default
             console.log('☀️ Applied light theme (default)');
         }
 
         toggle.addEventListener("change", () => {
-            document.body.classList.toggle("dark");
-            const theme = document.body.classList.contains("dark") ? "dark" : "light";
-            localStorage.setItem("theme", theme);
-            console.log('🎨 Theme changed to:', theme);
+            if (toggle.checked) {
+                // Switch to light mode
+                document.body.classList.remove("dark");
+                document.body.classList.add("light");
+                localStorage.setItem("theme", "light");
+                console.log('🎨 Theme changed to: light');
+            } else {
+                // Switch to dark mode
+                document.body.classList.remove("light");
+                document.body.classList.add("dark");
+                localStorage.setItem("theme", "dark");
+                console.log('🎨 Theme changed to: dark');
+            }
         });
         console.log('✅ Dark mode toggle initialized');
     } else {

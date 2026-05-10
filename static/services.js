@@ -4,17 +4,32 @@
 
 // ===== DARK MODE =====
 const toggle = document.getElementById("darkToggle");
-// Default to light mode
-if (localStorage.getItem("theme") === "dark") {
+// Clear any existing theme and default to light mode
+document.body.classList.remove("dark", "light");
+
+// Check saved theme or default to light
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
     document.body.classList.add("dark");
     toggle.checked = false;
 } else {
-    document.body.classList.remove("dark");
+    document.body.classList.add("light");
     toggle.checked = true;
+    localStorage.setItem("theme", "light"); // Ensure light is saved as default
 }
+
 toggle.addEventListener("change", () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+    if (toggle.checked) {
+        // Switch to light mode
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+        localStorage.setItem("theme", "light");
+    } else {
+        // Switch to dark mode
+        document.body.classList.remove("light");
+        document.body.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+    }
 });
 
 // ===== ERROR HELPERS =====

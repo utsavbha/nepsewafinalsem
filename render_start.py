@@ -48,12 +48,33 @@ def get_db():
     """Get database connection"""
     try:
         import pg8000
-        conn = pg8000.connect(**DB_CONFIG)
+        # Create connection with proper SSL handling
+        conn = pg8000.connect(
+            host=DB_CONFIG['host'],
+            port=DB_CONFIG['port'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password'],
+            database=DB_CONFIG['database'],
+            ssl_context=True  # Simplified SSL context
+        )
         conn.autocommit = True
         return conn
     except Exception as e:
         print(f"Database connection error: {e}")
-        return None
+        # Try without SSL context as fallback
+        try:
+            conn = pg8000.connect(
+                host=DB_CONFIG['host'],
+                port=DB_CONFIG['port'],
+                user=DB_CONFIG['user'],
+                password=DB_CONFIG['password'],
+                database=DB_CONFIG['database']
+            )
+            conn.autocommit = True
+            return conn
+        except Exception as e2:
+            print(f"Database fallback connection error: {e2}")
+            return None
 
 def init_db():
     """Initialize database tables"""
@@ -277,6 +298,46 @@ def api_providers():
         
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}")
+
+@app.route("/api/debug/db")
+def debug_database():
+    """Debug database connection"""
+    try:
+        if not DB_CONFIG:
+            return jsonify({"error": "No database configuration", "config": "missing"})
+        
+        # Test connection
+        conn = get_db()
+        if not conn:
+            return jsonify({"error": "Cannot connect to database", "config": DB_CONFIG.get('host', 'unknown')})
+        
+        # Test query
+        with conn.cursor() as cur:
+            cur.execute("SELECT version()")
+            version = cur.fetchone()[0]
+            
+            # Check tables
+            cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
+            tables = [row[0] for row in cur.fetchall()]
+            
+            # Check provider count if table exists
+            provider_count = 0
+            if 'service_providers' in tables:
+                cur.execute("SELECT COUNT(*) FROM service_providers")
+                provider_count = cur.fetchone()[0]
+        
+        conn.close()
+        
+        return jsonify({
+            "success": True,
+            "database_version": version,
+            "tables": tables,
+            "provider_count": provider_count,
+            "config_host": DB_CONFIG.get('host', 'unknown')
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e), "type": type(e).__name__})
 
 @app.route("/api/providers/nearby")
 def api_nearby_providers():
