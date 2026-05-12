@@ -52,12 +52,12 @@
       <!-- PROVIDER LOGIN FORM -->
       <div id="providerLoginForm" class="form-section active">
         <div class="field">
-          <label>Phone Number</label>
+          <label>Email or phone</label>
           <div class="input-wrap">
-            <span class="ico">📱</span>
-            <input type="tel" id="phone" placeholder="9801000001" autocomplete="tel">
+            <span class="ico">👤</span>
+            <input type="text" id="loginId" placeholder="you@email.com or 9800000000" autocomplete="username">
           </div>
-          <small style="color: #64748b; font-size: 0.8rem;">Demo: Use any provider phone (e.g., 9801000001) with any password</small>
+          <small style="color: #64748b; font-size: 0.8rem;">Use the same email or phone you registered with.</small>
         </div>
         <div class="field">
           <label>Password</label>
@@ -106,7 +106,7 @@ if (toggle) {
 }
 
 async function doProviderLogin() {
-    const phone = document.getElementById('phone').value.trim();
+    const loginId = document.getElementById('loginId').value.trim();
     const password = document.getElementById('password').value.trim();
     const submitBtn = document.getElementById('loginBtn');
     const msgEl = document.getElementById('msg');
@@ -115,15 +115,22 @@ async function doProviderLogin() {
     msgEl.textContent = '';
     msgEl.className = 'msg';
     
-    // Validation
-    if (!phone) {
-        showMessage('Phone number is required', 'error');
+    if (!loginId) {
+        showMessage('Email or phone is required', 'error');
         return;
     }
     
-    if (!/^98\d{8}$/.test(phone)) {
-        showMessage('Enter a valid Nepal number (98XXXXXXXX)', 'error');
-        return;
+    if (loginId.includes('@')) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginId)) {
+            showMessage('Enter a valid email address', 'error');
+            return;
+        }
+    } else {
+        const digits = loginId.replace(/\D/g, '');
+        if (digits.length < 9) {
+            showMessage('Enter a valid phone number (at least 9 digits) or use your email', 'error');
+            return;
+        }
     }
     
     if (!password) {
@@ -141,8 +148,9 @@ async function doProviderLogin() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
-                email: phone, // Using phone as email field for compatibility
+                email: loginId,
                 password: password
             })
         });
@@ -150,10 +158,8 @@ async function doProviderLogin() {
         const data = await response.json();
         
         if (data.success) {
-            showMessage('Login successful! Redirecting to dashboard...', 'success');
-            setTimeout(() => {
-                window.location.href = data.redirect_url || '/provider/dashboard';
-            }, 1500);
+            showMessage('Login successful! Redirecting…', 'success');
+            window.location.href = data.redirect_url || '/provider/dashboard';
         } else {
             showMessage(data.message || 'Login failed', 'error');
         }

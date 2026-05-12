@@ -395,7 +395,7 @@
             container.innerHTML = filteredProviders.map(provider => `
                 <div class="provider-card" onclick="selectProvider(${provider.id})" id="provider-${provider.id}">
                     <div class="provider-header">
-                        <img src="${provider.image}" alt="${provider.name}" class="provider-avatar">
+                        <img src="${provider.image || 'https://via.placeholder.com/150'}" alt="${provider.name}" class="provider-avatar" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/150'">
                         <div class="provider-info">
                             <div class="provider-name">${provider.name}</div>
                             <div class="provider-service">${provider.service}</div>
@@ -506,7 +506,7 @@
             const content = `
                 <div class="info-window">
                     <div class="info-header">
-                        <img src="${provider.image}" alt="${provider.name}" class="info-avatar">
+                        <img src="${provider.image || 'https://via.placeholder.com/150'}" alt="${provider.name}" class="info-avatar" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/150'">
                         <div>
                             <div class="info-name">${provider.name}</div>
                             <div class="info-service">${provider.service}</div>

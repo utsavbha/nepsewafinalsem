@@ -76,7 +76,7 @@ async function loadTopProfessionals() {
                 const card = document.createElement('div');
                 card.className = 'pro-card';
                 card.innerHTML = `
-                    <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}">
+                    <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/150'">
                     ${p.is_verified ? `
                     <div class="verified-badge">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">

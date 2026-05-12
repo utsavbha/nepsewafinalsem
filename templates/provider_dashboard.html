@@ -416,7 +416,7 @@
         
         async function loadProviderData() {
             try {
-                const response = await fetch('/api/provider/me');
+                const response = await fetch('/api/provider/me', { credentials: 'same-origin' });
                 const data = await response.json();
                 
                 if (data.success) {
@@ -437,7 +437,7 @@
                     const profileHTML = `
                         <div class="profile-section">
                             <div class="profile-avatar">
-                                ${provider.image ? `<img src="${provider.image}" alt="${provider.name}">` : initials}
+                                ${provider.image ? `<img src="${provider.image}" alt="${provider.name}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/150'">` : initials}
                             </div>
                             <div class="profile-info">
                                 <div class="profile-name">${provider.name}</div>
@@ -481,7 +481,7 @@
         
         async function loadStats() {
             try {
-                const response = await fetch('/api/provider/stats');
+                const response = await fetch('/api/provider/stats', { credentials: 'same-origin' });
                 const data = await response.json();
                 
                 if (data.success) {

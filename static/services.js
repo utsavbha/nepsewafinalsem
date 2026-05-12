@@ -347,7 +347,7 @@ function renderProviders(list, preferredLocation) {
         card.className = "pro-card-new";
         card.innerHTML = `
             ${isTop ? '<div class="top-match-ribbon">🏆 Top Match</div>' : ''}
-            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}" style="margin-top:${isTop?'20px':'0'}">
+            <img src="${p.image || 'https://via.placeholder.com/150'}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='https://via.placeholder.com/150'" style="margin-top:${isTop?'20px':'0'}">
             ${p.is_verified ? `<div class="verified-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg> Verified</div>` : '<div style="height:20px;"></div>'}
             <h4>${p.name}</h4>
             <p class="pro-loc">📍 ${p.location}</p>

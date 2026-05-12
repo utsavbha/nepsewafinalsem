@@ -1,64 +1,35 @@
 #!/usr/bin/env python3
-"""
-Quick test to verify all fixes are working
-"""
+"""Smoke-test a local NepSewa server (start `python main.py` in another terminal first)."""
 
-import subprocess
 import time
-import requests
-import threading
 import sys
 
-def start_server():
-    """Start the Flask server"""
-    try:
-        subprocess.run([sys.executable, "render_start.py"], cwd=".")
-    except KeyboardInterrupt:
-        pass
+import requests
+
 
 def test_endpoints():
-    """Test key endpoints"""
-    time.sleep(3)  # Wait for server to start
-    
-    base_url = "http://127.0.0.1:8001"
-    
+    base_url = f"http://127.0.0.1:{int(sys.argv[1]) if len(sys.argv) > 1 else 8001}"
+
     tests = [
         ("Health Check", f"{base_url}/health"),
-        ("Status Check", f"{base_url}/api/status"),
         ("Home Page", f"{base_url}/"),
         ("Services Page", f"{base_url}/services"),
         ("Top Professionals", f"{base_url}/api/top-professionals"),
         ("Services API", f"{base_url}/api/services"),
-        ("Providers API", f"{base_url}/api/providers")
+        ("Providers API", f"{base_url}/api/providers"),
     ]
-    
-    print("🧪 Testing NepSewa endpoints...")
-    
+
+    print(f"Testing {base_url} ...")
+    time.sleep(0.5)
+
     for name, url in tests:
         try:
             response = requests.get(url, timeout=5)
-            status = "✅" if response.status_code == 200 else f"❌ ({response.status_code})"
-            print(f"{status} {name}")
-            
-            if response.status_code == 200 and 'api' in url:
-                try:
-                    data = response.json()
-                    if 'success' in data:
-                        print(f"    Success: {data['success']}")
-                except:
-                    pass
-                    
+            ok = response.status_code == 200
+            print(f"{'OK' if ok else 'FAIL'} {name} ({response.status_code})")
         except Exception as e:
-            print(f"❌ {name}: {str(e)}")
-    
-    print("\n✅ Testing complete!")
+            print(f"FAIL {name}: {e}")
+
 
 if __name__ == "__main__":
-    print("🚀 Starting NepSewa test...")
-    
-    # Start server in background
-    server_thread = threading.Thread(target=start_server, daemon=True)
-    server_thread.start()
-    
-    # Run tests
     test_endpoints()

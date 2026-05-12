@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import json, os, random, string, requests, hmac, hashlib, base64, uuid
 from datetime import datetime
-# import pg8000  # Commented out for debugging
+import pymysql
+import pymysql.cursors
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
@@ -39,42 +40,72 @@ def save_provider_image(file):
     return f"/static/uploads/providers/{unique_filename}"
 
 # ─────────────────────────────────────────────
-# DB — reconnect-safe helper
+# DB — local MySQL
+# Env vars override: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
+# Otherwise defaults come from mysql_config.MYSQL_CONFIG (edit that file once).
 # ─────────────────────────────────────────────
-import os
+try:
+    from mysql_config import MYSQL_CONFIG as _MYSQL_DEFAULTS
+except ImportError:
+    _MYSQL_DEFAULTS = {}
 
-# Database configuration - supports both local and production
+
+def _db_setting(env_name, mysql_key, default):
+    if env_name in os.environ:
+        return os.environ[env_name]
+    return str(_MYSQL_DEFAULTS.get(mysql_key, default))
+
+
 DB_CONFIG = dict(
-    host=os.environ.get("DB_HOST", "localhost"),
-    user=os.environ.get("DB_USER", "postgres"),
-    password=os.environ.get("DB_PASSWORD", "nepsewa123"),
-    database=os.environ.get("DB_NAME", "nepsewa"),
-    port=int(os.environ.get("DB_PORT", 5432))
+    host=_db_setting("DB_HOST", "host", "localhost"),
+    user=_db_setting("DB_USER", "user", "root"),
+    password=_db_setting("DB_PASSWORD", "password", ""),
+    database=_db_setting("DB_NAME", "database", "nepsewa_db"),
+    port=int(_db_setting("DB_PORT", "port", "3306")),
 )
 
-# Handle DATABASE_URL for Render deployment
-if os.environ.get('DATABASE_URL'):
-    import urllib.parse as urlparse
-    url = urlparse.urlparse(os.environ['DATABASE_URL'])
-    DB_CONFIG.update({
-        'host': url.hostname,
-        'port': url.port or 5432,
-        'user': url.username,
-        'password': url.password,
-        'database': url.path[1:],  # Remove leading slash
-        'ssl_context': {'check_hostname': False, 'verify_mode': 0}  # Fix SSL issue
-    })
 
 def get_db():
-    """Get a fresh database connection for each request"""
+    """Return a MySQL connection; rows are dict-like (DictCursor)."""
     try:
-        conn = pg8000.connect(**DB_CONFIG)
-        conn.autocommit = True
-        return conn
+        return pymysql.connect(
+            host=DB_CONFIG["host"],
+            user=DB_CONFIG["user"],
+            password=DB_CONFIG["password"],
+            database=DB_CONFIG["database"],
+            port=DB_CONFIG["port"],
+            autocommit=True,
+            cursorclass=pymysql.cursors.DictCursor,
+            charset="utf8mb4",
+        )
+    except pymysql.err.OperationalError as e:
+        print(f"Database connection error: {e}")
+        if e.args[0] == 1045:
+            print("Access denied: your MySQL user needs a password.")
+            print("  • Edit NepSewa/mysql_config.py → set MYSQL_CONFIG['password'] to your MySQL root password,")
+            print("  • or run:  export DB_PASSWORD='your_password'  &&  python3 main.py")
+        else:
+            print("Create the database (e.g. CREATE DATABASE nepsewa_db;) or set DB_NAME; ensure MySQL is running.")
+        raise
     except Exception as e:
         print(f"Database connection error: {e}")
-        print("Make sure PostgreSQL is running and credentials are correct")
-        raise e
+        print("Ensure MySQL is running and DB settings in mysql_config.py (or DB_* env vars) are correct.")
+        raise
+
+
+def _ensure_indexes(cur):
+    for stmt in (
+        "CREATE INDEX idx_service_key ON service_providers (service_key)",
+        "CREATE INDEX idx_location ON service_providers (location)",
+        "CREATE INDEX idx_rating ON service_providers (rating)",
+        "CREATE INDEX idx_email ON service_providers (email)",
+        "CREATE INDEX idx_coordinates ON service_providers (latitude, longitude)",
+    ):
+        try:
+            cur.execute(stmt)
+        except pymysql.err.OperationalError as e:
+            if e.args[0] != 1061:
+                raise
 
 # ─────────────────────────────────────────────
 # DB INIT — create table if missing
@@ -82,53 +113,44 @@ def get_db():
 def init_db():
     conn = get_db()
     with conn.cursor() as cur:
-        # Users table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id         SERIAL PRIMARY KEY,
-                name       VARCHAR(120)  NOT NULL,
-                email      VARCHAR(180)  NOT NULL UNIQUE,
-                password   VARCHAR(256)  NOT NULL,
-                created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(120) NOT NULL,
+                email VARCHAR(180) NOT NULL UNIQUE,
+                password VARCHAR(256) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
-        
-        # Service providers table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS service_providers (
-                id                  SERIAL PRIMARY KEY,
-                name                VARCHAR(120) NOT NULL,
-                service             VARCHAR(100) NOT NULL,
-                service_key         VARCHAR(50)  NOT NULL,
-                location            VARCHAR(100) NOT NULL,
-                district            VARCHAR(100) NOT NULL,
-                latitude            DECIMAL(10,8) DEFAULT NULL,
-                longitude           DECIMAL(11,8) DEFAULT NULL,
-                rating              DECIMAL(3,2) DEFAULT 0.0,
-                experience          INTEGER      DEFAULT 0,
-                completed_jobs      INTEGER      DEFAULT 0,
-                cancellation_rate   DECIMAL(4,3) DEFAULT 0.0,
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(120) NOT NULL,
+                service VARCHAR(100) NOT NULL,
+                service_key VARCHAR(50) NOT NULL,
+                location VARCHAR(100) NOT NULL,
+                district VARCHAR(100) NOT NULL,
+                latitude DECIMAL(10,8) DEFAULT NULL,
+                longitude DECIMAL(11,8) DEFAULT NULL,
+                rating DECIMAL(3,2) DEFAULT 0.0,
+                experience INT DEFAULT 0,
+                completed_jobs INT DEFAULT 0,
+                cancellation_rate DECIMAL(4,3) DEFAULT 0.0,
                 response_time_hours DECIMAL(4,1) DEFAULT 24.0,
-                is_verified         BOOLEAN      DEFAULT FALSE,
-                review_count        INTEGER      DEFAULT 0,
-                image               TEXT,
-                phone               VARCHAR(15),
-                availability        JSONB,
-                email               VARCHAR(180) UNIQUE,
-                password            VARCHAR(256),
-                bio                 TEXT,
-                created_at          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
+                is_verified BOOLEAN DEFAULT FALSE,
+                review_count INT DEFAULT 0,
+                image TEXT,
+                phone VARCHAR(15),
+                availability JSON,
+                email VARCHAR(180) NULL,
+                password VARCHAR(256),
+                bio TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uq_service_providers_email (email)
             )
         """)
-        
-        # Create indexes
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_service_key ON service_providers (service_key)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_location ON service_providers (location)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_rating ON service_providers (rating)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_email ON service_providers (email)")
-        cur.execute("CREATE INDEX IF NOT EXISTS idx_coordinates ON service_providers (latitude, longitude)")
-    
-    # Insert sample data if table is empty
+        _ensure_indexes(cur)
+
     insert_sample_providers()
 
 # ─────────────────────────────────────────────
@@ -174,132 +196,140 @@ def get_order(booking_id):
     return next((o for o in load_orders() if o["booking_id"] == booking_id), None)
 
 # ─────────────────────────────────────────────
-# SAMPLE PROVIDERS DATA
+# SAMPLE PROVIDERS DATA (12+ per category, GPS, unique faces)
 # ─────────────────────────────────────────────
+
+SAMPLE_SERVICE_CATEGORIES = (
+    ("cleaning", "Home Cleaning"),
+    ("plumber", "Plumbing"),
+    ("electrician", "Electric Repair"),
+    ("ac", "AC Service"),
+    ("maid", "Maid Service"),
+    ("technician", "Technician Service"),
+    ("haircutting", "Hair Cutting"),
+    ("gardener", "Gardener"),
+    ("makeup", "Makeup Artist"),
+    ("photographer", "Photographer"),
+)
+
+LOCATION_HUBS = (
+    {"location": "Butwal", "district": "Rupandehi", "lat": 27.7012, "lng": 83.4520},
+    {"location": "Tilottama", "district": "Rupandehi", "lat": 27.7189, "lng": 83.4285},
+    {"location": "Bhairahawa", "district": "Rupandehi", "lat": 27.5095, "lng": 83.4530},
+    {"location": "Chitwan", "district": "Chitwan", "lat": 27.5280, "lng": 84.3540},
+    {"location": "Siddharthanagar", "district": "Rupandehi", "lat": 27.5195, "lng": 83.4580},
+    {"location": "Devdaha", "district": "Rupandehi", "lat": 27.6880, "lng": 83.4180},
+)
+
+_FIRST_NAMES = (
+    "Aarav", "Aakash", "Amit", "Anish", "Arjun", "Ashim", "Bijay", "Binod", "Bishal", "Chandra",
+    "Deepak", "Dhiraj", "Gopal", "Hari", "Ishwor", "Kiran", "Krishna", "Manoj", "Nabin", "Niraj",
+    "Prabin", "Rajan", "Ramesh", "Rohit", "Sabin", "Sagar", "Santosh", "Suresh", "Tarun", "Umesh",
+    "Aakriti", "Apsara", "Binita", "Chanda", "Deepa", "Gita", "Indira", "Kabita", "Laxmi", "Mamata",
+    "Nisha", "Puja", "Rashmi", "Sarita", "Sita", "Sunita", "Uma", "Anjana", "Barsha", "Binu",
+)
+
+_LAST_NAMES = (
+    "Shrestha", "Thapa", "Gurung", "Tamang", "Magar", "Rai", "Limbu", "Basnet", "Pandey", "Karki",
+    "Adhikari", "Bhattarai", "Bhandari", "Koirala", "Dahal", "Nepal", "Subedi", "Khadka", "Bista", "Mainali",
+    "Rana", "Bohara", "Oli", "Dhakal", "Bhatta", "Joshi", "Pokhrel", "Acharya", "Aryal", "Regmi",
+    "Maharjan", "Shakya", "Manandhar", "Pradhan", "Tuladhar", "Silwal", "Amatya", "Maskey", "Kayastha", "Rimal",
+)
+
+
+def _seed_portrait_url(seed):
+    """
+    Public portrait URLs that reliably load in <img> (avoids Pexels hotlink/CDN 404s).
+    randomuser.me serves fixed-size avatars meant for demos.
+    """
+    s = int(seed) % 198
+    if s < 99:
+        return f"https://randomuser.me/api/portraits/men/{s}.jpg"
+    return f"https://randomuser.me/api/portraits/women/{s - 99}.jpg"
+
+
+def _scatter_gps(lat, lng, salt):
+    """Small deterministic offset (~0–2 km) so pins spread but stay near the hub."""
+    h = hashlib.sha256(str(salt).encode("utf-8")).digest()
+    dlat = (h[0] / 255.0 - 0.5) * 0.032
+    dlng = (h[1] / 255.0 - 0.5) * 0.032
+    return round(lat + dlat, 7), round(lng + dlng, 7)
+
+
+def generate_seed_providers(per_category=12, *, name_start=0, phone_start=9800000000):
+    """
+    per_category rows for each of 10 service types (default 12 → 120 providers).
+    Each row has latitude/longitude so /api/providers/nearby can list them.
+    """
+    availability = '["Mon","Tue","Wed","Thu","Fri","Sat"]'
+    rows = []
+    n = 0
+    for cat_key, cat_label in SAMPLE_SERVICE_CATEGORIES:
+        for j in range(per_category):
+            i = name_start + n
+            hub = LOCATION_HUBS[(i + j) % len(LOCATION_HUBS)]
+            lat, lng = _scatter_gps(hub["lat"], hub["lng"], salt=i * 7919 + j * 97 + hash(cat_key) % 10000)
+            fn = _FIRST_NAMES[i % len(_FIRST_NAMES)]
+            ln = _LAST_NAMES[(i // len(_FIRST_NAMES)) % len(_LAST_NAMES)]
+            name = f"{fn} {ln}"
+            portrait_seed = name_start * 10007 + n * 31 + j * 3
+            image = _seed_portrait_url(portrait_seed)
+            phone = str(phone_start + n)
+            rating = round(3.6 + ((i * 17 + j * 5) % 14) / 10.0, 1)
+            rating = min(5.0, max(3.5, rating))
+            exp = 1 + (i + j * 3) % 14
+            jobs = 28 + (i * 47 + j * 89) % 540
+            cancel = round(0.01 + (i % 11) / 200.0, 3)
+            rsp = round(1.0 + (j % 9) * 0.45, 1)
+            verified = (i + j) % 8 != 0
+            reviews = max(6, min(400, jobs // 3))
+            rows.append({
+                "name": name,
+                "service": cat_label,
+                "service_key": cat_key,
+                "location": hub["location"],
+                "district": hub["district"],
+                "latitude": lat,
+                "longitude": lng,
+                "rating": rating,
+                "experience": exp,
+                "completed_jobs": jobs,
+                "cancellation_rate": cancel,
+                "response_time_hours": rsp,
+                "is_verified": verified,
+                "review_count": reviews,
+                "phone": phone,
+                "image": image,
+                "availability": availability,
+            })
+            n += 1
+    return rows
+
+
 def insert_sample_providers():
     conn = get_db()
     with conn.cursor() as cur:
-        # Check if providers already exist
         cur.execute("SELECT COUNT(*) as count FROM service_providers")
         result = cur.fetchone()
         if result["count"] > 0:
-            return  # Data already exists
-        
-        # Sample providers data
-        providers = [
-            {
-                "name": "Ram Bahadur", "service": "Electric Repair", "service_key": "electrician",
-                "location": "Butwal", "district": "Rupandehi", "rating": 4.8, "experience": 5,
-                "completed_jobs": 312, "cancellation_rate": 0.02, "response_time_hours": 1.5,
-                "is_verified": True, "review_count": 148, "phone": "9801000001",
-                "image": "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'
-            },
-            {
-                "name": "Sita Lama", "service": "Home Cleaning", "service_key": "cleaning",
-                "location": "Tilottama", "district": "Rupandehi", "rating": 4.9, "experience": 6,
-                "completed_jobs": 420, "cancellation_rate": 0.01, "response_time_hours": 1.0,
-                "is_verified": True, "review_count": 210, "phone": "9801000002",
-                "image": "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'
-            },
-            {
-                "name": "Hari Sharma", "service": "Plumbing", "service_key": "plumber",
-                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.7, "experience": 4,
-                "completed_jobs": 198, "cancellation_rate": 0.03, "response_time_hours": 2.0,
-                "is_verified": True, "review_count": 95, "phone": "9801000003",
-                "image": "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Wed","Thu","Fri"]'
-            },
-            {
-                "name": "Gita KC", "service": "Spa & Massage", "service_key": "makeup",
-                "location": "Chitwan", "district": "Chitwan", "rating": 5.0, "experience": 4,
-                "completed_jobs": 175, "cancellation_rate": 0.00, "response_time_hours": 2.5,
-                "is_verified": True, "review_count": 88, "phone": "9801000004",
-                "image": "https://images.pexels.com/photos/3757942/pexels-photo-3757942.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Tue","Wed","Thu","Fri","Sat","Sun"]'
-            },
-            {
-                "name": "Ramesh Tamang", "service": "Hair Cutting", "service_key": "haircutting",
-                "location": "Butwal", "district": "Rupandehi", "rating": 4.2, "experience": 2,
-                "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.0,
-                "is_verified": False, "review_count": 42, "phone": "9801000005",
-                "image": "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Wed","Fri","Sat","Sun"]'
-            },
-            {
-                "name": "Suman Rai", "service": "Home Cleaning", "service_key": "cleaning",
-                "location": "Tilottama", "district": "Rupandehi", "rating": 4.7, "experience": 3,
-                "completed_jobs": 134, "cancellation_rate": 0.04, "response_time_hours": 2.0,
-                "is_verified": True, "review_count": 67, "phone": "9801000006",
-                "image": "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Thu","Fri","Sat"]'
-            },
-            {
-                "name": "Binod KC", "service": "AC Service", "service_key": "ac",
-                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.5, "experience": 4,
-                "completed_jobs": 220, "cancellation_rate": 0.03, "response_time_hours": 2.0,
-                "is_verified": True, "review_count": 110, "phone": "9801000007",
-                "image": "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'
-            },
-            {
-                "name": "Anita Thapa", "service": "Maid Service", "service_key": "maid",
-                "location": "Chitwan", "district": "Chitwan", "rating": 4.6, "experience": 7,
-                "completed_jobs": 380, "cancellation_rate": 0.02, "response_time_hours": 1.5,
-                "is_verified": True, "review_count": 190, "phone": "9801000008",
-                "image": "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'
-            },
-            {
-                "name": "Deepak Gurung", "service": "Plumbing", "service_key": "plumber",
-                "location": "Butwal", "district": "Rupandehi", "rating": 4.4, "experience": 3,
-                "completed_jobs": 112, "cancellation_rate": 0.05, "response_time_hours": 3.5,
-                "is_verified": False, "review_count": 55, "phone": "9801000009",
-                "image": "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Tue","Wed","Fri","Sat"]'
-            },
-            {
-                "name": "Priya Shrestha", "service": "Makeup Artist", "service_key": "makeup",
-                "location": "Tilottama", "district": "Rupandehi", "rating": 4.8, "experience": 5,
-                "completed_jobs": 260, "cancellation_rate": 0.02, "response_time_hours": 2.0,
-                "is_verified": True, "review_count": 130, "phone": "9801000010",
-                "image": "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Wed","Thu","Fri","Sat","Sun"]'
-            },
-            {
-                "name": "Rajesh Pandey", "service": "Gardener", "service_key": "gardener",
-                "location": "Bhairahawa", "district": "Rupandehi", "rating": 4.3, "experience": 6,
-                "completed_jobs": 145, "cancellation_rate": 0.06, "response_time_hours": 4.0,
-                "is_verified": False, "review_count": 72, "phone": "9801000011",
-                "image": "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Mon","Tue","Thu","Sat","Sun"]'
-            },
-            {
-                "name": "Nisha Maharjan", "service": "Photographer", "service_key": "photographer",
-                "location": "Chitwan", "district": "Chitwan", "rating": 4.9, "experience": 8,
-                "completed_jobs": 310, "cancellation_rate": 0.01, "response_time_hours": 3.0,
-                "is_verified": True, "review_count": 155, "phone": "9801000012",
-                "image": "https://images.pexels.com/photos/1264210/pexels-photo-1264210.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop",
-                "availability": '["Fri","Sat","Sun"]'
-            }
-        ]
-        
-        # Insert providers
-        for provider in providers:
+            return
+
+        providers = generate_seed_providers(12)
+
+        for p in providers:
             cur.execute("""
                 INSERT INTO service_providers 
-                (name, service, service_key, location, district, rating, experience, 
-                 completed_jobs, cancellation_rate, response_time_hours, is_verified, 
-                 review_count, image, phone, availability)
-                VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s, 
-                        %(rating)s, %(experience)s, %(completed_jobs)s, %(cancellation_rate)s, 
-                        %(response_time_hours)s, %(is_verified)s, %(review_count)s, 
-                        %(image)s, %(phone)s, %(availability)s)
-            """, provider)
-    
+                (name, service, service_key, location, district, latitude, longitude,
+                 rating, experience, completed_jobs, cancellation_rate, response_time_hours,
+                 is_verified, review_count, image, phone, availability)
+                VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s,
+                        %(latitude)s, %(longitude)s, %(rating)s, %(experience)s, %(completed_jobs)s,
+                        %(cancellation_rate)s, %(response_time_hours)s, %(is_verified)s,
+                        %(review_count)s, %(image)s, %(phone)s, %(availability)s)
+            """, p)
+
     conn.commit()
-    print("Sample providers inserted successfully!")
+    print(f"Sample providers inserted successfully ({len(providers)} rows with GPS).")
 
 # ─────────────────────────────────────────────
 # PAGES
@@ -603,34 +633,59 @@ def provider_register():
 @app.route("/api/provider/login", methods=["POST"])
 def provider_login():
     data = request.get_json(silent=True) or {}
-    email = (data.get("email") or "").strip().lower()
+    login_id = (data.get("email") or data.get("phone") or "").strip()
     password = (data.get("password") or "").strip()
 
-    if not email or not password:
+    if not login_id or not password:
         return jsonify(success=False, message="All fields are required")
+
+    login_lower = login_id.lower()
+    digits = "".join(c for c in login_id if c.isdigit())
 
     conn = get_db()
     try:
         with conn.cursor() as cur:
-            cur.execute("""
-                SELECT id, name, email, password, service, location, is_verified, image, phone
-                FROM service_providers WHERE email=%s
-            """, (email,))
-            provider = cur.fetchone()
+            provider = None
+            if "@" in login_id:
+                cur.execute(
+                    """
+                    SELECT id, name, email, password, service, location, is_verified, image, phone
+                    FROM service_providers
+                    WHERE email IS NOT NULL AND TRIM(LOWER(email)) = %s
+                    LIMIT 1
+                    """,
+                    (login_lower,),
+                )
+                provider = cur.fetchone()
+            else:
+                cur.execute(
+                    """
+                    SELECT id, name, email, password, service, location, is_verified, image, phone
+                    FROM service_providers
+                    WHERE phone IS NOT NULL AND (
+                        REPLACE(REPLACE(REPLACE(phone, ' ', ''), '-', ''), '+', '') = %s
+                        OR TRIM(phone) = %s
+                    )
+                    LIMIT 1
+                    """,
+                    (digits, login_id),
+                )
+                provider = cur.fetchone()
 
         if not provider:
-            return jsonify(success=False, message="Invalid email or password")
-        
+            return jsonify(success=False, message="Invalid email, phone, or password")
+
         if not provider["password"]:
             return jsonify(success=False, message="Please register with a password first")
-        
+
         if not check_password_hash(provider["password"], password):
-            return jsonify(success=False, message="Invalid email or password")
+            return jsonify(success=False, message="Invalid email, phone, or password")
 
         session["provider_id"] = provider["id"]
         session["provider_name"] = provider["name"]
-        session["provider_email"] = provider["email"]
-        
+        session["provider_email"] = provider["email"] or ""
+        session["provider_phone"] = provider["phone"] or ""
+
         return jsonify(success=True, message="Login successful", redirect_url="/provider/dashboard")
     except Exception as e:
         return jsonify(success=False, message=f"Login failed: {str(e)}"), 500
@@ -1437,75 +1492,59 @@ def api_services():
 
 @app.route("/api/add-sample-providers", methods=["POST"])
 def add_sample_providers():
-    """Add more sample providers to populate the database"""
+    """Append another full GPS-enabled sample set (different names / phones from init seed)."""
     try:
         conn = get_db()
         with conn.cursor() as cur:
-            # Additional providers for better algorithm testing
-            additional_providers = [
-                # More Cleaning providers
-                {"name": "Maya Gurung", "service": "Home Cleaning", "service_key": "cleaning", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 34, "phone": "9801000020", "image": "https://images.pexels.com/photos/4099354/pexels-photo-4099354.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri"]'},
-                {"name": "Kiran Shrestha", "service": "Home Cleaning", "service_key": "cleaning", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.8, "experience": 5, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000021", "image": "https://images.pexels.com/photos/5217882/pexels-photo-5217882.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Sat","Sun"]'},
-                {"name": "Sunita Rai", "service": "Home Cleaning", "service_key": "cleaning", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 156, "cancellation_rate": 0.03, "response_time_hours": 2.5, "is_verified": True, "review_count": 78, "phone": "9801000022", "image": "https://images.pexels.com/photos/6195122/pexels-photo-6195122.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                
-                # More Electrician providers
-                {"name": "Bikash Tamang", "service": "Electric Repair", "service_key": "electrician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": False, "review_count": 61, "phone": "9801000023", "image": "https://images.pexels.com/photos/3862130/pexels-photo-3862130.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
-                {"name": "Santosh KC", "service": "Electric Repair", "service_key": "electrician", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.9, "experience": 8, "completed_jobs": 445, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 223, "phone": "9801000024", "image": "https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
-                {"name": "Laxmi Thapa", "service": "Electric Repair", "service_key": "electrician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.1, "experience": 1, "completed_jobs": 34, "cancellation_rate": 0.12, "response_time_hours": 5.0, "is_verified": False, "review_count": 17, "phone": "9801000025", "image": "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat"]'},
-                
-                # More Plumber providers
-                {"name": "Raju Maharjan", "service": "Plumbing", "service_key": "plumber", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.0, "is_verified": True, "review_count": 117, "phone": "9801000026", "image": "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Kamala Lama", "service": "Plumbing", "service_key": "plumber", "location": "Kathmandu", "district": "Kathmandu", "rating": 3.9, "experience": 2, "completed_jobs": 45, "cancellation_rate": 0.15, "response_time_hours": 6.0, "is_verified": False, "review_count": 23, "phone": "9801000027", "image": "https://images.pexels.com/photos/2254339/pexels-photo-2254339.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Sat","Sun"]'},
-                {"name": "Suresh Magar", "service": "Plumbing", "service_key": "plumber", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 84, "phone": "9801000028", "image": "https://images.pexels.com/photos/6195329/pexels-photo-6195329.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
-                
-                # More Maid providers
-                {"name": "Devi Pun", "service": "Maid Service", "service_key": "maid", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.2, "experience": 3, "completed_jobs": 89, "cancellation_rate": 0.07, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000029", "image": "https://images.pexels.com/photos/4107279/pexels-photo-4107279.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Bishnu Ghale", "service": "Maid Service", "service_key": "maid", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 9, "completed_jobs": 567, "cancellation_rate": 0.01, "response_time_hours": 1.0, "is_verified": True, "review_count": 284, "phone": "9801000030", "image": "https://images.pexels.com/photos/6195365/pexels-photo-6195365.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]'},
-                {"name": "Tek Bahadur Rana", "service": "Maid Service", "service_key": "maid", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.0, "experience": 1, "completed_jobs": 23, "cancellation_rate": 0.10, "response_time_hours": 4.5, "is_verified": False, "review_count": 12, "phone": "9801000031", "image": "https://images.pexels.com/photos/4108715/pexels-photo-4108715.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Sat"]'},
-                
-                # More AC providers
-                {"name": "Nabin Karki", "service": "AC Service", "service_key": "ac", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 5, "completed_jobs": 178, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 89, "phone": "9801000032", "image": "https://images.pexels.com/photos/2678452/pexels-photo-2678452.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri","Sat"]'},
-                {"name": "Sarita Basnet", "service": "AC Service", "service_key": "ac", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.3, "experience": 2, "completed_jobs": 67, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 34, "phone": "9801000033", "image": "https://images.pexels.com/photos/8293778/pexels-photo-8293778.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat","Sun"]'},
-                
-                # More Technician providers
-                {"name": "Gopal Adhikari", "service": "Technician Service", "service_key": "technician", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 117, "phone": "9801000034", "image": "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Mina Oli", "service": "Technician Service", "service_key": "technician", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.1, "experience": 2, "completed_jobs": 56, "cancellation_rate": 0.08, "response_time_hours": 4.0, "is_verified": False, "review_count": 28, "phone": "9801000035", "image": "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Wed","Thu","Fri","Sat"]'},
-                
-                # More Hair Cutting providers
-                {"name": "Arjun Limbu", "service": "Hair Cutting", "service_key": "haircutting", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.5, "experience": 4, "completed_jobs": 145, "cancellation_rate": 0.04, "response_time_hours": 2.5, "is_verified": True, "review_count": 73, "phone": "9801000036", "image": "https://images.pexels.com/photos/1570807/pexels-photo-1570807.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Wed","Fri","Sat","Sun"]'},
-                {"name": "Sabita Chhetri", "service": "Hair Cutting", "service_key": "haircutting", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.8, "experience": 7, "completed_jobs": 289, "cancellation_rate": 0.02, "response_time_hours": 1.5, "is_verified": True, "review_count": 145, "phone": "9801000037", "image": "https://images.pexels.com/photos/3992291/pexels-photo-3992291.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Tue","Thu","Fri","Sat","Sun"]'},
-                
-                # More Gardener providers
-                {"name": "Dilip Tharu", "service": "Gardener", "service_key": "gardener", "location": "Kathmandu", "district": "Kathmandu", "rating": 4.4, "experience": 5, "completed_jobs": 123, "cancellation_rate": 0.05, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000038", "image": "https://images.pexels.com/photos/1105019/pexels-photo-1105019.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Mon","Tue","Wed","Thu","Fri"]'},
-                {"name": "Kamana Dahal", "service": "Gardener", "service_key": "gardener", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.1, "experience": 3, "completed_jobs": 78, "cancellation_rate": 0.07, "response_time_hours": 4.5, "is_verified": False, "review_count": 39, "phone": "9801000039", "image": "https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Wed","Thu","Fri","Sat"]'},
-                
-                # More Makeup providers
-                {"name": "Roshani Gurung", "service": "Makeup Artist", "service_key": "makeup", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.6, "experience": 4, "completed_jobs": 167, "cancellation_rate": 0.03, "response_time_hours": 2.0, "is_verified": True, "review_count": 84, "phone": "9801000040", "image": "https://images.pexels.com/photos/3373738/pexels-photo-3373738.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Thu","Fri","Sat","Sun"]'},
-                {"name": "Sanjay Rana", "service": "Makeup Artist", "service_key": "makeup", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.2, "experience": 2, "completed_jobs": 89, "cancellation_rate": 0.06, "response_time_hours": 3.5, "is_verified": False, "review_count": 45, "phone": "9801000041", "image": "https://images.pexels.com/photos/3997989/pexels-photo-3997989.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Fri","Sat","Sun"]'},
-                
-                # More Photographer providers
-                {"name": "Anil Shakya", "service": "Photographer", "service_key": "photographer", "location": "Lalitpur", "district": "Lalitpur", "rating": 4.7, "experience": 6, "completed_jobs": 234, "cancellation_rate": 0.02, "response_time_hours": 2.5, "is_verified": True, "review_count": 117, "phone": "9801000042", "image": "https://images.pexels.com/photos/3052361/pexels-photo-3052361.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Fri","Sat","Sun"]'},
-                {"name": "Puja Manandhar", "service": "Photographer", "service_key": "photographer", "location": "Bhaktapur", "district": "Bhaktapur", "rating": 4.4, "experience": 3, "completed_jobs": 123, "cancellation_rate": 0.04, "response_time_hours": 3.0, "is_verified": True, "review_count": 62, "phone": "9801000043", "image": "https://images.pexels.com/photos/3379774/pexels-photo-3379774.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop", "availability": '["Sat","Sun"]'}
-            ]
-            
-            # Insert additional providers
-            for provider in additional_providers:
+            cur.execute("SELECT COALESCE(MAX(id), 0) AS max_id FROM service_providers")
+            row = cur.fetchone()
+            max_id = int(row["max_id"])
+            name_start = int(max_id) + 50
+            phone_start = 9812000000 + int(max_id) % 10000
+
+            extra = generate_seed_providers(12, name_start=name_start, phone_start=phone_start)
+            for p in extra:
                 cur.execute("""
                     INSERT INTO service_providers 
-                    (name, service, service_key, location, district, rating, experience, 
-                     completed_jobs, cancellation_rate, response_time_hours, is_verified, 
-                     review_count, image, phone, availability)
-                    VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s, 
-                            %(rating)s, %(experience)s, %(completed_jobs)s, %(cancellation_rate)s, 
-                            %(response_time_hours)s, %(is_verified)s, %(review_count)s, 
-                            %(image)s, %(phone)s, %(availability)s)
-                """, provider)
-        
+                    (name, service, service_key, location, district, latitude, longitude,
+                     rating, experience, completed_jobs, cancellation_rate, response_time_hours,
+                     is_verified, review_count, image, phone, availability)
+                    VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s,
+                            %(latitude)s, %(longitude)s, %(rating)s, %(experience)s, %(completed_jobs)s,
+                            %(cancellation_rate)s, %(response_time_hours)s, %(is_verified)s,
+                            %(review_count)s, %(image)s, %(phone)s, %(availability)s)
+                """, p)
+
         conn.commit()
-        return jsonify(success=True, message=f"Added {len(additional_providers)} more providers successfully!")
-        
+        return jsonify(
+            success=True,
+            message=f"Added {len(extra)} GPS-enabled providers ({len(SAMPLE_SERVICE_CATEGORIES)} categories × 12).",
+        )
+
     except Exception as e:
         return jsonify(success=False, message=f"Error adding providers: {str(e)}"), 500
+
+
+@app.route("/api/refresh-demo-portraits", methods=["POST"])
+def refresh_demo_portraits():
+    """Set each provider's image to a stable demo portrait (fixes broken Pexels/unreliable URLs)."""
+    try:
+        conn = get_db()
+        updated = 0
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM service_providers")
+            for row in cur.fetchall():
+                pid = int(row["id"])
+                url = _seed_portrait_url(pid * 7919 + 17)
+                cur.execute(
+                    "UPDATE service_providers SET image = %s WHERE id = %s",
+                    (url, pid),
+                )
+                updated += 1
+        conn.commit()
+        return jsonify(success=True, message=f"Updated {updated} provider portrait URLs.")
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
 
 
 @app.route("/api/top-professionals")
@@ -1803,116 +1842,28 @@ def export_providers():
         return jsonify(success=False, message=str(e)), 500
 @app.route("/api/reset-providers", methods=["POST"])
 def reset_providers():
-    """Reset all providers with unique names and images for each service"""
+    """Clear all providers and insert the standard GPS-enabled seed (12 per category)."""
     try:
         conn = get_db()
+        rows = generate_seed_providers(12)
         with conn.cursor() as cur:
-            # Clear existing providers
             cur.execute("DELETE FROM service_providers")
-            
-            # Nepali names
-            names = [
-                "Aarav Sharma", "Aashish Karki", "Abhishek Adhikari", "Aditya Bhandari", "Ajay Thapa",
-                "Akash Shrestha", "Alok Poudel", "Amit Gurung", "Anil KC", "Anish Rana",
-                "Arjun Basnet", "Ashok Bhattarai", "Baburam Dahal", "Bikash Giri", "Binod Joshi",
-                "Bishal Rai", "Chandan Khatri", "Deepak Neupane", "Dhiraj Khadka", "Gopal Pandey",
-                "Hari Koirala", "Hemant Bista", "Ishwor Acharya", "Kamal Baral", "Kiran Subedi",
-                "Krishna Sigdel", "Laxman Regmi", "Madan Sapkota", "Manoj Thakuri", "Nabin Oli",
-                "Naresh Bhusal", "Niraj Tiwari", "Prabin KC", "Prakash Dahal", "Ramesh Kafle",
-                "Aakriti Sharma", "Aashika Karki", "Anjana Adhikari", "Anusha Bhandari", "Apsara Thapa",
-                "Arati Shrestha", "Bimala Poudel", "Bina Gurung", "Chhaya KC", "Deepa Rana",
-                "Gita Basnet", "Hema Bhattarai", "Indira Dahal", "Janaki Giri", "Kabita Joshi",
-                "Karuna Rai", "Laxmi Khatri", "Mamata Neupane", "Manisha Khadka", "Nirmala Pandey",
-                "Nisha Koirala", "Pabitra Bista", "Pramila Acharya", "Radhika Baral", "Rekha Subedi",
-                "Sabita Sigdel", "Sarita Regmi", "Sharmila Sapkota", "Sita Thakuri", "Sunita Oli",
-                "Sushma Bhusal", "Tara Tiwari", "Usha Kafle", "Yamuna Dahal", "Zoya Gurung"
-            ]
-            
-            # Images
-            images = [
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1463453091185-61582044d556?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1590031905470-a1a1feacbb0b?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=150&h=150&fit=crop&crop=face",
-                "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=150&h=150&fit=crop&crop=face"
-            ]
-            
-            # Services
-            services = [
-                {"key": "cleaning", "name": "Home Cleaning"},
-                {"key": "plumber", "name": "Plumbing"},
-                {"key": "electrician", "name": "Electric Repair"},
-                {"key": "ac", "name": "AC Service"},
-                {"key": "maid", "name": "Maid Service"},
-                {"key": "technician", "name": "Technician Service"},
-                {"key": "haircutting", "name": "Hair Cutting"},
-                {"key": "gardener", "name": "Gardener"},
-                {"key": "makeup", "name": "Makeup Artist"},
-                {"key": "photographer", "name": "Photographer"}
-            ]
-            
-            locations = ["Kathmandu", "Lalitpur", "Bhaktapur"]
-            name_idx = 0
-            image_idx = 0
-            total = 0
-            
-            # Create unique providers for each service
-            for service in services:
-                for i in range(7):  # 7 providers per service
-                    name = names[name_idx % len(names)]
-                    image = images[image_idx % len(images)]
-                    location = locations[i % len(locations)]
-                    
-                    # Ensure uniqueness by adding service suffix if name repeats
-                    if name_idx >= len(names):
-                        name = f"{name} ({service['name']})"
-                    
-                    cur.execute("""
-                        INSERT INTO service_providers 
-                        (name, service, service_key, location, district, rating, experience, 
-                         completed_jobs, cancellation_rate, response_time_hours, is_verified, 
-                         review_count, image, phone, availability)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (
-                        name,
-                        service["name"],
-                        service["key"],
-                        location,
-                        location,
-                        round(3.0 + (i * 0.3), 1),  # Rating 3.0-4.8
-                        (i % 5) + 1,  # Experience 1-5
-                        50 + (i * 30),  # Jobs 50-230
-                        round(0.02 + (i * 0.01), 2),  # Cancel rate
-                        1.5 + (i * 0.5),  # Response time
-                        i % 2 == 0,  # Verified every other
-                        25 + (i * 15),  # Reviews
-                        image,
-                        f"980{1000000 + total:07d}",  # Unique phone
-                        '["Mon","Tue","Wed","Thu","Fri","Sat"]'
-                    ))
-                    
-                    name_idx += 1
-                    image_idx += 1
-                    total += 1
-        
+            for p in rows:
+                cur.execute("""
+                    INSERT INTO service_providers 
+                    (name, service, service_key, location, district, latitude, longitude,
+                     rating, experience, completed_jobs, cancellation_rate, response_time_hours,
+                     is_verified, review_count, image, phone, availability)
+                    VALUES (%(name)s, %(service)s, %(service_key)s, %(location)s, %(district)s,
+                            %(latitude)s, %(longitude)s, %(rating)s, %(experience)s, %(completed_jobs)s,
+                            %(cancellation_rate)s, %(response_time_hours)s, %(is_verified)s,
+                            %(review_count)s, %(image)s, %(phone)s, %(availability)s)
+                """, p)
         conn.commit()
-        return jsonify(success=True, message=f"Created {total} unique providers across all services!")
-        
+        return jsonify(
+            success=True,
+            message=f"Reset complete: {len(rows)} providers with GPS ({len(SAMPLE_SERVICE_CATEGORIES)} categories × 12).",
+        )
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}"), 500
 @app.route("/api/update-provider-data", methods=["POST"])
@@ -2370,18 +2321,6 @@ def payment_failure():
     booking_id = request.args.get("transaction_uuid", "")
     return render_template("payment_failure.html", booking_id=booking_id)
 
-
-# ─────────────────────────────────────────────
-# RUN
-# ─────────────────────────────────────────────
-if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get('PORT', 8001))
-    print("🚀 NepSewa server starting...")
-    print(f"📍 Server will be available at: http://127.0.0.1:{port}")
-    print(f"📍 Health check: http://127.0.0.1:{port}/health")
-    print(f"📍 Services page: http://127.0.0.1:{port}/services")
-    app.run(debug=True, host='0.0.0.0', port=port)
 
 @app.route("/api/add-nepali-providers", methods=["POST"])
 def add_nepali_providers():
@@ -3035,3 +2974,15 @@ def fix_nearby_providers():
         
     except Exception as e:
         return jsonify(success=False, message=f"Error: {str(e)}"), 500
+
+
+# ─────────────────────────────────────────────
+# RUN (local development)
+# ─────────────────────────────────────────────
+if __name__ == "__main__":
+    init_db()
+    port = int(os.environ.get("PORT", 8001))
+    print("NepSewa local server")
+    print(f"  http://127.0.0.1:{port}/")
+    print(f"  http://127.0.0.1:{port}/health")
+    app.run(debug=True, host="127.0.0.1", port=port)

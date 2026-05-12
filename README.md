@@ -86,18 +86,17 @@
    pip install flask pymysql werkzeug requests
    ```
 
-3. **Setup MySQL Database**
+3. **Setup MySQL database**
    ```sql
-   CREATE DATABASE nepsewa;
-   CREATE USER 'root'@'localhost' IDENTIFIED BY 'nepsewa123';
-   GRANT ALL PRIVILEGES ON nepsewa.* TO 'root'@'localhost';
-   FLUSH PRIVILEGES;
+   CREATE DATABASE IF NOT EXISTS nepsewa_db;
    ```
+   Adjust credentials in `mysql_config.py` or set `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, and `DB_PORT` if yours differ (defaults: `root` / empty password / `nepsewa_db` on port `3306`).
 
 4. **Run the application**
    ```bash
-   python3 run_server.py
+   python3 main.py
    ```
+   Optional: `python3 run_local.py` binds `0.0.0.0` so other devices on your network can reach the dev server.
 
 5. **Access the application**
    - Open your browser and go to `http://127.0.0.1:8001`
@@ -107,7 +106,7 @@
 ```
 NepSewa/
 ├── main.py                 # Main Flask application
-├── run_server.py          # Development server
+├── run_local.py            # Local dev server (0.0.0.0)
 ├── migrate_database.py    # Database migration script
 ├── orders.json           # Order data storage
 ├── static/               # Static assets

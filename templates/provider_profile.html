@@ -297,7 +297,7 @@
         
         async function loadProviderProfile() {
             try {
-                const response = await fetch('/api/provider/me');
+                const response = await fetch('/api/provider/me', { credentials: 'same-origin' });
                 const data = await response.json();
                 
                 if (data.success) {
@@ -435,6 +435,7 @@
                 const response = await fetch('/api/provider/update', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify(formData)
                 });
                 
