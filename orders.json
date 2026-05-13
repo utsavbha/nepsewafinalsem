@@ -219,5 +219,22 @@
     "payment": "unpaid",
     "booked_at": "2026-05-01 15:42:41",
     "user_id": 1
+  },
+  {
+    "booking_id": "NS-SGTC2G",
+    "name": "Mr Fury",
+    "phone": "9869423357",
+    "address": "drivertole",
+    "service": "Plumbing",
+    "service_key": "plumber",
+    "provider_id": 32,
+    "provider_name": "Nabin Shrestha",
+    "preferred_date": "2026-05-13",
+    "preferred_time": "8AM - 10AM",
+    "notes": "",
+    "status": "confirmed",
+    "payment": "pending",
+    "booked_at": "2026-05-12 10:38:05",
+    "booking_type": "direct_provider"
   }
 ]
