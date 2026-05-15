@@ -2272,8 +2272,10 @@ def esewa_initiate():
     return jsonify(
         success=True,
         merchant_code=ESEWA_MERCHANT_CODE,
+        product_code=ESEWA_MERCHANT_CODE,  # Added for frontend compatibility
         amount=amount_str,
         booking_id=booking_id,
+        transaction_uuid=booking_id,  # Added for frontend compatibility
         signature=signature,
         success_url=base_url + "/payment/success",
         failure_url=base_url + "/payment/failure",

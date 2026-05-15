@@ -8,7 +8,7 @@ MySQL Configuration for NepSewa Local Development
 MYSQL_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': '',
+    'password': 'nepsewa123',  # Set your MySQL root password here
     'database': 'nepsewa_db',
     'port': 3306
 }

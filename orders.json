@@ -236,5 +236,29 @@
     "payment": "pending",
     "booked_at": "2026-05-12 10:38:05",
     "booking_type": "direct_provider"
+  },
+  {
+    "booking_id": "NS-AH6OKP",
+    "name": "Utsav Bhandari",
+    "email": "utsav1@gmail.com",
+    "phone": "9869423357",
+    "address": "butwal",
+    "service": "haircutting",
+    "status": "pending",
+    "payment": "unpaid",
+    "booked_at": "2026-05-15 11:11:26",
+    "user_id": 1
+  },
+  {
+    "booking_id": "NS-ER8MZ2",
+    "name": "Utsav Bhandari",
+    "email": "utsav1@gmail.com",
+    "phone": "9869423357",
+    "address": "butwal",
+    "service": "ac",
+    "status": "pending",
+    "payment": "unpaid",
+    "booked_at": "2026-05-15 11:16:50",
+    "user_id": 1
   }
 ]
