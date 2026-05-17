@@ -385,70 +385,38 @@
 
 <script>
 // Mobile menu toggle
-function toggleMobileMenu() {
-    const menu = document.getElementById('navMenu');
-    const hamburger = document.getElementById('mobileMenuToggle');
-    
-    if (!menu || !hamburger) return;
-    
-    menu.classList.toggle('active');
-    hamburger.classList.toggle('active');
-}
-
-// Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('mobileMenuToggle');
+    const menu = document.getElementById('navMenu');
     
-    if (hamburger) {
+    if (hamburger && menu) {
         hamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            toggleMobileMenu();
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
         });
-    }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const menu = document.getElementById('navMenu');
-        const hamburger = document.getElementById('mobileMenuToggle');
         
-        if (menu && hamburger && menu.classList.contains('active')) {
-            if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (menu.classList.contains('active')) {
+                if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            }
+        });
+        
+        // Close menu when clicking on a link
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
                 menu.classList.remove('active');
                 hamburger.classList.remove('active');
-            }
-        }
-    });
-});
-</script>
-    
-    if (hamburger && menu) {
-        // Initialize menu as closed
-        menu.setAttribute('data-open', 'false');
-        
-        hamburger.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileMenu();
-        };
+            });
+        });
     }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const menu = document.getElementById('navMenu');
-        const hamburger = document.getElementById('mobileMenuToggle');
-        
-        if (menu && hamburger && 
-            menu.getAttribute('data-open') === 'true' &&
-            !hamburger.contains(event.target) && 
-            !menu.contains(event.target)) {
-            toggleMobileMenu();
-        }
-    });
 });
-</script>
 
-<script>
 // Check login status on page load and update navbar
 document.addEventListener('DOMContentLoaded', async function() {
     try {
