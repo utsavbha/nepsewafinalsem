@@ -1425,7 +1425,7 @@ def api_services():
         },
         "plumber": {
             "title": "Plumber Service", "price": "Rs. 500 / Hour",
-            "image": "https://nnps.com.np/wp-content/uploads/2023/06/imgs-1.jpg",
+            "image": "/static/plumber.svg",
             "description": "Our plumbers fix leaking taps, blocked drains, broken pipes and bathroom fittings."
         },
         "electrician": {

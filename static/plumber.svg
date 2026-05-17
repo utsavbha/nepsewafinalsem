@@ -1,0 +1,52 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="400" fill="#f0f4f8"/>
+  
+  <!-- Wall -->
+  <rect x="50" y="80" width="300" height="250" fill="#e8e8e8" stroke="#999" stroke-width="2"/>
+  
+  <!-- Plumber with hard hat -->
+  <circle cx="120" cy="100" r="25" fill="#f4a460"/>
+  <rect x="105" y="125" width="30" height="40" fill="#4a90e2"/>
+  <rect x="100" y="165" width="15" height="50" fill="#f4a460"/>
+  <rect x="125" y="165" width="15" height="50" fill="#f4a460"/>
+  
+  <!-- Hard hat (yellow) -->
+  <ellipse cx="120" cy="95" rx="28" ry="20" fill="#ffd700" stroke="#daa520" stroke-width="2"/>
+  <path d="M 95 100 Q 120 85 145 100" fill="none" stroke="#daa520" stroke-width="2"/>
+  
+  <!-- Wrench in hand -->
+  <g transform="translate(140, 140)">
+    <rect x="0" y="0" width="50" height="8" fill="#c0c0c0" rx="4"/>
+    <circle cx="45" cy="4" r="12" fill="#c0c0c0" stroke="#808080" stroke-width="1"/>
+  </g>
+  
+  <!-- Pipes -->
+  <rect x="200" y="120" width="20" height="80" fill="#8b7355" stroke="#654321" stroke-width="2"/>
+  <rect x="230" y="140" width="20" height="60" fill="#8b7355" stroke="#654321" stroke-width="2"/>
+  <rect x="260" y="160" width="20" height="40" fill="#8b7355" stroke="#654321" stroke-width="2"/>
+  
+  <!-- Pipe connections (valves) -->
+  <circle cx="210" cy="115" r="8" fill="#ff6b6b" stroke="#c92a2a" stroke-width="2"/>
+  <circle cx="240" cy="135" r="8" fill="#ff6b6b" stroke="#c92a2a" stroke-width="2"/>
+  <circle cx="270" cy="155" r="8" fill="#ff6b6b" stroke="#c92a2a" stroke-width="2"/>
+  
+  <!-- Water drops -->
+  <circle cx="215" cy="200" r="4" fill="#4a90e2" opacity="0.7"/>
+  <circle cx="245" cy="200" r="4" fill="#4a90e2" opacity="0.7"/>
+  <circle cx="275" cy="195" r="4" fill="#4a90e2" opacity="0.7"/>
+  
+  <!-- Toolbox -->
+  <rect x="280" y="240" width="80" height="50" fill="#d4a574" stroke="#8b6914" stroke-width="2" rx="4"/>
+  <rect x="285" y="235" width="70" height="8" fill="#8b6914" rx="2"/>
+  
+  <!-- Tools in box -->
+  <line x1="295" y1="250" x2="295" y2="280" stroke="#c0c0c0" stroke-width="3"/>
+  <line x1="310" y1="250" x2="310" y2="280" stroke="#c0c0c0" stroke-width="3"/>
+  <line x1="325" y1="250" x2="325" y2="280" stroke="#c0c0c0" stroke-width="3"/>
+  <line x1="340" y1="250" x2="340" y2="280" stroke="#c0c0c0" stroke-width="3"/>
+  
+  <!-- Title -->
+  <text x="200" y="350" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Plumber Service</text>
+  <text x="200" y="375" font-size="14" text-anchor="middle" fill="#666">Professional Pipe Repair</text>
+</svg>
