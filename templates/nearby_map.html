@@ -422,6 +422,27 @@
             background: #f9fafb;
             border-bottom-color: #e5e7eb;
         }
+        
+        body.light .sidebar-close-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        body.light .sidebar-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+        
+        body.light .sidebar-toggle-btn {
+            background: #ffffff;
+            border-color: #e5e7eb;
+            color: #1f2937;
+        }
+        
+        body.light .sidebar-toggle-btn:hover {
+            background: #f9fafb;
+        }
 
         body.light .provider-card {
             background: #ffffff;
@@ -709,6 +730,7 @@
         .map-container {
             height: calc(100vh - 80px);
             position: relative;
+            overflow: hidden;
         }
         
         #map {
@@ -721,23 +743,88 @@
         }
         
         .sidebar {
-            position: absolute;
-            top: 20px;
+            position: fixed;
+            top: 140px;
             left: 20px;
             width: 350px;
-            max-height: calc(100vh - 120px);
+            max-height: calc(100vh - 160px);
             background: #1e293b;
             border-radius: 12px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             z-index: 1000;
             overflow: hidden;
             border: 2px solid #334155;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .sidebar.hidden {
+            transform: translateX(-400px);
+            opacity: 0;
+            pointer-events: none;
         }
         
         .sidebar-header {
             padding: 20px;
             border-bottom: 1px solid #334155;
             background: #0f172a;
+            position: relative;
+        }
+        
+        .sidebar-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        
+        .sidebar-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            transform: scale(1.1);
+        }
+        
+        .sidebar-close-btn svg {
+            pointer-events: none;
+        }
+        
+        /* Toggle button to show sidebar when hidden */
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 140px;
+            left: 20px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            color: #e2e8f0;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .sidebar-toggle-btn:hover {
+            background: #334155;
+            transform: scale(1.05);
+        }
+        
+        .sidebar-toggle-btn.show {
+            display: flex;
         }
         
         .sidebar-title {
@@ -745,6 +832,7 @@
             font-weight: 600;
             color: #e2e8f0;
             margin-bottom: 8px;
+            padding-right: 40px;
         }
         
         .location-status {
@@ -759,7 +847,7 @@
         }
         
         .providers-list {
-            max-height: 500px;
+            max-height: calc(100vh - 300px);
             overflow-y: auto;
             position: relative;
             z-index: 5;
@@ -1311,9 +1399,25 @@
     <div class="map-container">
         <div id="map"></div>
         
-        <div class="sidebar">
+        <!-- Toggle button to show sidebar -->
+        <button class="sidebar-toggle-btn" id="sidebarToggle" onclick="toggleSidebar()" title="Show providers list">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+        </button>
+        
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">Nearby Providers</div>
+                <button class="sidebar-close-btn" onclick="toggleSidebar()" title="Close sidebar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
                 <div class="location-status" id="locationStatus">Click "Use My Location" to find nearby providers</div>
                 <div class="results-count" id="resultsCount"></div>
             </div>
@@ -1339,6 +1443,17 @@
         
         // Default center (Butwal)
         const defaultCenter = { lat: 27.7000, lng: 83.4500 };
+        
+        // Toggle sidebar visibility
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            
+            if (sidebar && toggleBtn) {
+                sidebar.classList.toggle('hidden');
+                toggleBtn.classList.toggle('show');
+            }
+        }
         
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -1945,15 +2060,6 @@
     <!-- Footer -->
     <!-- ===== FOOTER (same as services page) ===== -->
     <footer class="site-footer">
-        <div class="footer-cta-strip">
-            <div class="footer-cta-inner">
-                <div>
-                    <h3>Need help at home?</h3>
-                    <p>Book trusted professionals in minutes — available across Nepal</p>
-                </div>
-                <button class="footer-cta-btn" onclick="window.location.href='/services'">Book a Service ↑</button>
-            </div>
-        </div>
         <div class="footer-main">
             <div class="footer-grid">
                 <div class="footer-col footer-brand">
