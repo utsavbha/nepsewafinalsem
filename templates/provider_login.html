@@ -4,17 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NepSewa — Provider Login</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-<link rel="stylesheet" href="/static/alerts.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/nepsewa.css">
+<link rel="stylesheet" href="/static/login.css">
+</head>
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
     <a href="/" class="nav-left">
       <img src="/static/final_logo.png" alt="NepSewa Logo" class="logo-img">
     </a>
-    <ul class="nav-menu">
+    
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
+    <ul class="nav-menu" id="navMenu">
       <li><a href="/">Home</a></li>
       <li><a href="/services">Services &amp; Providers</a></li>
       <li><a href="/login">Customer Login</a></li>
@@ -33,16 +43,14 @@
   </div>
 </nav>
 
-<div class="auth-wrapper">
-  <div class="bg-orb orb1"></div>
-  <div class="bg-orb orb2"></div>
-  <div class="bg-orb orb3"></div>
-
-  <div class="container">
-    <div class="card">
-
-      <div class="brand">
-        <div class="brand-icon">🏢</div>
+<!-- LOGIN SECTION -->
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-card">
+      
+      <!-- Brand -->
+      <div class="login-brand">
+        <img src="/static/final_logo.png" alt="NepSewa Logo" class="login-logo">
         <h1>Provider Login</h1>
         <p>Access your provider dashboard</p>
       </div>
@@ -50,27 +58,21 @@
       <div id="msg" class="msg"></div>
 
       <!-- PROVIDER LOGIN FORM -->
-      <div id="providerLoginForm" class="form-section active">
-        <div class="field">
-          <label>Email or phone</label>
-          <div class="input-wrap">
-            <span class="ico">👤</span>
-            <input type="text" id="loginId" placeholder="you@email.com or 9800000000" autocomplete="username">
-          </div>
-          <small style="color: #64748b; font-size: 0.8rem;">Use the same email or phone you registered with.</small>
+      <div class="login-form-section active">
+        <div class="login-field">
+          <label>EMAIL OR PHONE</label>
+          <input type="text" id="loginId" placeholder="you@example.com or 9800000000" autocomplete="username">
         </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔑</span>
-            <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
-          </div>
+        <div class="login-field">
+          <label>PASSWORD</label>
+          <input type="password" id="password" placeholder="Your password" autocomplete="current-password">
         </div>
-        <button class="btn" id="loginBtn" onclick="doProviderLogin()">Login to Dashboard</button>
+        <button class="login-btn" id="loginBtn" onclick="doProviderLogin()">Login to Dashboard</button>
       </div>
 
-      <div class="foot">
-        Don't have a provider account? <a href="/provider/register">Register here</a><br>
+      <!-- Footer -->
+      <div class="login-footer">
+        Don't have a provider account? <a href="/register-provider">Register here</a><br>
         <a href="/">← Back to Home</a>
       </div>
 
@@ -81,29 +83,53 @@
 <script src="/static/alerts.js"></script>
 <script>
 // Dark mode toggle
-const toggle = document.getElementById("darkToggle");
-if (toggle) {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-        document.body.classList.add("dark");
-        toggle.checked = false;
-    } else {
-        document.body.classList.add("light");
-        toggle.checked = true;
-    }
+const darkToggle = document.getElementById('darkToggle');
 
-    toggle.addEventListener("change", () => {
-        if (toggle.checked) {
-            document.body.classList.remove("dark");
-            document.body.classList.add("light");
-            localStorage.setItem("theme", "light");
-        } else {
-            document.body.classList.remove("light");
-            document.body.classList.add("dark");
-            localStorage.setItem("theme", "dark");
+if (localStorage.getItem('theme') === 'light') {
+  document.body.classList.add('light');
+  darkToggle.checked = true;
+}
+
+darkToggle.addEventListener('change', () => {
+  document.body.classList.toggle('light', darkToggle.checked);
+  localStorage.setItem('theme', darkToggle.checked ? 'light' : 'dark');
+});
+
+// Mobile menu toggle
+function toggleMobileMenu() {
+    const menu = document.getElementById('navMenu');
+    const hamburger = document.getElementById('mobileMenuToggle');
+    
+    if (!menu || !hamburger) return;
+    
+    menu.classList.toggle('active');
+    hamburger.classList.toggle('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.getElementById('mobileMenuToggle');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileMenu();
+        });
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('navMenu');
+        const hamburger = document.getElementById('mobileMenuToggle');
+        
+        if (menu && hamburger && menu.classList.contains('active')) {
+            if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
         }
     });
-}
+});
 
 async function doProviderLogin() {
     const loginId = document.getElementById('loginId').value.trim();
@@ -115,26 +141,8 @@ async function doProviderLogin() {
     msgEl.textContent = '';
     msgEl.className = 'msg';
     
-    if (!loginId) {
-        showMessage('Email or phone is required', 'error');
-        return;
-    }
-    
-    if (loginId.includes('@')) {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginId)) {
-            showMessage('Enter a valid email address', 'error');
-            return;
-        }
-    } else {
-        const digits = loginId.replace(/\D/g, '');
-        if (digits.length < 9) {
-            showMessage('Enter a valid phone number (at least 9 digits) or use your email', 'error');
-            return;
-        }
-    }
-    
-    if (!password) {
-        showMessage('Password is required', 'error');
+    if (!loginId || !password) {
+        showMessage('Please fill in all fields', 'error');
         return;
     }
     
@@ -159,7 +167,9 @@ async function doProviderLogin() {
         
         if (data.success) {
             showMessage('Login successful! Redirecting…', 'success');
-            window.location.href = data.redirect_url || '/provider/dashboard';
+            setTimeout(() => {
+                window.location.href = data.redirect_url || '/provider/dashboard';
+            }, 1000);
         } else {
             showMessage(data.message || 'Login failed', 'error');
         }
@@ -175,9 +185,17 @@ async function doProviderLogin() {
 
 function showMessage(text, type) {
     const msgEl = document.getElementById('msg');
-    msgEl.textContent = text;
-    msgEl.className = `msg ${type}`;
+    msgEl.textContent = (type === 'error' ? '⚠️  ' : '✅  ') + text;
+    msgEl.className = `msg ${type === 'error' ? 'error' : 'ok'}`;
+    msgEl.style.display = 'block';
 }
+
+// Enter key support
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    doProviderLogin();
+  }
+});
 </script>
 
 </body>

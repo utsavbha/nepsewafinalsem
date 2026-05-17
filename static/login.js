@@ -2,6 +2,42 @@
 //  NepSewa — login.js
 // ============================================================
 
+// ── Mobile Menu ──
+function toggleMobileMenu() {
+    const menu = document.getElementById('navMenu');
+    const hamburger = document.getElementById('mobileMenuToggle');
+    
+    if (!menu || !hamburger) return;
+    
+    menu.classList.toggle('active');
+    hamburger.classList.toggle('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.getElementById('mobileMenuToggle');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileMenu();
+        });
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('navMenu');
+        const hamburger = document.getElementById('mobileMenuToggle');
+        
+        if (menu && hamburger && menu.classList.contains('active')) {
+            if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        }
+    });
+});
+
 // ── Dark mode ──
 // ── Dark mode — matches your other pages ──
 const darkToggle = document.getElementById('darkToggle');

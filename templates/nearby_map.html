@@ -1905,84 +1905,26 @@
     <script src="/static/alerts.js"></script>
 
     <script>
-    // Ultra-simple mobile menu with !important overrides
+    // ===== MOBILE MENU TOGGLE =====
     function toggleMobileMenu() {
         const menu = document.getElementById('navMenu');
         const hamburger = document.getElementById('mobileMenuToggle');
         
-        if (menu.getAttribute('data-open') === 'true') {
-            // Close menu
-            menu.removeAttribute('style');
-            menu.setAttribute('data-open', 'false');
-            hamburger.classList.remove('active');
-            
-            // Remove styles from links
-            const links = menu.querySelectorAll('a');
-            links.forEach(link => {
-                link.removeAttribute('style');
-            });
-        } else {
-            // Better theme detection - check multiple sources
-            const isLight = document.body.classList.contains('light') || 
-                           document.documentElement.classList.contains('light') ||
-                           getComputedStyle(document.body).backgroundColor.includes('255'); // Check if background is white-ish
-            
-            const bgColor = isLight ? '#ffffff' : '#1e293b';
-            const textColor = isLight ? '#1f2937' : '#ffffff';
-            const borderColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(99, 102, 241, 0.2)';
-            
-            // Open menu - use setAttribute for better override
-            menu.setAttribute('style', `
-                display: flex !important;
-                flex-direction: column !important;
-                position: absolute !important;
-                top: 100% !important;
-                left: 0 !important;
-                right: 0 !important;
-                background: ${bgColor} !important;
-                border: 1px solid ${borderColor} !important;
-                border-radius: 12px !important;
-                padding: 20px !important;
-                z-index: 9999 !important;
-                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-                margin-top: 10px !important;
-                gap: 0 !important;
-                list-style: none !important;
-            `);
-            
-            menu.setAttribute('data-open', 'true');
-            
-            // Style each link with theme colors
-            const links = menu.querySelectorAll('a');
-            links.forEach(link => {
-                link.setAttribute('style', `
-                    display: block !important;
-                    padding: 12px 0 !important;
-                    text-align: center !important;
-                    border-bottom: 1px solid ${borderColor} !important;
-                    color: ${textColor} !important;
-                    text-decoration: none !important;
-                `);
-            });
-            
-            hamburger.classList.add('active');
-        }
+        if (!menu || !hamburger) return;
+        
+        menu.classList.toggle('active');
+        hamburger.classList.toggle('active');
     }
 
-    // Add click handler directly to hamburger
     document.addEventListener('DOMContentLoaded', function() {
         const hamburger = document.getElementById('mobileMenuToggle');
-        const menu = document.getElementById('navMenu');
         
-        if (hamburger && menu) {
-            // Initialize menu as closed
-            menu.setAttribute('data-open', 'false');
-            
-            hamburger.onclick = function(e) {
+        if (hamburger) {
+            hamburger.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 toggleMobileMenu();
-            };
+            });
         }
         
         // Close menu when clicking outside
@@ -1990,11 +1932,11 @@
             const menu = document.getElementById('navMenu');
             const hamburger = document.getElementById('mobileMenuToggle');
             
-            if (menu && hamburger && 
-                menu.getAttribute('data-open') === 'true' &&
-                !hamburger.contains(event.target) && 
-                !menu.contains(event.target)) {
-                toggleMobileMenu();
+            if (menu && hamburger && menu.classList.contains('active')) {
+                if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+                    menu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
             }
         });
     });

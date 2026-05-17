@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NepSewa — Services &amp; Providers</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/nepsewa.css">
     <link rel="stylesheet" href="/static/serv.css">
     <link rel="stylesheet" href="/static/alerts.css">
     
@@ -383,146 +384,43 @@
 <script src="/static/alerts.js"></script>
 
 <script>
-// Check login status on page load and update navbar
-document.addEventListener('DOMContentLoaded', async function() {
-    try {
-        const response = await fetch('/api/me');
-        const result = await response.json();
-        
-        const loginLink = document.getElementById('loginNavLink');
-        if (result.success && result.user) {
-            // User is logged in - show profile link
-            loginLink.textContent = result.user.name;
-            loginLink.href = '/profile';
-            loginLink.title = 'Go to Profile';
-        } else {
-            // User not logged in - show login link with redirect
-            loginLink.textContent = 'Login';
-            const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
-            loginLink.href = `/login?redirect=${currentUrl}`;
-            loginLink.title = 'Login to your account';
-        }
-    } catch (error) {
-        console.error('Error checking login status:', error);
-    }
-});
-</script>
-
-<style>
-/* Mobile Menu CSS for Services Page */
-@media (max-width: 768px) {
-    .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column;
-        cursor: pointer;
-        padding: 8px;
-        border: none;
-        background: none;
-        z-index: 10000;
-        order: 2;
-    }
-    
-    .mobile-menu-toggle span {
-        width: 25px;
-        height: 3px;
-        background: var(--text);
-        margin: 3px 0;
-        transition: 0.3s;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(1) {
-        transform: rotate(-45deg) translate(-5px, 6px);
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(3) {
-        transform: rotate(45deg) translate(-5px, -6px);
-    }
-    
-    /* Hide the default nav menu on mobile */
-    .nav-container .nav-menu {
-        display: none !important;
-        position: static !important;
-        transform: none !important;
-        left: auto !important;
-        right: auto !important;
-    }
-    
-    .nav-right {
-        order: 3;
-    }
-}
-</style>
-
-<script>
-// Mobile menu for services page with theme awareness
+// Mobile menu toggle
 function toggleMobileMenu() {
     const menu = document.getElementById('navMenu');
     const hamburger = document.getElementById('mobileMenuToggle');
     
-    if (menu.getAttribute('data-open') === 'true') {
-        // Close menu
-        menu.removeAttribute('style');
-        menu.setAttribute('data-open', 'false');
-        hamburger.classList.remove('active');
-        
-        // Remove styles from links
-        const links = menu.querySelectorAll('a');
-        links.forEach(link => {
-            link.removeAttribute('style');
-        });
-    } else {
-        // Check if body has light class for theme
-        const isLight = document.body.classList.contains('light');
-        const bgColor = isLight ? '#ffffff' : '#1e293b';
-        const textColor = isLight ? '#1f2937' : '#ffffff';
-        const borderColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(99, 102, 241, 0.2)';
-        
-        // Open menu - use setAttribute for better override
-        menu.setAttribute('style', `
-            display: flex !important;
-            flex-direction: column !important;
-            position: absolute !important;
-            top: 100% !important;
-            left: 0 !important;
-            right: 0 !important;
-            background: ${bgColor} !important;
-            border: 1px solid ${borderColor} !important;
-            border-radius: 12px !important;
-            padding: 20px !important;
-            z-index: 9999 !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-            margin-top: 10px !important;
-            gap: 0 !important;
-            list-style: none !important;
-        `);
-        
-        menu.setAttribute('data-open', 'true');
-        
-        // Style each link with theme colors
-        const links = menu.querySelectorAll('a');
-        links.forEach(link => {
-            link.setAttribute('style', `
-                display: block !important;
-                padding: 12px 0 !important;
-                text-align: center !important;
-                border-bottom: 1px solid ${borderColor} !important;
-                color: ${textColor} !important;
-                text-decoration: none !important;
-            `);
-        });
-        
-        hamburger.classList.add('active');
-    }
+    if (!menu || !hamburger) return;
+    
+    menu.classList.toggle('active');
+    hamburger.classList.toggle('active');
 }
 
-// Add mobile menu functionality
+// Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('mobileMenuToggle');
-    const menu = document.getElementById('navMenu');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMobileMenu();
+        });
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('navMenu');
+        const hamburger = document.getElementById('mobileMenuToggle');
+        
+        if (menu && hamburger && menu.classList.contains('active')) {
+            if (!hamburger.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        }
+    });
+});
+</script>
     
     if (hamburger && menu) {
         // Initialize menu as closed
@@ -547,6 +445,32 @@ document.addEventListener('DOMContentLoaded', function() {
             toggleMobileMenu();
         }
     });
+});
+</script>
+
+<script>
+// Check login status on page load and update navbar
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await fetch('/api/me');
+        const result = await response.json();
+        
+        const loginLink = document.getElementById('loginNavLink');
+        if (result.success && result.user) {
+            // User is logged in - show profile link
+            loginLink.textContent = result.user.name;
+            loginLink.href = '/profile';
+            loginLink.title = 'Go to Profile';
+        } else {
+            // User not logged in - show login link with redirect
+            loginLink.textContent = 'Login';
+            const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            loginLink.href = `/login?redirect=${currentUrl}`;
+            loginLink.title = 'Login to your account';
+        }
+    } catch (error) {
+        console.error('Error checking login status:', error);
+    }
 });
 </script>
 

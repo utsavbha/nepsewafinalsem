@@ -4,10 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NepSewa — Login</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/nepsewa.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 <body>
 
+<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
     <a href="/" class="nav-left">
@@ -39,82 +41,64 @@
   </div>
 </nav>
 
-<div class="auth-wrapper">
-  <div class="bg-orb orb1"></div>
-  <div class="bg-orb orb2"></div>
-  <div class="bg-orb orb3"></div>
-
-  <div class="container">
-    <div class="card">
-
-      <div class="brand">
-        <div class="brand-icon">🏡</div>
+<!-- LOGIN SECTION -->
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="login-card">
+      
+      <!-- Brand -->
+      <div class="login-brand">
+        <img src="/static/final_logo.png" alt="NepSewa Logo" class="login-logo">
         <h1>NepSewa</h1>
         <p>Your trusted home services platform</p>
       </div>
 
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('login')">Login</button>
-        <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+      <!-- Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('login')">Login</button>
+        <button class="login-tab" onclick="switchTab('signup')">Sign Up</button>
       </div>
 
       <div id="msg" class="msg"></div>
 
       <!-- LOGIN FORM -->
-      <div id="loginForm" class="form-section active">
-        <div class="field">
-          <label>Email Address</label>
-          <div class="input-wrap">
-            <span class="ico">✉️</span>
-            <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
-          </div>
+      <div id="loginForm" class="login-form-section active">
+        <div class="login-field">
+          <label>EMAIL ADDRESS</label>
+          <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email">
         </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔑</span>
-            <input type="password" id="l-pass" placeholder="Your password" autocomplete="current-password">
-          </div>
+        <div class="login-field">
+          <label>PASSWORD</label>
+          <input type="password" id="l-pass" placeholder="Your password" autocomplete="current-password">
         </div>
-        <button class="btn" id="loginBtn" onclick="doLogin()">Login to NepSewa</button>
+        <button class="login-btn" id="loginBtn" onclick="doLogin()">Login to NepSewa</button>
       </div>
 
       <!-- SIGNUP FORM -->
-      <div id="signupForm" class="form-section">
-        <div class="field">
-          <label>Full Name</label>
-          <div class="input-wrap">
-            <span class="ico">👤</span>
-            <input type="text" id="s-name" placeholder="Aarav Sharma" autocomplete="name">
-          </div>
+      <div id="signupForm" class="login-form-section">
+        <div class="login-field">
+          <label>FULL NAME</label>
+          <input type="text" id="s-name" placeholder="Aarav Sharma" autocomplete="name">
         </div>
-        <div class="field">
-          <label>Email Address</label>
-          <div class="input-wrap">
-            <span class="ico">✉️</span>
-            <input type="email" id="s-email" placeholder="you@example.com" autocomplete="email">
-          </div>
+        <div class="login-field">
+          <label>EMAIL ADDRESS</label>
+          <input type="email" id="s-email" placeholder="you@example.com" autocomplete="email">
         </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔑</span>
-            <input type="password" id="s-pass" placeholder="Min. 6 characters"
-                   oninput="checkStrength(this.value)" autocomplete="new-password">
-          </div>
+        <div class="login-field">
+          <label>PASSWORD</label>
+          <input type="password" id="s-pass" placeholder="Min. 6 characters"
+                 oninput="checkStrength(this.value)" autocomplete="new-password">
           <div class="strength"><div class="strength-fill" id="strengthFill"></div></div>
         </div>
-        <div class="field">
-          <label>Confirm Password</label>
-          <div class="input-wrap">
-            <span class="ico">🔒</span>
-            <input type="password" id="s-confirm" placeholder="Repeat password" autocomplete="new-password">
-          </div>
+        <div class="login-field">
+          <label>CONFIRM PASSWORD</label>
+          <input type="password" id="s-confirm" placeholder="Repeat password" autocomplete="new-password">
         </div>
-        <button class="btn" id="signupBtn" onclick="doSignup()">Create Account</button>
+        <button class="login-btn" id="signupBtn" onclick="doSignup()">Create Account</button>
       </div>
 
-      <div class="foot">
+      <!-- Footer -->
+      <div class="login-footer">
         By continuing you agree to our <a href="#">Terms of Service</a> &amp; <a href="#">Privacy Policy</a>
       </div>
 
@@ -123,148 +107,6 @@
 </div>
 
 <script src="{{ url_for('static', filename='login.js') }}"></script>
-
-<style>
-/* Mobile Menu CSS for Login Page */
-@media (max-width: 768px) {
-    .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column;
-        cursor: pointer;
-        padding: 8px;
-        border: none;
-        background: none;
-        z-index: 10000;
-        order: 2;
-    }
-    
-    .mobile-menu-toggle span {
-        width: 25px;
-        height: 3px;
-        background: var(--text);
-        margin: 3px 0;
-        transition: 0.3s;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(1) {
-        transform: rotate(-45deg) translate(-5px, 6px);
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-    }
-    
-    .mobile-menu-toggle.active span:nth-child(3) {
-        transform: rotate(45deg) translate(-5px, -6px);
-    }
-    
-    /* Hide the default nav menu on mobile */
-    .nav-container .nav-menu {
-        display: none !important;
-        position: static !important;
-        transform: none !important;
-        left: auto !important;
-        right: auto !important;
-    }
-    
-    .nav-right {
-        order: 3;
-    }
-}
-</style>
-
-<script>
-// Mobile menu for login page with theme awareness
-function toggleMobileMenu() {
-    const menu = document.getElementById('navMenu');
-    const hamburger = document.getElementById('mobileMenuToggle');
-    
-    if (menu.getAttribute('data-open') === 'true') {
-        // Close menu
-        menu.removeAttribute('style');
-        menu.setAttribute('data-open', 'false');
-        hamburger.classList.remove('active');
-        
-        // Remove styles from links
-        const links = menu.querySelectorAll('a');
-        links.forEach(link => {
-            link.removeAttribute('style');
-        });
-    } else {
-        // Check if body has light class for theme
-        const isLight = document.body.classList.contains('light');
-        const bgColor = isLight ? '#ffffff' : '#1e293b';
-        const textColor = isLight ? '#1f2937' : '#ffffff';
-        const borderColor = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(99, 102, 241, 0.2)';
-        
-        // Open menu - use setAttribute for better override
-        menu.setAttribute('style', `
-            display: flex !important;
-            flex-direction: column !important;
-            position: absolute !important;
-            top: 100% !important;
-            left: 0 !important;
-            right: 0 !important;
-            background: ${bgColor} !important;
-            border: 1px solid ${borderColor} !important;
-            border-radius: 12px !important;
-            padding: 20px !important;
-            z-index: 9999 !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-            margin-top: 10px !important;
-            gap: 0 !important;
-            list-style: none !important;
-        `);
-        
-        menu.setAttribute('data-open', 'true');
-        
-        // Style each link with theme colors
-        const links = menu.querySelectorAll('a');
-        links.forEach(link => {
-            link.setAttribute('style', `
-                display: block !important;
-                padding: 12px 0 !important;
-                text-align: center !important;
-                border-bottom: 1px solid ${borderColor} !important;
-                color: ${textColor} !important;
-                text-decoration: none !important;
-            `);
-        });
-        
-        hamburger.classList.add('active');
-    }
-}
-
-// Add mobile menu functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const hamburger = document.getElementById('mobileMenuToggle');
-    const menu = document.getElementById('navMenu');
-    
-    if (hamburger && menu) {
-        // Initialize menu as closed
-        menu.setAttribute('data-open', 'false');
-        
-        hamburger.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileMenu();
-        };
-    }
-    
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const menu = document.getElementById('navMenu');
-        const hamburger = document.getElementById('mobileMenuToggle');
-        
-        if (menu && hamburger && 
-            menu.getAttribute('data-open') === 'true' &&
-            !hamburger.contains(event.target) && 
-            !menu.contains(event.target)) {
-            toggleMobileMenu();
-        }
-    });
-});
-</script>
 
 </body>
 </html>

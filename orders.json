@@ -260,5 +260,46 @@
     "payment": "unpaid",
     "booked_at": "2026-05-15 11:16:50",
     "user_id": 1
+  },
+  {
+    "booking_id": "NS-PVOAM8",
+    "name": "Utsav Bhandari",
+    "email": "utsav1@gmail.com",
+    "phone": "9869423357",
+    "address": "butwal",
+    "service": "ac",
+    "status": "confirmed",
+    "payment": "paid",
+    "booked_at": "2026-05-16 08:41:23",
+    "user_id": 1
+  },
+  {
+    "booking_id": "NS-RGDUXL",
+    "name": "Utsav Bhandari",
+    "phone": "9869423357",
+    "address": "hellojdsajd",
+    "service": "Photographer",
+    "service_key": "photographer",
+    "provider_id": 254,
+    "provider_name": "Utsav Bhandari",
+    "preferred_date": "2026-05-18",
+    "preferred_time": "8AM - 10AM",
+    "notes": "sjvjxvjca",
+    "status": "confirmed",
+    "payment": "pending",
+    "booked_at": "2026-05-17 09:35:35",
+    "booking_type": "direct_provider"
+  },
+  {
+    "booking_id": "NS-538HRO",
+    "name": "Utsav Bhandari",
+    "email": "utsav1@gmail.com",
+    "phone": "9869423357",
+    "address": "butwal",
+    "service": "gardener",
+    "status": "confirmed",
+    "payment": "paid",
+    "booked_at": "2026-05-17 09:36:37",
+    "user_id": 1
   }
 ]
